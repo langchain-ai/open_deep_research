@@ -1,10 +1,8 @@
 from typing import Literal
 
-from langchain_anthropic import ChatAnthropic 
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.chat_models import init_chat_model
 from langchain_core.runnables import RunnableConfig
-from langchain_openai import ChatOpenAI
-from langchain_groq import ChatGroq
 
 from langgraph.constants import Send
 from langgraph.graph import START, END, StateGraph
@@ -16,7 +14,7 @@ from open_deep_research.configuration import Configuration
 from open_deep_research.utils import tavily_search_async, deduplicate_and_format_sources, format_sections, perplexity_search
 
 # Set writer model
-writer_model = ChatAnthropic(model=Configuration.writer_model, temperature=0) 
+writer_model = init_chat_model(model=Configuration.writer_model, model_provider=Configuration.writer_provider.value, temperature=0) 
 
 # Nodes
 async def generate_report_plan(state: ReportState, config: RunnableConfig):
@@ -75,13 +73,8 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
         planner_provider = configurable.planner_provider.value
 
     # Set the planner model
-    if  planner_provider == "openai":
-        planner_llm = ChatOpenAI(model=configurable.planner_model) 
-    elif planner_provider == "groq":
-        planner_llm = ChatGroq(model=configurable.planner_model)
-    else:
-        raise ValueError(f"Unsupported search API: {configurable.search_api}")
-
+    planner_llm = init_chat_model(model=Configuration.planner_model, model_provider=planner_provider, temperature=0)
+    
     # Generate sections 
     structured_llm = planner_llm.with_structured_output(Sections)
     report_sections = structured_llm.invoke([SystemMessage(content=system_instructions_sections)]+[HumanMessage(content="Generate the sections of the report. Your response must include a 'sections' field containing a list of sections. Each section must have: name, description, plan, research, and content fields.")])
