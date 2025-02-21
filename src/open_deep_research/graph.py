@@ -13,9 +13,6 @@ from open_deep_research.prompts import report_planner_query_writer_instructions,
 from open_deep_research.configuration import Configuration
 from open_deep_research.utils import tavily_search_async, deduplicate_and_format_sources, format_sections, perplexity_search
 
-# Set writer model
-writer_model = init_chat_model(model=Configuration.writer_model, model_provider=Configuration.writer_provider.value, temperature=0) 
-
 # Nodes
 async def generate_report_plan(state: ReportState, config: RunnableConfig):
     """ Generate the report plan """
@@ -32,6 +29,15 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     # Convert JSON object to string if necessary
     if isinstance(report_structure, dict):
         report_structure = str(report_structure)
+
+    # Set the writer provider
+    if isinstance(configurable.writer_provider, str):
+        writer_provider = configurable.writer_provider
+    else:
+        writer_provider = configurable.writer_provider.value
+
+    # Set writer model
+    writer_model = init_chat_model(model=configurable.writer_model, model_provider=writer_provider, temperature=0) 
 
     # Generate search query
     structured_llm = writer_model.with_structured_output(Queries)
@@ -73,7 +79,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
         planner_provider = configurable.planner_provider.value
 
     # Set the planner model
-    planner_llm = init_chat_model(model=Configuration.planner_model, model_provider=planner_provider, temperature=0)
+    planner_llm = init_chat_model(model=configurable.planner_model, model_provider=planner_provider, temperature=0)
     
     # Generate sections 
     structured_llm = planner_llm.with_structured_output(Sections)
@@ -128,6 +134,15 @@ def generate_queries(state: SectionState, config: RunnableConfig):
     configurable = Configuration.from_runnable_config(config)
     number_of_queries = configurable.number_of_queries
 
+    # Set the writer provider
+    if isinstance(configurable.writer_provider, str):
+        writer_provider = configurable.writer_provider
+    else:
+        writer_provider = configurable.writer_provider.value
+
+    # Set writer model
+    writer_model = init_chat_model(model=configurable.writer_model, model_provider=writer_provider, temperature=0) 
+
     # Generate queries 
     structured_llm = writer_model.with_structured_output(Queries)
 
@@ -180,6 +195,14 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
 
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
+    # Set the writer provider
+    if isinstance(configurable.writer_provider, str):
+        writer_provider = configurable.writer_provider
+    else:
+        writer_provider = configurable.writer_provider.value
+
+    # Set writer model
+    writer_model = init_chat_model(model=configurable.writer_model, model_provider=writer_provider, temperature=0) 
 
     # Format system instructions
     system_instructions = section_writer_instructions.format(section_title=section.name, section_topic=section.description, context=source_str, section_content=section.content)
@@ -210,7 +233,7 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
         goto="search_web"
         )
     
-def write_final_sections(state: SectionState):
+def write_final_sections(state: SectionState, config: RunnableConfig):
     """ Write final sections of the report, which do not require web search and use the completed sections as context """
 
     # Get state 
@@ -219,6 +242,18 @@ def write_final_sections(state: SectionState):
     
     # Format system instructions
     system_instructions = final_section_writer_instructions.format(section_title=section.name, section_topic=section.description, context=completed_report_sections)
+
+    # Get configuration
+    configurable = Configuration.from_runnable_config(config)
+
+    # Set the writer provider
+    if isinstance(configurable.writer_provider, str):
+        writer_provider = configurable.writer_provider
+    else:
+        writer_provider = configurable.writer_provider.value
+
+    # Set writer model
+    writer_model = init_chat_model(model=configurable.writer_model, model_provider=writer_provider, temperature=0)
 
     # Generate section  
     section_content = writer_model.invoke([SystemMessage(content=system_instructions)]+[HumanMessage(content="Generate a report section based on the provided sources.")])
