@@ -43,6 +43,7 @@ class Configuration:
     writer_provider: WriterProvider = WriterProvider.ANTHROPIC # Defaults to Anthropic as provider
     writer_model: str = "claude-3-5-sonnet-latest" # Defaults to Anthropic as provider
     search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
+    rate_limit: Optional[int] = None # Rate limit for API calls (requests per minute)
 
     @classmethod
     def from_runnable_config(

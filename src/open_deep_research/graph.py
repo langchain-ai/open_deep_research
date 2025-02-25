@@ -3,6 +3,7 @@ from typing import Literal
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.chat_models import init_chat_model
 from langchain_core.runnables import RunnableConfig
+from langchain_core.rate_limiters import InMemoryRateLimiter
 
 from langgraph.constants import Send
 from langgraph.graph import START, END, StateGraph
@@ -25,6 +26,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     configurable = Configuration.from_runnable_config(config)
     report_structure = configurable.report_structure
     number_of_queries = configurable.number_of_queries
+    rate_limit = configurable.rate_limit
 
     # Convert JSON object to string if necessary
     if isinstance(report_structure, dict):
@@ -35,6 +37,10 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     structured_llm = writer_model.with_structured_output(Queries)
+
+    # Apply rate limiter
+    rate_limiter = InMemoryRateLimiter(max_calls_per_minute=rate_limit)
+    structured_llm = rate_limiter(structured_llm)
 
     # Format system instructions
     system_instructions_query = report_planner_query_writer_instructions.format(topic=topic, report_organization=report_structure, number_of_queries=number_of_queries)
@@ -130,12 +136,17 @@ def generate_queries(state: SectionState, config: RunnableConfig):
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
     number_of_queries = configurable.number_of_queries
+    rate_limit = configurable.rate_limit
 
     # Generate queries 
     writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     structured_llm = writer_model.with_structured_output(Queries)
+
+    # Apply rate limiter
+    rate_limiter = InMemoryRateLimiter(max_calls_per_minute=rate_limit)
+    structured_llm = rate_limiter(structured_llm)
 
     # Format system instructions
     system_instructions = query_writer_instructions.format(topic=topic, section_topic=section.description, number_of_queries=number_of_queries)
@@ -182,6 +193,7 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
 
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
+    rate_limit = configurable.rate_limit
 
     # Format system instructions
     system_instructions = section_writer_instructions.format(topic=topic, section_title=section.name, section_topic=section.description, context=source_str, section_content=section.content)
@@ -192,6 +204,10 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
     writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     section_content = writer_model.invoke([SystemMessage(content=system_instructions)]+[HumanMessage(content="Generate a report section based on the provided sources.")])
     
+    # Apply rate limiter
+    rate_limiter = InMemoryRateLimiter(max_calls_per_minute=rate_limit)
+    section_content = rate_limiter(section_content)
+
     # Write content to the section object  
     section.content = section_content.content
 
@@ -225,6 +241,7 @@ def write_final_sections(state: SectionState, config: RunnableConfig):
     topic = state["topic"]
     section = state["section"]
     completed_report_sections = state["report_sections_from_research"]
+    rate_limit = configurable.rate_limit
     
     # Format system instructions
     system_instructions = final_section_writer_instructions.format(topic=topic, section_title=section.name, section_topic=section.description, context=completed_report_sections)
@@ -235,6 +252,10 @@ def write_final_sections(state: SectionState, config: RunnableConfig):
     writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     section_content = writer_model.invoke([SystemMessage(content=system_instructions)]+[HumanMessage(content="Generate a report section based on the provided sources.")])
     
+    # Apply rate limiter
+    rate_limiter = InMemoryRateLimiter(max_calls_per_minute=rate_limit)
+    section_content = rate_limiter(section_content)
+
     # Write content to section 
     section.content = section_content.content
 
