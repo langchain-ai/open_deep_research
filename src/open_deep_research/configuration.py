@@ -26,11 +26,13 @@ class PlannerProvider(Enum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     GROQ = "groq"
+    GEMINI = "google_genai"
 
 class WriterProvider(Enum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     GROQ = "groq"
+    GEMINI = "google_genai"
 
 @dataclass(kw_only=True)
 class Configuration:
