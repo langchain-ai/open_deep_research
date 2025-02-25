@@ -25,12 +25,14 @@ Select a writer model (by default Open Deep Research uses Anthropic Claude 3.5 S
 * [Anthropic](https://www.anthropic.com/)
 * [OpenAI](https://openai.com/)
 * [Groq](https://groq.com/)
+* [Gemini](https://cloud.google.com/genai)
 
 Select a planner model (by default Open Deep Research uses OpenAI o3-mini):
 
 * [Anthropic](https://www.anthropic.com/)
 * [OpenAI](https://openai.com/)
 * [Groq](https://groq.com/)
+* [Gemini](https://cloud.google.com/genai)
 
 ### Using the package
 
@@ -114,6 +116,7 @@ Set:
 export TAVILY_API_KEY=<your_tavily_api_key>
 export ANTHROPIC_API_KEY=<your_anthropic_api_key>
 export OPENAI_API_KEY=<your_openai_api_key>
+export GEMINI_API_KEY=<your_gemini_api_key>
 ```
 
 Launch the assistant with the LangGraph server locally, which will open in your browser:
