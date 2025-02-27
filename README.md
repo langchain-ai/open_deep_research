@@ -17,16 +17,13 @@ Ensure you have API keys set for your desired tools.
 
 Select a web search tool (by default Open Deep Research uses Tavily):
 
-* [Tavily API](https://tavily.com/)
-* [Perplexity API](https://www.perplexity.ai/hub/blog/introducing-the-sonar-pro-api)
+* [Tavily API](https://tavily.com/) - General web search
+* [Perplexity API](https://www.perplexity.ai/hub/blog/introducing-the-sonar-pro-api) - General web search
+* [Exa API](https://exa.ai/) - Powerful neural search for web content
+* [ArXiv](https://arxiv.org/) - Academic papers in physics, mathematics, computer science, and more
+* [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature from MEDLINE, life science journals, and online books
 
 Select a writer model (by default Open Deep Research uses Anthropic Claude 3.5 Sonnet):
-
-* [Anthropic](https://www.anthropic.com/)
-* [OpenAI](https://openai.com/)
-* [Groq](https://groq.com/)
-
-Select a planner model (by default Open Deep Research uses OpenAI o3-mini):
 
 * [Anthropic](https://www.anthropic.com/)
 * [OpenAI](https://openai.com/)
@@ -114,6 +111,11 @@ Set:
 export TAVILY_API_KEY=<your_tavily_api_key>
 export ANTHROPIC_API_KEY=<your_anthropic_api_key>
 export OPENAI_API_KEY=<your_openai_api_key>
+export PERPLEXITY_API_KEY=<your_perplexity_api_key>
+export EXA_API_KEY=<your_exa_api_key>
+# Optional: For higher rate limits with PubMed
+export PUBMED_API_KEY=<your_pubmed_api_key>
+export PUBMED_EMAIL=<your_email@example.com>
 ```
 
 Launch the assistant with the LangGraph server locally, which will open in your browser:
@@ -178,7 +180,7 @@ You can customize the research assistant's behavior through several parameters:
 - `planner_provider`: Model provider for planning phase (default: "openai", but can be "groq")
 - `planner_model`: Specific model for planning (default: "o3-mini", but can be any Groq hosted model such as "deepseek-r1-distill-llama-70b")
 - `writer_model`: Model for writing the report (default: "claude-3-5-sonnet-latest")
-- `search_api`: API to use for web searches (default: Tavily)
+- `search_api`: API to use for web searches (default: "tavily", options include "perplexity", "exa", "arxiv", "pubmed")
 
 These configurations allow you to fine-tune the research process based on your needs, from adjusting the depth of research to selecting specific AI models for different phases of report generation.
 
@@ -199,7 +201,7 @@ groq.APIError: Failed to call a function. Please adjust your prompt. See 'failed
    
 1. `Plan and Execute` - Open Deep Research follows a [plan-and-execute workflow](https://github.com/assafelovic/gpt-researcher) that separates planning from research, allowing for human-in-the-loop approval of a report plan before the more time-consuming research phase. It uses, by default, a [reasoning model](https://www.youtube.com/watch?v=f0RbwrBcFmc) to plan the report sections. During this phase, it uses web search to gather general information about the report topic to help in planning the report sections. But, it also accepts a report structure from the user to help guide the report sections as well as human feedback on the report plan.
    
-2. `Research and Write` - Each section of the report is written in parallel. The research assistant uses web search via [Tavily API](https://tavily.com/) or [Perplexity](https://www.perplexity.ai/hub/blog/introducing-the-sonar-pro-api) to gather information about each section topic. It will reflect on each report section and suggest follow-up questions for web search. This "depth" of research will proceed for any many iterations as the user wants. Any final sections, such as introductions and conclusions, are written after the main body of the report is written, which helps ensure that the report is cohesive and coherent. The planner determines main body versus final sections during the planning phase.
+2. `Research and Write` - Each section of the report is written in parallel. The research assistant uses web search via [Tavily API](https://tavily.com/), [Perplexity](https://www.perplexity.ai/hub/blog/introducing-the-sonar-pro-api), [Exa](https://exa.ai/), [ArXiv](https://arxiv.org/), or [PubMed](https://pubmed.ncbi.nlm.nih.gov/) to gather information about each section topic. It will reflect on each report section and suggest follow-up questions for web search. This "depth" of research will proceed for any many iterations as the user wants. Any final sections, such as introductions and conclusions, are written after the main body of the report is written, which helps ensure that the report is cohesive and coherent. The planner determines main body versus final sections during the planning phase.
 
 3. `Managing different types` - Open Deep Research is built on LangGraph, which has native support for configuration management [using assistants](https://langchain-ai.github.io/langgraph/concepts/assistants/). The report `structure` is a field in the graph configuration, which allows users to create different assistants for different types of reports. 
 
