@@ -34,9 +34,12 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
         report_structure = str(report_structure)
 
     # Set writer model (model used for query writing and section writing)
-    writer_provider = get_config_value(configurable.writer_provider)
-    writer_model_name = get_config_value(configurable.writer_model)
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
+    if configurable.writer_chat_model is not None:
+        writer_model = configurable.writer_chat_model
+    else:
+        writer_provider = get_config_value(configurable.writer_provider)
+        writer_model_name = get_config_value(configurable.writer_model)
+        writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     structured_llm = writer_model.with_structured_output(Queries)
 
     # Format system instructions
@@ -83,7 +86,13 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
                         Each section must have: name, description, plan, research, and content fields."""
 
     # Run the planner
-    if planner_model == "claude-3-7-sonnet-latest":
+    if configurable.planner_chat_model is not None:
+        planner_llm = configurable.planner_chat_model
+        structured_llm = planner_llm.with_structured_output(Sections)
+        report_sections = structured_llm.invoke([SystemMessage(content=system_instructions_sections),
+                                                 HumanMessage(content=planner_message)])
+        
+    elif planner_model == "claude-3-7-sonnet-latest":
 
         # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
         planner_llm = init_chat_model(model=planner_model, 
@@ -160,9 +169,12 @@ def generate_queries(state: SectionState, config: RunnableConfig):
     number_of_queries = configurable.number_of_queries
 
     # Generate queries 
-    writer_provider = get_config_value(configurable.writer_provider)
-    writer_model_name = get_config_value(configurable.writer_model)
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
+    if configurable.writer_chat_model is not None:
+        writer_model = configurable.writer_chat_model
+    else:
+        writer_provider = get_config_value(configurable.writer_provider)
+        writer_model_name = get_config_value(configurable.writer_model)
+        writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     structured_llm = writer_model.with_structured_output(Queries)
 
     # Format system instructions
@@ -233,9 +245,12 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
                                                              section_content=section.content)
 
     # Generate section  
-    writer_provider = get_config_value(configurable.writer_provider)
-    writer_model_name = get_config_value(configurable.writer_model)
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
+    if configurable.writer_chat_model is not None:
+        writer_model = configurable.writer_chat_model
+    else:
+        writer_provider = get_config_value(configurable.writer_provider)
+        writer_model_name = get_config_value(configurable.writer_model)
+        writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     section_content = writer_model.invoke([SystemMessage(content=system_instructions),
                                            HumanMessage(content="Generate a report section based on the provided sources.")])
     
@@ -257,7 +272,12 @@ def write_section(state: SectionState, config: RunnableConfig) -> Command[Litera
     planner_model = get_config_value(configurable.planner_model)
 
     # If the planner model is claude-3-7-sonnet-latest, we need to use bind_tools to use thinking when generating the feedback 
-    if planner_model == "claude-3-7-sonnet-latest":
+    if configurable.planner_chat_model is not None:
+        reflection_model = configurable.planner_chat_model.with_structured_output(Feedback)
+        feedback = reflection_model.invoke([SystemMessage(content=section_grader_instructions_formatted),
+                                            HumanMessage(content=section_grader_message)])
+        
+    elif planner_model == "claude-3-7-sonnet-latest":
         # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
         reflection_model = init_chat_model(model=planner_model, 
                                            model_provider=planner_provider, 
@@ -307,9 +327,12 @@ def write_final_sections(state: SectionState, config: RunnableConfig):
     system_instructions = final_section_writer_instructions.format(topic=topic, section_name=section.name, section_topic=section.description, context=completed_report_sections)
 
     # Generate section  
-    writer_provider = get_config_value(configurable.writer_provider)
-    writer_model_name = get_config_value(configurable.writer_model)
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
+    if configurable.writer_chat_model is not None:
+        writer_model = configurable.writer_chat_model
+    else:
+        writer_provider = get_config_value(configurable.writer_provider)
+        writer_model_name = get_config_value(configurable.writer_model)
+        writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, temperature=0) 
     section_content = writer_model.invoke([SystemMessage(content=system_instructions),
                                            HumanMessage(content="Generate a report section based on the provided sources.")])
     

@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass, fields
 from typing import Any, Optional, Dict 
 
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
 from dataclasses import dataclass
 
@@ -44,8 +45,10 @@ class Configuration:
     max_search_depth: int = 2 # Maximum number of reflection + search iterations
     planner_provider: PlannerProvider = PlannerProvider.ANTHROPIC  # Defaults to Anthropic as provider
     planner_model: str = "claude-3-7-sonnet-latest" # Defaults to claude-3-7-sonnet-latest
+    planner_chat_model: BaseChatModel = None # Set this if you want to specify the Planner model directly. planner_provider and planner_model will be ignored.
     writer_provider: WriterProvider = WriterProvider.ANTHROPIC # Defaults to Anthropic as provider
     writer_model: str = "claude-3-5-sonnet-latest" # Defaults to claude-3-5-sonnet-latest
+    writer_chat_model: BaseChatModel = None # Set this if you want to specify the Writer model directly. writer_provider and writer_model will be ignored.
     search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
     search_api_config: Optional[Dict[str, Any]] = None 
 
