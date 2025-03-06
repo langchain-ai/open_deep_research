@@ -22,6 +22,7 @@ class SearchAPI(Enum):
     PERPLEXITY = "perplexity"
     TAVILY = "tavily"
     EXA = "exa"
+    DUCKDUCKGO = "duckduckgo"
     ARXIV = "arxiv"
     PUBMED = "pubmed"
     LINKUP = "linkup"

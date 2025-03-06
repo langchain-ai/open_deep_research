@@ -20,6 +20,7 @@ Select a web search tool (by default Open Deep Research uses Tavily):
 * [Tavily API](https://tavily.com/) - General web search
 * [Perplexity API](https://www.perplexity.ai/hub/blog/introducing-the-sonar-pro-api) - General web search
 * [Exa API](https://exa.ai/) - Powerful neural search for web content
+* [DuckDuckGo API](https://duckduckgo.com/) - Free general web search
 * [ArXiv](https://arxiv.org/) - Academic papers in physics, mathematics, computer science, and more
 * [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature from MEDLINE, life science journals, and online books
 * [Linkup API](https://www.linkup.so/) - General web search

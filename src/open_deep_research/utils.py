@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from exa_py import Exa
 from linkup import LinkupClient
 from tavily import AsyncTavilyClient
+from duckduckgo_search import DDGS
 
 from langchain_community.retrievers import ArxivRetriever
 from langchain_community.utilities.pubmed import PubMedAPIWrapper
@@ -463,6 +464,190 @@ async def exa_search(search_queries, max_characters: Optional[int] = None, num_r
     return search_docs
 
 @traceable
+async def duckduckgo_search_async(search_queries, max_results: int = 5, include_raw_content: bool = True):
+    """
+    Performs concurrent web searches using DuckDuckGo with adaptive rate limiting and parallel processing.
+
+    Args:
+        search_queries (List[str]): List of search queries to process. Can be a single string or a list of strings.
+        max_results (int, optional): Maximum number of results to return per query. Defaults to 5.
+        include_raw_content (bool, optional): Whether to fetch and parse full page content. When True,
+                                             the function will retrieve the complete webpage text. Defaults to True.
+
+    Returns:
+        List[dict]: List of search responses from DuckDuckGo, one per query. Each response has format:
+            {
+                'query': str,                    # The original search query
+                'follow_up_questions': None,      
+                'answer': None,
+                'images': [],
+                'results': [                     # List of search results
+                    {
+                        'title': str,            # Title of the webpage
+                        'url': str,              # URL of the result
+                        'content': str,          # Summary/snippet of content
+                        'score': None,           # No relevance score in DuckDuckGo
+                        'raw_content': str       # Full page content if include_raw_content=True,
+                                                # otherwise same as content
+                    },
+                    ...
+                ]
+            }
+    """
+    # Handle case where search_queries is a single string
+    if isinstance(search_queries, str):
+        search_queries = [search_queries]
+    
+    # For concurrent execution
+    async def process_query(query):
+        try:
+            # Run DDGS search in a separate thread using run_in_executor
+            loop = asyncio.get_running_loop()
+            
+            def run_search():
+                with DDGS() as ddgs:
+                    return list(ddgs.text(query, max_results=max_results))
+            
+            ddg_results = await loop.run_in_executor(None, run_search)
+            
+            results = []
+            for r in ddg_results:
+                url = r.get('href')
+                title = r.get('title')
+                content = r.get('body')
+                
+                if not all([url, title, content]):
+                    print(f"Warning: Incomplete result from DuckDuckGo: {r}")
+                    continue
+
+                result = {
+                    "title": title,
+                    "url": url,
+                    "content": content,
+                    "score": None,
+                    "raw_content": content  # Default to snippet
+                }
+                
+                # Fetch full content if requested using standard library
+                if include_raw_content:
+                    try:
+                        # Use standard library for HTTP requests
+                        def fetch_content():
+                            import urllib.request
+                            import html.parser
+                            
+                            class HTMLTextExtractor(html.parser.HTMLParser):
+                                def __init__(self):
+                                    super().__init__()
+                                    self.text = []
+                                
+                                def handle_data(self, data):
+                                    self.text.append(data.strip())
+                                
+                                def get_text(self):
+                                    return ' '.join(self.text)
+                            
+                            try:
+                                # Add headers to mimic a browser
+                                headers = {
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                                }
+                                req = urllib.request.Request(url, headers=headers)
+                                with urllib.request.urlopen(req, timeout=10) as response:
+                                    html_content = response.read().decode('utf-8', errors='replace')
+                                    
+                                    # Extract text from HTML
+                                    parser = HTMLTextExtractor()
+                                    parser.feed(html_content)
+                                    return parser.get_text()
+                            except Exception as e:
+                                print(f"Error fetching content for {url}: {str(e)}")
+                                return None
+                        
+                        # Run the fetch operation in a thread
+                        full_content = await loop.run_in_executor(None, fetch_content)
+                        if full_content:
+                            result['raw_content'] = full_content
+                    except Exception as e:
+                        print(f"Error processing content for {url}: {str(e)}")
+                
+                results.append(result)
+            
+            return {
+                "query": query,
+                "follow_up_questions": None,
+                "answer": None,
+                "images": [],
+                "results": results
+            }
+        except Exception as e:
+            print(f"Error in DuckDuckGo search for query '{query}': {str(e)}")
+            return {
+                "query": query,
+                "follow_up_questions": None,
+                "answer": None,
+                "images": [],
+                "results": []
+            }
+    
+    # Implement adaptive rate limiting
+    delay = 0.5  # Start with a modest delay
+    search_results = []
+    
+    # Process all queries concurrently, but with a limit to avoid overwhelming the API
+    tasks = []
+    max_concurrent_tasks = 3  # Limit concurrent tasks
+    
+    for i, query in enumerate(search_queries):
+        # Add adaptive delay between creating tasks
+        if i > 0:
+            await asyncio.sleep(delay)
+        
+        # Create and store the task
+        task = asyncio.create_task(process_query(query))
+        tasks.append(task)
+        
+        # If we've reached our concurrency limit or this is the last query,
+        # wait for some tasks to complete
+        if len(tasks) >= max_concurrent_tasks or i == len(search_queries) - 1:
+            # Wait for the first task to complete
+            done, pending = await asyncio.wait(
+                tasks, 
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            
+            # Process completed tasks
+            for completed_task in done:
+                try:
+                    result = await completed_task
+                    search_results.append(result)
+                    
+                    # Adjust delay based on success
+                    if result and result.get('results'):
+                        # Slightly decrease delay for successful queries with results
+                        delay = max(0.2, delay * 0.9)
+                    else:
+                        # Increase delay for unsuccessful queries
+                        delay = min(2.0, delay * 1.2)
+                except Exception as e:
+                    print(f"Task processing error: {str(e)}")
+            
+            # Update our task list to only include pending tasks
+            tasks = list(pending)
+    
+    # Wait for any remaining tasks
+    if tasks:
+        remaining_results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in remaining_results:
+            if not isinstance(result, Exception):
+                search_results.append(result)
+    
+    # Sort results to match original query order
+    search_results.sort(key=lambda x: search_queries.index(x['query']) if 'query' in x else float('inf'))
+    
+    return search_results
+
+@traceable
 async def arxiv_search_async(search_queries, load_max_docs=5, get_full_documents=True, load_all_available_meta=True):
     """
     Performs concurrent searches on arXiv using the ArxivRetriever.
@@ -835,6 +1020,9 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
         return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
     elif search_api == "exa":
         search_results = await exa_search(query_list, **params_to_pass)
+        return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
+    elif search_api == "duckduckgo":
+        search_results = await duckduckgo_search_async(query_list, **params_to_pass)
         return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
     elif search_api == "arxiv":
         search_results = await arxiv_search_async(query_list, **params_to_pass)
