@@ -24,9 +24,14 @@ from open_deep_research.state import Section
 
 def get_config_value(value):
     """
-    Helper function to handle both string and enum cases of configuration values
+    Helper function to handle string, dict, and enum cases of configuration values
     """
-    return value if isinstance(value, str) else value.value
+    if isinstance(value, str):
+        return value
+    elif isinstance(value, dict):
+        return value
+    else:
+        return value.value
 
 def get_search_params(search_api: str, search_api_config: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """

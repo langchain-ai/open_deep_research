@@ -166,8 +166,10 @@ You can customize the research assistant's behavior through several parameters:
 - `max_search_depth`: Maximum number of reflection and search iterations (default: 2)
 - `planner_provider`: Model provider for planning phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
 - `planner_model`: Specific model for planning (default: "claude-3-7-sonnet-latest")
+- `planner_model_kwargs`: Additional parameter for planner_model
 - `writer_provider`: Model provider for writing phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
 - `writer_model`: Model for writing the report (default: "claude-3-5-sonnet-latest")
+- `writer_model_kwargs`: Additional parameter for writer_model
 - `search_api`: API to use for web searches (default: "tavily", options include "perplexity", "exa", "arxiv", "pubmed", "linkup")
 
 These configurations allow you to fine-tune the research process based on your needs, from adjusting the depth of research to selecting specific AI models for different phases of report generation.
