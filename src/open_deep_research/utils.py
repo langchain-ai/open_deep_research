@@ -10,7 +10,7 @@ from typing import List, Optional, Dict, Any, Union
 from urllib.parse import unquote
 
 from exa_py import Exa
-from linkup import LinkupClient
+#from linkup import LinkupClient
 from tavily import AsyncTavilyClient
 from duckduckgo_search import DDGS 
 from bs4 import BeautifulSoup
