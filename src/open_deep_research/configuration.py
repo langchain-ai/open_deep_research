@@ -62,7 +62,7 @@ class Configuration:
             config["configurable"] if config and "configurable" in config else {}
         )
         values: dict[str, Any] = {
-            f.name: os.environ.get(f.name.upper(), configurable.get(f.name))
+            f.name: configurable.get(f.name)
             for f in fields(cls)
             if f.init
         }
