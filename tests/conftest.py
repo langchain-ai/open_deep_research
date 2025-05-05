@@ -16,3 +16,11 @@ def pytest_addoption(parser):
     parser.addoption("--writer-provider", action="store", help="Provider for writer model")
     parser.addoption("--writer-model", action="store", help="Model for writing")
     parser.addoption("--max-search-depth", action="store", help="Maximum search depth")
+    
+    # New options for MCP integration tests
+    parser.addoption("--mcp-server-path", action="store", 
+                    help="Path to the MCP server file (defaults to example_mcp_server.py in the same directory)")
+    parser.addoption("--test-type", action="store", 
+                    choices=["direct", "langchain", "langgraph", "all"],
+                    default="all", 
+                    help="Which MCP integration test to run (direct, langchain, langgraph, or all)")

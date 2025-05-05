@@ -29,8 +29,10 @@ dependencies = [
     "langgraph_supervisor",
     "langchain_tavily",
     "pytest",
+    "pytest-asyncio>=0.26.0",
     "httpx>=0.24.0",
-    "markdownify>=0.11.6"
+    "markdownify>=0.11.6",
+    "langchain-mcp-adapters>=0.0.9",
 ]
 
 [project.optional-dependencies]
@@ -48,6 +50,12 @@ packages = ["open_deep_research"]
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "asyncio: mark test to run using asyncio",
+]
 
 [tool.ruff]
 lint.select = [
@@ -72,3 +80,8 @@ lint.ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]

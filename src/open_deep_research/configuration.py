@@ -1,11 +1,22 @@
 import os
 from enum import Enum
-from dataclasses import dataclass, fields
-from typing import Any, Optional, Dict 
+from dataclasses import dataclass, fields, field
+from typing import Any, Optional, Dict
+from pathlib import Path
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
-from dataclasses import dataclass
+
+# Get the path to the example_mcp_server.py relative to this file
+def default_mcp_servers() -> Dict[str, Dict[str, Any]]:
+    example_server_path = str(Path(__file__).parent.joinpath("example_mcp_server.py").resolve())
+    return {
+        "patient_data": {
+            "transport": "stdio",
+            "command": "python",
+            "args": [example_server_path],
+        }
+    }
 
 DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-provided topic:
 
@@ -35,23 +46,26 @@ class Configuration:
     # Common configuration
     report_structure: str = DEFAULT_REPORT_STRUCTURE # Defaults to the default report structure
     search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None
+    search_api_config: Optional[Dict[str, Any]] = field(default_factory=lambda: None)
     
     # Graph-specific configuration
     number_of_queries: int = 2 # Number of search queries to generate per iteration
     max_search_depth: int = 2 # Maximum number of reflection + search iterations
     planner_provider: str = "anthropic"  # Defaults to Anthropic as provider
     planner_model: str = "claude-3-7-sonnet-latest" # Defaults to claude-3-7-sonnet-latest
-    planner_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for planner_model
+    planner_model_kwargs: Optional[Dict[str, Any]] = field(default_factory=lambda: None) # kwargs for planner_model
     writer_provider: str = "anthropic" # Defaults to Anthropic as provider
     writer_model: str = "claude-3-5-sonnet-latest" # Defaults to claude-3-5-sonnet-latest
-    writer_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for writer_model
+    writer_model_kwargs: Optional[Dict[str, Any]] = field(default_factory=lambda: None) # kwargs for writer_model
     search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None 
+    search_api_config: Optional[Dict[str, Any]] = field(default_factory=lambda: None) 
     
     # Multi-agent specific configuration
     supervisor_model: str = "openai:gpt-4.1" # Model for supervisor agent in multi-agent setup
     researcher_model: str = "openai:gpt-4.1" # Model for research agents in multi-agent setup 
+    
+    # MCP configuration
+    mcp_servers: Optional[Dict[str, Dict[str, Any]]] = field(default_factory=default_mcp_servers)
 
     @classmethod
     def from_runnable_config(
