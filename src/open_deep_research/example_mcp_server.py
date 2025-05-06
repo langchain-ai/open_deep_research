@@ -71,7 +71,7 @@ PATIENT_CHECKS = {
 @mcp.tool()
 def patient_vitals(patient_id: str) -> Dict[str, Any]:
     """
-    Retrieve current vital signs for a patient.
+    Use this tool to retrieve current vital signs for a patient for your research.
     
     Args:
         patient_id: Unique identifier for the patient
@@ -89,7 +89,7 @@ def patient_vitals(patient_id: str) -> Dict[str, Any]:
 @mcp.tool()
 def patient_current_conditions(patient_id: str) -> List[Dict[str, Any]]:
     """
-    Retrieve current diagnosed conditions for a patient.
+    Use this tool to retrieve current diagnosed conditions for a patient so you can narrow your research.
     
     Args:
         patient_id: Unique identifier for the patient
@@ -107,7 +107,7 @@ def patient_current_conditions(patient_id: str) -> List[Dict[str, Any]]:
 @mcp.tool()
 def patient_scheduled_checks(patient_id: str) -> List[Dict[str, Any]]:
     """
-    Retrieve upcoming scheduled health checks for a patient.
+    Use this tool to retrieve upcoming scheduled health checks for a patient to understand their needs.
     
     Args:
         patient_id: Unique identifier for the patient

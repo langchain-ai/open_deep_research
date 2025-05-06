@@ -21,14 +21,13 @@ from open_deep_research.utils import (
     tavily_search,
     duckduckgo_search,
 )
-from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
+from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS_MCP, RESEARCH_INSTRUCTIONS
 from open_deep_research.mcp_integration import create_mcp_manager
 
 logger = logging.getLogger(__name__)
 
 
 # Helper – stringify any tool observation safely
-
 def _to_str(x: Any) -> str:
     if isinstance(x, str):
         return x
@@ -39,7 +38,6 @@ def _to_str(x: Any) -> str:
 
 
 # MCP helpers
-
 def _flatten(tools: List[BaseTool] | Any) -> List[BaseTool]:
     """Expand any StructuredTool collections returned by MCP."""
     flat: List[BaseTool] = []
@@ -54,7 +52,6 @@ def _search_tool(cfg: Configuration):
 
 
 # Shared tool‑lists
-
 def _supervisor_tools(r: RunnableConfig):
     cfg = Configuration.from_runnable_config(r)
     base = [_search_tool(cfg), Sections, Introduction, Conclusion]
@@ -63,10 +60,10 @@ def _supervisor_tools(r: RunnableConfig):
     mcp_tools = []
     if "_mcp_tools" in r:
         mcp_tools = r["_mcp_tools"]
-        logger.info(f"Found {len(mcp_tools)} MCP tools in _mcp_tools")
+        # logger.info(f"Found {len(mcp_tools)} MCP tools in _mcp_tools")
     elif "configurable" in r and "mcp_tools" in r["configurable"]:
         mcp_tools = r["configurable"]["mcp_tools"]
-        logger.info(f"Found {len(mcp_tools)} MCP tools in configurable.mcp_tools")
+        # logger.info(f"Found {len(mcp_tools)} MCP tools in configurable.mcp_tools")
     else:
         logger.warning("No MCP tools found in configuration")
     
@@ -75,7 +72,7 @@ def _supervisor_tools(r: RunnableConfig):
     
     # Log full details of available tools
     tools_map = {t.name: t for t in tools}
-    logger.info(f"Supervisor tools available: {list(tools_map.keys())}")
+    # logger.info(f"Supervisor tools available: {list(tools_map.keys())}")
     
     return tools, tools_map
 
@@ -88,10 +85,10 @@ def _research_tools(r: RunnableConfig):
     mcp_tools = []
     if "_mcp_tools" in r:
         mcp_tools = r["_mcp_tools"]
-        logger.info(f"Found {len(mcp_tools)} MCP tools in _mcp_tools")
+        # logger.info(f"Found {len(mcp_tools)} MCP tools in _mcp_tools")
     elif "configurable" in r and "mcp_tools" in r["configurable"]:
         mcp_tools = r["configurable"]["mcp_tools"]
-        logger.info(f"Found {len(mcp_tools)} MCP tools in configurable.mcp_tools")
+        # logger.info(f"Found {len(mcp_tools)} MCP tools in configurable.mcp_tools")
     else:
         logger.warning("No MCP tools found in configuration")
     
@@ -100,13 +97,12 @@ def _research_tools(r: RunnableConfig):
     
     # Log full details of available tools
     tools_map = {t.name: t for t in tools}
-    logger.info(f"Research tools available: {list(tools_map.keys())}")
+    # logger.info(f"Research tools available: {list(tools_map.keys())}")
     
     return tools, tools_map
 
 
 # Pydantic tool schemas
-
 @tool
 class Section(BaseModel):
     name: str
@@ -132,7 +128,6 @@ class Conclusion(BaseModel):
 
 
 # States
-
 class ReportState(MessagesState):
     sections: list[str]
     completed_sections: Annotated[list, operator.add]
@@ -153,7 +148,6 @@ class SectionOutput(TypedDict):
 
 
 # Nodes – supervisor / researcher
-
 async def supervisor(state: ReportState, config: RunnableConfig):
     msgs = state["messages"]
     cfg = Configuration.from_runnable_config(config)
@@ -205,7 +199,7 @@ async def supervisor(state: ReportState, config: RunnableConfig):
     
     try:
         ai_msg = await llm.bind_tools(tools).ainvoke(
-            [{"role": "system", "content": SUPERVISOR_INSTRUCTIONS}] + msgs
+            [{"role": "system", "content": SUPERVISOR_INSTRUCTIONS_MCP}] + msgs
         )
         return {"messages": [ai_msg]}
     except Exception as e:
@@ -245,17 +239,17 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
             # Create a new MCP manager just for this function call
             from open_deep_research.mcp_integration import create_mcp_manager
             mcp_manager = await create_mcp_manager(mcp_servers)
-            logger.info(f"Created on-demand MCP manager for this request")
+            # logger.info(f"Created on-demand MCP manager for this request")
             
             if mcp_manager and mcp_manager.get_tools():
                 mcp_tools = mcp_manager.get_tools()
                 for tool in mcp_tools:
                     tools_by_name[tool.name] = tool
-                logger.info(f"Added MCP tools: {[t for t in tools_by_name if t not in [x.name for x in base_tools]]}")
+                # logger.info(f"Added MCP tools: {[t for t in tools_by_name if t not in [x.name for x in base_tools]]}")
         
         # Process tool calls
-        logger.info(f"Processing tool calls: {[call['name'] for call in state['messages'][-1].tool_calls]}")
-        logger.info(f"Available tools: {list(tools_by_name.keys())}")
+        # logger.info(f"Processing tool calls: {[call['name'] for call in state['messages'][-1].tool_calls]}")
+        # logger.info(f"Available tools: {list(tools_by_name.keys())}")
         
         # Process all tool calls to ensure we respond to each one (required for OpenAI)
         for tool_call in state["messages"][-1].tool_calls:
@@ -281,7 +275,7 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
                 tool = tools_by_name[tool_name]
                 
                 # Log tool execution for debugging
-                logger.info(f"Executing tool '{tool_name}' with args: {tool_call['args']}")
+                # logger.info(f"Executing tool '{tool_name}' with args: {tool_call['args']}")
                 
                 # Perform the tool call - use ainvoke for async tools
                 if hasattr(tool, 'ainvoke'):
@@ -300,15 +294,15 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
                 # Store special tool results for processing after all tools have been called
                 if tool_name == "Sections":
                     sections_list = observation.sections
-                    logger.info(f"Sections defined: {sections_list}")
+                    # logger.info(f"Sections defined: {sections_list}")
                 elif tool_name == "Introduction":
                     # Format introduction with proper H1 heading if not already formatted
                     intro_content = f"# {observation.name}\n\n{observation.content}" if not _to_str(observation).startswith("# ") else _to_str(observation)
-                    logger.info("Introduction created")
+                    # logger.info("Introduction created")
                 elif tool_name == "Conclusion":
                     # Format conclusion with proper H2 heading if not already formatted
                     conclusion_content = f"## {observation.name}\n\n{observation.content}" if not _to_str(observation).startswith("## ") else _to_str(observation)
-                    logger.info("Conclusion created")
+                    # logger.info("Conclusion created")
                     
             except Exception as e:
                 # Add better error handling with full traceback
@@ -326,22 +320,22 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
         # Always clean up MCP manager in the same task that created it
         if mcp_manager:
             await mcp_manager.cleanup()
-            logger.info("Cleaned up on-demand MCP manager")
+            # logger.info("Cleaned up on-demand MCP manager")
     
     # After processing all tool calls, decide what to do next
     if sections_list:
         # Send the sections to the research agents
-        logger.info(f"Sending {len(sections_list)} sections to research team")
+        # logger.info(f"Sending {len(sections_list)} sections to research team")
         return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], update={"messages": result})
     elif intro_content:
         # Store introduction while waiting for conclusion
         # Append to messages to guide the LLM to write conclusion next
-        logger.info("Introduction complete, prompting for conclusion")
+        # logger.info("Introduction complete, prompting for conclusion")
         result.append({"role": "user", "content": "Introduction written. Now write a conclusion section."})
         return Command(goto="supervisor", update={"final_report": intro_content, "messages": result})
     elif conclusion_content:
         # Get all sections and combine in proper order: Introduction, Body Sections, Conclusion
-        logger.info("Conclusion complete, generating final report")
+        # logger.info("Conclusion complete, generating final report")
         intro = state.get("final_report", "")
         body_sections = "\n\n".join([s.content for s in state["completed_sections"]])
         
@@ -426,7 +420,7 @@ async def researcher(state: SectionState, config: RunnableConfig):
                 section_description = "Unknown section"
     
     # Log for debugging
-    logger.info(f"Researcher processing section: {section_description}")
+    # logger.info(f"Researcher processing section: {section_description}")
     
     # Get configuration
     cfg = Configuration.from_runnable_config(config)
@@ -480,17 +474,17 @@ async def researcher_tools(state: SectionState, config: RunnableConfig):
             # Create a new MCP manager just for this function call
             from open_deep_research.mcp_integration import create_mcp_manager
             mcp_manager = await create_mcp_manager(mcp_servers)
-            logger.info(f"Created on-demand MCP manager for researcher request")
+            # logger.info(f"Created on-demand MCP manager for researcher request")
             
             if mcp_manager and mcp_manager.get_tools():
                 mcp_tools = mcp_manager.get_tools()
                 for tool in mcp_tools:
                     tools_by_name[tool.name] = tool
-                logger.info(f"Added MCP tools to researcher: {[t for t in tools_by_name if t not in [x.name for x in base_tools]]}")
+                # logger.info(f"Added MCP tools to researcher: {[t for t in tools_by_name if t not in [x.name for x in base_tools]]}")
     
         # Add debugging to show available tools and tool calls
-        logger.info(f"Research: Processing tool calls: {[call['name'] for call in state['messages'][-1].tool_calls]}")
-        logger.info(f"Research: Available tools: {list(tools_by_name.keys())}")
+        # logger.info(f"Research: Processing tool calls: {[call['name'] for call in state['messages'][-1].tool_calls]}")
+        # logger.info(f"Research: Available tools: {list(tools_by_name.keys())}")
         
         # Process all tool calls first (required for OpenAI)
         for tool_call in state["messages"][-1].tool_calls:
@@ -516,7 +510,7 @@ async def researcher_tools(state: SectionState, config: RunnableConfig):
                 tool = tools_by_name[tool_name]
                 
                 # Log tool execution for debugging
-                logger.info(f"Executing tool '{tool_name}' with args: {tool_call['args']}")
+                # logger.info(f"Executing tool '{tool_name}' with args: {tool_call['args']}")
                 
                 # Perform the tool call - use ainvoke for async tools
                 if hasattr(tool, 'ainvoke'):
@@ -535,7 +529,7 @@ async def researcher_tools(state: SectionState, config: RunnableConfig):
                 # Store the section observation if a Section tool was called
                 if tool_name == "Section":
                     completed_section = observation
-                    logger.info(f"Section completed: {observation.name}")
+                    # logger.info(f"Section completed: {observation.name}")
                     
             except Exception as e:
                 # Add better error handling with full traceback
@@ -553,12 +547,12 @@ async def researcher_tools(state: SectionState, config: RunnableConfig):
         # Always clean up MCP manager in the same task that created it
         if mcp_manager:
             await mcp_manager.cleanup()
-            logger.info("Cleaned up on-demand MCP manager for researcher")
+            # logger.info("Cleaned up on-demand MCP manager for researcher")
     
     # After processing all tools, decide what to do next
     if completed_section:
         # Write the completed section to state and return to the supervisor
-        logger.info("Section completed, returning to supervisor")
+        # logger.info("Section completed, returning to supervisor")
         return {"messages": result, "completed_sections": [completed_section]}
     else:
         # Continue the research loop for search tools, etc.
@@ -613,7 +607,6 @@ supervisor_g.add_edge("supervisor_tools", "supervisor")
 supervisor_g.add_edge("research_team", "supervisor")
 
 # Factory helpers
-
 async def build_graph_with_mcp(cfg: Optional[Dict[str, Any]] = None):
     """Create a graph with MCP configuration but without long-lived MCP connections."""
     cfg = cfg or {}
@@ -623,9 +616,9 @@ async def build_graph_with_mcp(cfg: Optional[Dict[str, Any]] = None):
     mcp_servers = configurable.mcp_servers
     
     # Log configuration info
-    logger.info(f"Building graph with config keys: {list(cfg.keys() if cfg else [])}")
+    # logger.info(f"Building graph with config keys: {list(cfg.keys() if cfg else [])}")
     if mcp_servers:
-        logger.info(f"MCP servers configured: {list(mcp_servers.keys())}")
+        # logger.info(f"MCP servers configured: {list(mcp_servers.keys())}")
         
         # Store MCP servers config in a special key
         if "configurable" not in cfg:
@@ -639,121 +632,10 @@ async def build_graph_with_mcp(cfg: Optional[Dict[str, Any]] = None):
 
 # Async factory expected by LangGraph Studio 
 async def graph(config: dict | None = None):
-    logger.info(f"Creating graph with config: {config}")
+    # logger.info(f"Creating graph with config: {config}")
     g, _, _ = await build_graph_with_mcp(config)
     return g
 
 # Sync alias for non‑async import flows 
 def graph_sync(config: dict | None = None):
     return asyncio.run(graph(config))
-
-# run `python multi_agent_new.py` to smoke‑test
-
-if __name__ == "__main__":
-    async def _demo():
-        """Launch an example MCP server and ask a question about P001."""
-        # Use default configuration
-        # Build the graph
-        graph, _, rc = await build_graph_with_mcp()
-        
-        try:
-            logger.info("Invoking graph with patient query...")
-            
-            # Create initial state with our test query
-            initial_state = {
-                "messages": [{"role": "user", "content": "What do we know about patient with id P001?"}]
-            }
-            
-            # First, run the supervisor directly to get AI response
-            supervisor_state = await supervisor(initial_state, rc)
-            logger.info("Supervisor completed initial processing")
-            
-            # Check if we have tool calls
-            has_tool_calls = False
-            if "messages" in supervisor_state and supervisor_state["messages"]:
-                last_message = supervisor_state["messages"][-1]
-                has_tool_calls = hasattr(last_message, "tool_calls") and last_message.tool_calls
-            
-            if not has_tool_calls:
-                print("\n=== DEMO RESULT ===\n")
-                print("No tool calls were made by the supervisor.")
-                return supervisor_state
-                
-            # Update the state with supervisor results
-            combined_state = {**initial_state, **supervisor_state}
-            
-            # Now run the tools function directly with our query
-            logger.info("Running supervisor_tools with MCP calls...")
-            tools_result = await supervisor_tools(combined_state, rc)
-            
-            # Print the MCP tool results
-            print("\n=== PATIENT DATA FROM MCP TOOLS ===\n")
-            
-            # Extract tool responses from the Command update
-            tool_responses = []
-            if isinstance(tools_result, Command) and hasattr(tools_result, "update"):
-                for msg in tools_result.update.get("messages", []):
-                    if isinstance(msg, dict) and msg.get("role") == "tool":
-                        tool_responses.append(msg)
-            
-            # Display each tool response with nice formatting
-            for resp in tool_responses:
-                tool_name = resp.get("name", "Unknown Tool")
-                content = resp.get("content", "No data")
-                
-                print(f"\n## {tool_name}:")
-                
-                # Try to parse and pretty-print JSON content
-                try:
-                    if isinstance(content, str) and (content.startswith("{") or content.startswith("[")):
-                        parsed = json.loads(content)
-                        formatted = json.dumps(parsed, indent=2)
-                        print(formatted)
-                    else:
-                        print(content)
-                except:
-                    # If not valid JSON, just print as is
-                    print(content)
-            
-            # Now run one more step to get the AI's interpretation
-            print("\n=== AI INTERPRETATION ===\n")
-            
-            # Update state with both supervisor and tool results
-            if isinstance(tools_result, Command) and hasattr(tools_result, "update"):
-                final_state = {
-                    "messages": initial_state["messages"] + supervisor_state["messages"] + tools_result.update.get("messages", [])
-                }
-                
-                # Run supervisor again to get interpretation
-                final_response = await supervisor(final_state, rc)
-                
-                # Display the AI's interpretation
-                if "messages" in final_response and final_response["messages"]:
-                    ai_msg = final_response["messages"][-1]
-                    if hasattr(ai_msg, "content") and ai_msg.content:
-                        print(ai_msg.content)
-                    elif isinstance(ai_msg, dict) and "content" in ai_msg:
-                        print(ai_msg["content"])
-                    else:
-                        print("No AI interpretation available")
-                else:
-                    print("No AI interpretation available")
-            
-            return {
-                "supervisor": supervisor_state,
-                "tools": tools_result,
-                "interpretation": final_response if 'final_response' in locals() else None
-            }
-                
-        except Exception as e:
-            logger.error(f"Error in demo execution: {str(e)}", exc_info=True)
-            return None
-
-    # Set up logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    
-    # Run the demo
-    asyncio.run(_demo())
