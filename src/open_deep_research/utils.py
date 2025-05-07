@@ -12,6 +12,10 @@ from urllib.parse import unquote
 from exa_py import Exa
 from linkup import LinkupClient
 from tavily import AsyncTavilyClient
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents.aio import SearchClient as AsyncAzureAISearchClient
+import asyncio
+import os
 from duckduckgo_search import DDGS 
 from bs4 import BeautifulSoup
 from markdownify import markdownify
@@ -178,6 +182,66 @@ async def tavily_search_async(search_queries, max_results: int = 5, topic: str =
     # Execute all searches concurrently
     search_docs = await asyncio.gather(*search_tasks)
     return search_docs
+
+@traceable
+async def azureaisearch_search_async(search_queries: list[str], max_results: int = 5, topic: str = "general", include_raw_content: bool = True) -> list[dict]:
+    """
+    Performs concurrent web searches using the Azure AI Search API.
+
+    Args:
+        search_queries (List[str]): list of search queries to process
+        max_results (int): maximum number of results to return for each query
+        topic (str): semantic topic filter for the search.
+        include_raw_content (bool)
+
+    Returns:
+        List[dict]: list of search responses from Azure AI Search API, one per query.
+    """
+    # configure and create the Azure Search client
+    # ensure all environment variables are set
+    if not all(var in os.environ for var in ["AZURE_AI_SEARCH_ENDPOINT", "AZURE_AI_SEARCH_INDEX_NAME", "AZURE_AI_SEARCH_API_KEY"]):
+        raise ValueError("Missing required environment variables for Azure Search API which are: AZURE_AI_SEARCH_ENDPOINT, AZURE_AI_SEARCH_INDEX_NAME, AZURE_AI_SEARCH_API_KEY")
+    endpoint = os.getenv("AZURE_AI_SEARCH_ENDPOINT")
+    index_name = os.getenv("AZURE_AI_SEARCH_INDEX_NAME")
+    credential = AzureKeyCredential(os.getenv("AZURE_AI_SEARCH_API_KEY"))
+
+    reranker_key = '@search.reranker_score'
+
+    async with AsyncAzureAISearchClient(endpoint, index_name, credential) as client:
+        async def do_search(query: str) -> dict:
+            # search query 
+            paged = await client.search(
+                search_text=query,
+                vector_queries=[{
+                    "fields": "vector",
+                    "kind": "text",
+                    "text": query,
+                    "exhaustive": True
+                }],
+                semantic_configuration_name="fraunhofer-rag-semantic-config",
+                query_type="semantic",
+                select=["url", "title", "chunk", "creationTime", "lastModifiedTime"],
+                top=max_results,
+            )
+            # async iterator to get all results
+            items = [doc async for doc in paged]
+            # Umwandlung in einfaches Dict-Format
+            results = [
+                {
+                    "title": doc.get("title"),
+                    "url": doc.get("url"),
+                    "content": doc.get("chunk"),
+                    "score": doc.get(reranker_key),
+                    "raw_content": doc.get("chunk") if include_raw_content else None
+                }
+                for doc in items
+            ]
+            return {"query": query, "results": results}
+
+        # parallelize the search queries
+        tasks = [do_search(q) for q in search_queries]
+        return await asyncio.gather(*tasks)
+
 
 @traceable
 def perplexity_search(search_queries):
@@ -1304,6 +1368,55 @@ async def tavily_search(queries: List[str]) -> str:
     else:
         return "No valid search results found. Please try different search queries or use a different search API."
 
+
+@tool
+async def azureaisearch_search(queries: List[str], max_results: int = 5, topic: str = "general") -> str:
+    """
+    Fetches results from Azure AI Search API.
+    
+    Args:
+        queries (List[str]): List of search queries
+        
+    Returns:
+        str: A formatted string of search results
+    """
+    # Use azureaisearch_search_async with include_raw_content=True to get content directly
+    search_results = await azureaisearch_search_async(
+        queries,
+        max_results=max_results,
+        topic=topic,
+        include_raw_content=True
+    )
+
+    # Format the search results directly using the raw_content already provided
+    formatted_output = f"Search results: \n\n"
+    
+    # Deduplicate results by URL
+    unique_results = {}
+    for response in search_results:
+        for result in response['results']:
+            url = result['url']
+            if url not in unique_results:
+                unique_results[url] = result
+    
+    # Format the unique results
+    for i, (url, result) in enumerate(unique_results.items()):
+        formatted_output += f"\n\n--- SOURCE {i+1}: {result['title']} ---\n"
+        formatted_output += f"URL: {url}\n\n"
+        formatted_output += f"SUMMARY:\n{result['content']}\n\n"
+        if result.get('raw_content'):
+            formatted_output += f"FULL CONTENT:\n{result['raw_content'][:30000]}"  # Limit content size
+        formatted_output += "\n\n" + "-" * 80 + "\n"
+    
+    if unique_results:
+        return formatted_output
+    else:
+        return "No valid search results found. Please try different search queries or use a different search API."
+
+
+
+
+
 async def select_and_execute_search(search_api: str, query_list: list[str], params_to_pass: dict) -> str:
     """Select and execute the appropriate search API.
     
@@ -1318,6 +1431,7 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
     Raises:
         ValueError: If an unsupported search API is specified
     """
+    print(f"query_list: {query_list} params_to_pass: {params_to_pass}")
     if search_api == "tavily":
         # Tavily search tool used with both workflow and agent 
         return await tavily_search.ainvoke({'queries': query_list}, **params_to_pass)
@@ -1341,6 +1455,10 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
         return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
     elif search_api == "googlesearch":
         search_results = await google_search_async(query_list, **params_to_pass)
+        return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
+    elif search_api == "azureaisearch":
+        #raise NotImplementedError("Azure AI Search is not implemented yet.")
+        search_results = await azureaisearch_search_async(query_list, **params_to_pass)
         return deduplicate_and_format_sources(search_results, max_tokens_per_source=4000)
     else:
         raise ValueError(f"Unsupported search API: {search_api}")
