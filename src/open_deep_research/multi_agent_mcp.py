@@ -1,8 +1,9 @@
-from typing import List, Annotated, TypedDict, operator, Literal
+from typing import List, Annotated, TypedDict, operator, Literal, Dict, Any, Optional
 from pydantic import BaseModel, Field
+import asyncio
 
 from langchain.chat_models import init_chat_model
-from langchain_core.tools import tool
+from langchain_core.tools import tool, BaseTool
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import MessagesState
 
@@ -12,6 +13,13 @@ from langgraph.graph import START, END, StateGraph
 from open_deep_research.configuration import Configuration
 from open_deep_research.utils import get_config_value, tavily_search, duckduckgo_search
 from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
+from open_deep_research.mcp_integration import create_mcp_manager
+
+import logging
+logger = logging.getLogger(__name__)
+
+# Global variable to store MCP manager
+_mcp_manager = None
 
 ## Tools factory - will be initialized based on configuration
 def get_search_tool(config: RunnableConfig):
@@ -86,17 +94,76 @@ class SectionState(MessagesState):
 class SectionOutputState(TypedDict):
     completed_sections: list[Section] # Final key we duplicate in outer state for Send() API
 
+# Initialize MCP tools at the start
+async def initialize_mcp(state: ReportState, config: RunnableConfig):
+    """Initialize MCP and continue to supervisor"""
+    global _mcp_manager
+    
+    # Get MCP configuration
+    configurable = Configuration.from_runnable_config(config)
+    mcp_servers = getattr(configurable, "mcp_servers", None)
+    
+    if mcp_servers:
+        logger.info(f"Initializing MCP manager with {len(mcp_servers)} servers")
+        try:
+            _mcp_manager = await create_mcp_manager(mcp_servers)
+            logger.info(f"MCP manager initialized: {_mcp_manager is not None}")
+        except Exception as e:
+            logger.error(f"Error initializing MCP: {e}", exc_info=True)
+    else:
+        logger.info("No MCP servers configured, continuing without MCP")
+    
+    # Return state unchanged - just pass through to supervisor
+    return state
+
+# Clean up MCP resources at the end
+async def cleanup_mcp(state: ReportState, config: RunnableConfig):
+    """Clean up MCP resources before exiting"""
+    global _mcp_manager
+    
+    if _mcp_manager:
+        logger.info("Cleaning up MCP resources")
+        try:
+            await _mcp_manager.cleanup()
+            logger.info("MCP resources cleaned up successfully")
+        except Exception as e:
+            logger.error(f"Error cleaning up MCP: {e}", exc_info=True)
+        _mcp_manager = None
+    
+    # Return final report state
+    return {"final_report": state.get("final_report", "")}
+
 # Tool lists will be built dynamically based on configuration
 def get_supervisor_tools(config: RunnableConfig):
     """Get supervisor tools based on configuration"""
+    global _mcp_manager
+    
     search_tool = get_search_tool(config)
     tool_list = [search_tool, Sections, Introduction, Conclusion]
+    
+    # Add MCP tools if available
+    if _mcp_manager:
+        mcp_tools = _mcp_manager.get_tools()
+        if mcp_tools:
+            logger.info(f"Adding {len(mcp_tools)} MCP tools to supervisor tools")
+            tool_list.extend(mcp_tools)
+    
     return tool_list, {tool.name: tool for tool in tool_list}
 
 def get_research_tools(config: RunnableConfig):
     """Get research tools based on configuration"""
+    global _mcp_manager
+    
     search_tool = get_search_tool(config)
     tool_list = [search_tool, Section]
+    
+    # Add MCP tools if available
+    if _mcp_manager:
+        mcp_tools = _mcp_manager.get_tools()
+        if mcp_tools:
+            logger.info(f"Adding {len(mcp_tools)} MCP tools to research tools")
+            tool_list.extend(mcp_tools)
+    
     return tool_list, {tool.name: tool for tool in tool_list}
 
 async def supervisor(state: ReportState, config: RunnableConfig):
@@ -112,7 +179,9 @@ async def supervisor(state: ReportState, config: RunnableConfig):
     # Initialize the model
     llm = init_chat_model(model=supervisor_model)
     
-    # If sections have been completed, but we don't yet have the final report, then we need to initiate writing the introduction and conclusion
+    # If sections have been completed, but we don't yet have the final report, 
+    # then we need to initiate writing the introduction and conclusion
+    # CHANGE: Remove the section count check to match original flow
     if state.get("completed_sections") and not state.get("final_report"):
         research_complete_message = {"role": "user", "content": "Research is complete. Now write the introduction and conclusion for the report. Here are the completed main body sections: \n\n" + "\n\n".join([s.content for s in state["completed_sections"]])}
         messages = messages + [research_complete_message]
@@ -134,7 +203,7 @@ async def supervisor(state: ReportState, config: RunnableConfig):
         ]
     }
 
-async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Command[Literal["supervisor", "research_team", "__end__"]]:
+async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Command[Literal["supervisor", "research_team", "cleanup_mcp"]]:
     """Performs the tool call and sends to the research agent"""
 
     result = []
@@ -145,63 +214,56 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
     # Get tools based on configuration
     _, supervisor_tools_by_name = get_supervisor_tools(config)
     
-    # First process all tool calls to ensure we respond to each one (required for OpenAI)
+    # Simplify tool handling to match old implementation
     for tool_call in state["messages"][-1].tool_calls:
         # Get the tool
         tool = supervisor_tools_by_name[tool_call["name"]]
+        
         # Perform the tool call - use ainvoke for async tools
         if hasattr(tool, 'ainvoke'):
             observation = await tool.ainvoke(tool_call["args"])
         else:
             observation = tool.invoke(tool_call["args"])
 
-        # Append to messages 
-        result.append({"role": "tool", 
-                       "content": observation, 
-                       "name": tool_call["name"], 
-                       "tool_call_id": tool_call["id"]})
+        # Append to messages - Keep format exactly like old implementation
+        result.append({
+            "role": "tool", 
+            "content": observation,  # Don't convert to string/JSON 
+            "name": tool_call["name"], 
+            "tool_call_id": tool_call["id"]
+        })
         
-        # Store special tool results for processing after all tools have been called
+        # Store special tool results exactly as in old implementation
         if tool_call["name"] == "Sections":
             sections_list = observation.sections
         elif tool_call["name"] == "Introduction":
-            # Format introduction with proper H1 heading if not already formatted
             if not observation.content.startswith("# "):
                 intro_content = f"# {observation.name}\n\n{observation.content}"
             else:
                 intro_content = observation.content
         elif tool_call["name"] == "Conclusion":
-            # Format conclusion with proper H2 heading if not already formatted
             if not observation.content.startswith("## "):
                 conclusion_content = f"## {observation.name}\n\n{observation.content}"
             else:
                 conclusion_content = observation.content
     
-    # After processing all tool calls, decide what to do next
+    # Match old implementation's decision flow exactly
     if sections_list:
-        # Send the sections to the research agents
-        return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], update={"messages": result})
+        return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], 
+                      update={"messages": result})
     elif intro_content:
-        # Store introduction while waiting for conclusion
-        # Append to messages to guide the LLM to write conclusion next
         result.append({"role": "user", "content": "Introduction written. Now write a conclusion section."})
         return Command(goto="supervisor", update={"final_report": intro_content, "messages": result})
     elif conclusion_content:
-        # Get all sections and combine in proper order: Introduction, Body Sections, Conclusion
         intro = state.get("final_report", "")
         body_sections = "\n\n".join([s.content for s in state["completed_sections"]])
-        
-        # Assemble final report in correct order
         complete_report = f"{intro}\n\n{body_sections}\n\n{conclusion_content}"
-        
-        # Append to messages to indicate completion
         result.append({"role": "user", "content": "Report is now complete with introduction, body sections, and conclusion."})
         return Command(goto="supervisor", update={"final_report": complete_report, "messages": result})
     else:
-        # Default case (for search tools, etc.)
         return Command(goto="supervisor", update={"messages": result})
-
-async def supervisor_should_continue(state: ReportState) -> Literal["supervisor_tools", END]:
+    
+async def supervisor_should_continue(state: ReportState) -> Literal["supervisor_tools", "cleanup_mcp"]:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
 
     messages = state["messages"]
@@ -212,8 +274,9 @@ async def supervisor_should_continue(state: ReportState) -> Literal["supervisor_
         return "supervisor_tools"
     
     # Else end because the supervisor asked a question or is finished
+    # Match old implementation by returning END directly
     else:
-        return END
+        return "cleanup_mcp"
 
 async def research_agent(state: SectionState, config: RunnableConfig):
     """LLM decides whether to call a tool or not"""
@@ -253,22 +316,57 @@ async def research_agent_tools(state: SectionState, config: RunnableConfig):
     
     # Process all tool calls first (required for OpenAI)
     for tool_call in state["messages"][-1].tool_calls:
-        # Get the tool
-        tool = research_tools_by_name[tool_call["name"]]
-        # Perform the tool call - use ainvoke for async tools
-        if hasattr(tool, 'ainvoke'):
-            observation = await tool.ainvoke(tool_call["args"])
-        else:
-            observation = tool.invoke(tool_call["args"])
-        # Append to messages 
-        result.append({"role": "tool", 
-                       "content": observation, 
-                       "name": tool_call["name"], 
-                       "tool_call_id": tool_call["id"]})
-        
-        # Store the section observation if a Section tool was called
-        if tool_call["name"] == "Section":
-            completed_section = observation
+        try:
+            # Get the tool
+            tool_name = tool_call["name"]
+            if tool_name not in research_tools_by_name:
+                logger.warning(f"Tool '{tool_name}' not found in available tools")
+                result.append({
+                    "role": "tool", 
+                    "content": f"Tool '{tool_name}' not found", 
+                    "tool_call_id": tool_call["id"],
+                    "name": tool_name
+                })
+                continue
+                
+            tool = research_tools_by_name[tool_name]
+            
+            # Perform the tool call - use ainvoke for async tools
+            if hasattr(tool, 'ainvoke'):
+                observation = await tool.ainvoke(tool_call["args"])
+            else:
+                observation = tool.invoke(tool_call["args"])
+                
+            # Special handling for MCP tools vs standard tools
+            if tool_name == "Section":
+                # For standard Section tool - pass observation directly
+                tool_content = observation
+                completed_section = observation
+            else:
+                # For MCP tools - convert to JSON string to ensure consistency
+                import json
+                if isinstance(observation, (dict, list)):
+                    tool_content = json.dumps(observation)
+                else:
+                    # If already a string or other type, use as is
+                    tool_content = str(observation)
+            
+            # Only append ONCE with properly formatted content
+            result.append({
+                "role": "tool", 
+                "content": tool_content,
+                "name": tool_name, 
+                "tool_call_id": tool_call["id"]
+            })
+                
+        except Exception as e:
+            logger.error(f"Error executing research tool '{tool_call['name']}': {e}", exc_info=True)
+            result.append({
+                "role": "tool", 
+                "content": f"Error executing tool: {str(e)}", 
+                "name": tool_call["name"], 
+                "tool_call_id": tool_call["id"]
+            })
     
     # After processing all tools, decide what to do next
     if completed_section:
@@ -311,21 +409,30 @@ research_builder.add_edge("research_agent_tools", "research_agent")
 
 # Supervisor workflow
 supervisor_builder = StateGraph(ReportState, input=MessagesState, output=ReportStateOutput, config_schema=Configuration)
+supervisor_builder.add_node("initialize_mcp", initialize_mcp)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
 supervisor_builder.add_node("research_team", research_builder.compile())
+supervisor_builder.add_node("cleanup_mcp", cleanup_mcp)
 
-# Flow of the supervisor agent
-supervisor_builder.add_edge(START, "supervisor")
+# Flow of the supervisor agent with MCP lifecycle
+supervisor_builder.add_edge(START, "initialize_mcp")
+supervisor_builder.add_edge("initialize_mcp", "supervisor")
 supervisor_builder.add_conditional_edges(
     "supervisor",
     supervisor_should_continue,
     {
-        # Name returned by should_continue : Name of next node to visit
         "supervisor_tools": "supervisor_tools",
-        END: END,
+        "cleanup_mcp": "cleanup_mcp",
     },
 )
 supervisor_builder.add_edge("research_team", "supervisor")
+supervisor_builder.add_edge("cleanup_mcp", END)
 
+# Keep the original graph entry point for LangGraph Studio
 graph = supervisor_builder.compile()
+
+# Create an async factory function that matches the expected interface
+async def create_graph(config=None):
+    """Create a graph with the given configuration"""
+    return graph.with_config(config) if config else graph
