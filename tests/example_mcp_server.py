@@ -1,8 +1,6 @@
-# example_mcp_server.py
 from mcp.server.fastmcp import FastMCP
-from typing import Dict, List, Any, Optional
 
-# Create an MCP server with a clear name
+# Create an MCP server
 mcp = FastMCP("PatientData")
 
 # Mock database
@@ -50,7 +48,6 @@ PATIENT_CONDITIONS = {
             "status": "active"
         }
     ],
-    # ...rest of the conditions
 }
 
 PATIENT_CHECKS = {
@@ -69,59 +66,81 @@ PATIENT_CHECKS = {
 }
 
 @mcp.tool()
-def patient_vitals(patient_id: str) -> Dict[str, Any]:
+def get_patient_vitals(patient_id: str) -> str:
     """
-    Retrieve current vital signs for a patient.
+    Use this tool to retrieve current vital signs for a patient for your research.
     
     Args:
         patient_id: Unique identifier for the patient
         
     Returns:
-        Dictionary containing vital measurements including:
-        - heart_rate: Beats per minute
-        - blood_pressure: Systolic/diastolic in mmHg
-        - temperature: Body temperature in Celsius
-        - respiratory_rate: Breaths per minute
-        - oxygen_saturation: Blood oxygen percentage
+        String containing vital measurements information
     """
-    return PATIENT_VITALS.get(patient_id, {"error": "Patient not found"})
+    vitals = PATIENT_VITALS.get(patient_id)
+    if not vitals:
+        return f"Patient {patient_id} not found."
+    
+    # Format as plain text
+    result = f"Vitals for Patient {patient_id}:\n"
+    result += f"- Heart Rate: {vitals['heart_rate']} bpm\n"
+    result += f"- Blood Pressure: {vitals['blood_pressure']} mmHg\n"
+    result += f"- Temperature: {vitals['temperature']}°C\n"
+    result += f"- Respiratory Rate: {vitals['respiratory_rate']} breaths/min\n"
+    result += f"- Oxygen Saturation: {vitals['oxygen_saturation']}%\n"
+    result += f"- Last Updated: {vitals['last_updated']}"
+    
+    return result
 
 @mcp.tool()
-def patient_current_conditions(patient_id: str) -> List[Dict[str, Any]]:
+def get_patient_current_conditions(patient_id: str) -> str:
     """
-    Retrieve current diagnosed conditions for a patient.
+    Use this tool to retrieve current diagnosed conditions for a patient so you can narrow your research.
     
     Args:
         patient_id: Unique identifier for the patient
         
     Returns:
-        List of condition dictionaries, each containing:
-        - name: Name of the condition
-        - icd_code: ICD-10 code
-        - diagnosed_date: When the condition was diagnosed
-        - severity: Severity level (mild, moderate, severe)
-        - status: Current status (active, managed, resolved)
+        String containing a list of patient conditions
     """
-    return PATIENT_CONDITIONS.get(patient_id, [])
+    conditions = PATIENT_CONDITIONS.get(patient_id, [])
+    if not conditions:
+        return f"No conditions found for Patient {patient_id}."
+    
+    # Format as plain text
+    result = f"Current Conditions for Patient {patient_id}:\n"
+    for i, condition in enumerate(conditions, 1):
+        result += f"{i}. {condition['name']} ({condition['icd_code']})\n"
+        result += f"   - Diagnosed: {condition['diagnosed_date']}\n"
+        result += f"   - Severity: {condition['severity']}\n"
+        result += f"   - Status: {condition['status']}\n"
+    
+    return result.strip()
 
 @mcp.tool()
-def patient_scheduled_checks(patient_id: str) -> List[Dict[str, Any]]:
+def get_patient_scheduled_checks(patient_id: str) -> str:
     """
-    Retrieve upcoming scheduled health checks for a patient.
+    Use this tool to retrieve upcoming scheduled health checks for a patient to understand their needs.
     
     Args:
         patient_id: Unique identifier for the patient
         
     Returns:
-        List of scheduled check dictionaries, each containing:
-        - check_type: Type of health check
-        - scheduled_date: Date and time of the check
-        - provider: Healthcare provider conducting the check
-        - location: Where the check will take place
-        - preparation: Any required preparation instructions
-        - priority: Priority level (routine, follow-up, urgent)
+        String containing a list of scheduled health checks
     """
-    return PATIENT_CHECKS.get(patient_id, [])
+    checks = PATIENT_CHECKS.get(patient_id, [])
+    if not checks:
+        return f"No scheduled checks found for Patient {patient_id}."
+    
+    # Format as plain text
+    result = f"Scheduled Checks for Patient {patient_id}:\n"
+    for i, check in enumerate(checks, 1):
+        result += f"{i}. {check['check_type']} - {check['scheduled_date']}\n"
+        result += f"   - Provider: {check['provider']}\n"
+        result += f"   - Location: {check['location']}\n"
+        result += f"   - Preparation: {check['preparation']}\n"
+        result += f"   - Priority: {check['priority']}\n"
+    
+    return result.strip()
 
 if __name__ == "__main__":
     # Use stdio transport for integration with MCP clients
