@@ -12,6 +12,7 @@ class MCPClientManager:
     def __init__(self):
         self.client = None
         self.tools: List[BaseTool] = []
+        self._initialized = False
     
     async def initialize(self, mcp_servers: Dict[str, Dict[str, Any]]):
         """Initialize the MCP client and get all tools."""
@@ -34,6 +35,7 @@ class MCPClientManager:
             
             # Use __aenter__ instead of initialize
             await self.client.__aenter__()
+            self._initialized = True
             
             # Get all tools
             self.tools = self.client.get_tools()
@@ -58,20 +60,30 @@ class MCPClientManager:
     
     async def cleanup(self):
         """Clean up MCP resources"""
-        if self.client:
+        if self.client and self._initialized:
+            logger.info("Cleaning up MCP client resources")
             try:
                 await self.client.__aexit__(None, None, None)
+                logger.info("MCP client cleanup successful")
             except RuntimeError as e:
                 if "cancel scope in a different task" in str(e):
                     # Log as warning, not error
                     logger.warning("Task context error during MCP client cleanup - this is expected in StateGraph context")
                 else:
-                    # Re-raise other types of RuntimeError
-                    raise
+                    # Just log the error instead of raising
+                    logger.error(f"RuntimeError during MCP cleanup: {e}")
+            except Exception as e:
+                # Catch all other exceptions during cleanup
+                logger.error(f"Unexpected error during MCP cleanup: {e}")
+            
+            # Always set client to None and tools to empty list to ensure we don't reuse them
+            self.client = None
+            self.tools = []
+            self._initialized = False
     
     def get_tools(self) -> List[BaseTool]:
         """Get all tools from connected MCP servers."""
-        return self.tools
+        return self.tools.copy() if self._initialized else []
 
 async def create_mcp_manager(mcp_servers: Optional[Dict[str, Dict[str, Any]]] = None) -> Optional[MCPClientManager]:
     """Create and initialize an MCP client manager."""

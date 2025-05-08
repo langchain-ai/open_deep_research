@@ -508,7 +508,6 @@ research_builder.add_conditional_edges(
 research_builder.add_edge("research_agent_tools", "research_agent")
 
 # Supervisor workflow
-# Supervisor workflow
 supervisor_builder = StateGraph(ReportState, input=MessagesState, output=ReportStateOutput, config_schema=Configuration)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
@@ -635,28 +634,3 @@ async def create_mcp_research_graph(config: RunnableConfig):
     else:
         logger.warning("No MCP servers configured, using standard graph")
         yield graph.with_config(config_dict)
-
-# Utility function for using the context manager
-async def run_with_mcp(query, config: RunnableConfig):
-    """
-    Run a research query using the multi-agent system with MCP integration.
-    
-    Args:
-        query: The research query
-        config: RunnableConfig containing MCP configuration
-        
-    Returns:
-        The research results
-    """
-    async with create_mcp_research_graph(config) as research_graph:
-        # Create input message
-        messages = [{"role": "user", "content": query}]
-        
-        # Run the graph
-        response = await research_graph.ainvoke({"messages": messages})
-        
-        # Log the final report
-        if "final_report" in response:
-            logger.info(f"Generated report with {len(response['final_report'])} characters")
-        
-        return response
