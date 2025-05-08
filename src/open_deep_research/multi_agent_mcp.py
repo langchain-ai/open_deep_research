@@ -116,7 +116,6 @@ async def initialize_mcp(state: ReportState, config: RunnableConfig):
     # Return state unchanged - just pass through to supervisor
     return state
 
-# Clean up MCP resources at the end
 async def cleanup_mcp(state: ReportState, config: RunnableConfig):
     """Clean up MCP resources before exiting"""
     global _mcp_manager
@@ -126,8 +125,16 @@ async def cleanup_mcp(state: ReportState, config: RunnableConfig):
         try:
             await _mcp_manager.cleanup()
             logger.info("MCP resources cleaned up successfully")
-        except Exception as e:
-            logger.error(f"Error cleaning up MCP: {e}", exc_info=True)
+        except RuntimeError as e:
+            if "cancel scope in a different task" in str(e):
+                # Just log a warning for this specific error and continue
+                logger.warning("Task context error during cleanup - this is expected in the StateGraph context")
+                logger.info("Cleanup will happen on process exit")
+            else:
+                # Only log as error for other types of RuntimeError
+                logger.error(f"Error during MCP cleanup: {e}", exc_info=True)
+        
+        # Set manager to None regardless of success
         _mcp_manager = None
     
     # Return final report state

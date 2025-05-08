@@ -57,17 +57,17 @@ class MCPClientManager:
                 self.client = None
     
     async def cleanup(self):
-        """Clean up MCP resources."""
+        """Clean up MCP resources"""
         if self.client:
             try:
-                # Use __aexit__ instead of cleanup
                 await self.client.__aexit__(None, None, None)
-                logger.info("MCP client cleaned up successfully")
-            except Exception as e:
-                logger.error(f"Error during MCP client cleanup: {e}", exc_info=True)
-            finally:
-                self.client = None
-                self.tools = []
+            except RuntimeError as e:
+                if "cancel scope in a different task" in str(e):
+                    # Log as warning, not error
+                    logger.warning("Task context error during MCP client cleanup - this is expected in StateGraph context")
+                else:
+                    # Re-raise other types of RuntimeError
+                    raise
     
     def get_tools(self) -> List[BaseTool]:
         """Get all tools from connected MCP servers."""
