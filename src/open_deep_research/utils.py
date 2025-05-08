@@ -6,7 +6,7 @@ import concurrent
 import aiohttp
 import httpx
 import time
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union, Literal
 from urllib.parse import unquote
 
 from exa_py import Exa
@@ -137,12 +137,15 @@ Content:
     return formatted_str
 
 @traceable
-async def tavily_search_async(search_queries, max_results: int = 5, topic: str = "general", include_raw_content: bool = True):
+async def tavily_search_async(search_queries, max_results: int = 5, topic: Literal["general", "news", "finance"] = "general", include_raw_content: bool = True):
     """
     Performs concurrent web searches with the Tavily API
 
     Args:
         search_queries (List[str]): List of search queries to process
+        max_results (int): Maximum number of results to return
+        topic (Literal["general", "news", "finance"]): Topic to filter results by
+        include_raw_content (bool): Whether to include raw content in the results
 
     Returns:
             List[dict]: List of search responses from Tavily API:
@@ -1261,12 +1264,14 @@ async def duckduckgo_search(search_queries: List[str]):
         return "No valid search results found. Please try different search queries or use a different search API."
 
 @tool
-async def tavily_search(queries: List[str]) -> str:
+async def tavily_search(queries: List[str], max_results: int = 5, topic: Literal["general", "news", "finance"] = "general") -> str:
     """
     Fetches results from Tavily search API.
     
     Args:
         queries (List[str]): List of search queries
+        max_results (int): Maximum number of results to return
+        topic (Literal["general", "news", "finance"]): Topic to filter results by
         
     Returns:
         str: A formatted string of search results
