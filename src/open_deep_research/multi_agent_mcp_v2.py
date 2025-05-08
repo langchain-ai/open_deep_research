@@ -1,3 +1,4 @@
+# src/open_deep_research/multi_agent_mcp_v2.py
 from typing import List, Annotated, TypedDict, operator, Literal, Dict, Any, Optional
 from pydantic import BaseModel, Field
 import asyncio
@@ -19,53 +20,8 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 import logging
 logger = logging.getLogger(__name__)
 
-# Create a serializable proxy for MCP tools
-# Global registry with initial logging
-_MCP_CLIENT_REGISTRY = {}
-logger.info(f"Initialized empty MCP registry: {_MCP_CLIENT_REGISTRY}")
-
-class SerializableMCPToolProxy(BaseTool):
-    """A serializable proxy for MCP tools that doesn't maintain references to async resources."""
-    
-    name: str = Field(..., description="Name of the tool")
-    description: str = Field(..., description="Description of the tool")
-    args_schema: Dict[str, Any] = Field(default_factory=dict, description="Schema for tool arguments")
-    server_name: str = Field(..., description="Server identifier for this tool")
-    
-    def _run(self, **kwargs) -> Any:
-        """Sync version just raises an error - MCP tools should be async."""
-        raise NotImplementedError("MCP tools must be used asynchronously")
-    
-    async def _arun(self, **kwargs) -> Any:
-        """Dynamically get the MCP client from our local registry and locate the tool."""
-        logger.info(f"Tool '{self.name}' invoked with args: {kwargs}")
-        logger.info(f"Looking for client with server_name '{self.server_name}' in registry")
-        
-        # Get client from registry
-        client = _MCP_CLIENT_REGISTRY.get(self.server_name)
-        if not client:
-            logger.error(f"No MCP client found for server {self.server_name}")
-            raise ValueError(f"No MCP client found for server {self.server_name}")
-        
-        # Get all tools from the client
-        logger.info(f"Found client, getting tools")
-        all_tools = client.get_tools()
-        
-        # Find the specific tool by name
-        logger.info(f"Looking for tool '{self.name}' among {len(all_tools)} tools")
-        for tool in all_tools:
-            if tool.name == self.name:
-                logger.info(f"Found tool '{self.name}', invoking with {kwargs}")
-                # Use the tool's ainvoke method directly
-                return await tool.ainvoke(kwargs)
-        
-        # Tool not found
-        logger.error(f"Tool '{self.name}' not found in client tools")
-        raise ValueError(f"Tool '{self.name}' not found in client tools")
-    
-def get_mcp_client_registry():
-    """Get the global MCP client registry."""
-    return _MCP_CLIENT_REGISTRY
+# This registry stores our mcp tools without being serialized
+_TOOL_REGISTRY = {}
 
 @tool
 class Section(BaseModel):
@@ -140,7 +96,7 @@ def get_supervisor_tools(config: RunnableConfig):
     """Get supervisor tools based on configuration"""
     logger.info("get_supervisor_tools called")
     
-    # Extract Configuration object properly
+    # Extract Configuration object
     configurable = Configuration.from_runnable_config(config)
     
     # Get search tool
@@ -149,50 +105,24 @@ def get_supervisor_tools(config: RunnableConfig):
     # Standard tools
     tool_list = [search_tool, Sections, Introduction, Conclusion]
     
-    # Check for direct MCP client access via session_id
-    session_id = None
-    if hasattr(configurable, "mcp_session_id"):
-        session_id = configurable.mcp_session_id
-        logger.info(f"Found session_id in configurable: {session_id}")
-    elif isinstance(config, dict):
-        session_id = config.get("mcp_session_id")
-        logger.info(f"Found session_id in config dict: {session_id}")
+    # Get MCP tools from registry if available
+    mcp_tools = []
+    registry_key = None
+    
+    if hasattr(configurable, "mcp_tool_registry_key"):
+        registry_key = configurable.mcp_tool_registry_key
+    elif isinstance(config, dict) and "configurable" in config and "mcp_tool_registry_key" in config["configurable"]:
+        registry_key = config["configurable"]["mcp_tool_registry_key"]
+    
+    if registry_key and registry_key in _TOOL_REGISTRY:
+        mcp_tools = _TOOL_REGISTRY[registry_key]
+        logger.info(f"Retrieved {len(mcp_tools)} tools from registry with key {registry_key}")
     else:
-        logger.warning("No session_id found in config")
+        logger.warning(f"No MCP tools found in registry with key {registry_key}")
     
-    # Log registry state
-    logger.info(f"Current registry state: {list(_MCP_CLIENT_REGISTRY.keys())}")
-    
-    if session_id and session_id in _MCP_CLIENT_REGISTRY:
-        # Get tools directly from client in registry
-        logger.info(f"Found live client for session '{session_id}' in registry")
-        client = _MCP_CLIENT_REGISTRY[session_id]
-        mcp_tools = client.get_tools()
-        logger.info(f"Retrieved {len(mcp_tools)} tools from live client: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
+    if mcp_tools:
+        logger.info(f"Using {len(mcp_tools)} tools: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
         tool_list.extend(mcp_tools)
-    
-    # Fall back to tools stored in configurable
-    else:
-        if session_id:
-            logger.warning(f"Session '{session_id}' not found in registry, falling back to configurable")
-        
-        # Properly check for mcp_tools in the configurable
-        mcp_tools = []
-        if hasattr(configurable, "mcp_tools"):
-            mcp_tools = configurable.mcp_tools
-            logger.info(f"Found {len(mcp_tools)} tools in configurable.mcp_tools")
-        elif isinstance(config, dict) and "configurable" in config and "mcp_tools" in config["configurable"]:
-            mcp_tools = config["configurable"]["mcp_tools"]
-            logger.info(f"Found {len(mcp_tools)} tools in config dict configurable.mcp_tools")
-        
-        if mcp_tools:
-            logger.info(f"Using {len(mcp_tools)} tools from configurable: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
-            tool_list.extend(mcp_tools)
-        else:
-            logger.warning("No MCP tools found in config")
-    
-    # Log the final combined tool list
-    logger.info(f"Final tool list: {[getattr(t, 'name', str(t)) for t in tool_list]}")
     
     # Create and return the tool dictionary
     tool_dict = {tool.name: tool for tool in tool_list if hasattr(tool, 'name')}
@@ -202,7 +132,9 @@ def get_supervisor_tools(config: RunnableConfig):
 
 def get_research_tools(config: RunnableConfig):
     """Get research tools based on configuration"""
-    # Extract Configuration object properly
+    logger.info("get_research_tools called")
+    
+    # Extract Configuration object
     configurable = Configuration.from_runnable_config(config)
     
     # Get search tool
@@ -211,35 +143,30 @@ def get_research_tools(config: RunnableConfig):
     # Standard tools
     tool_list = [search_tool, Section]
     
-    # Check for direct MCP client access via session_id
-    session_id = None
-    if hasattr(configurable, "mcp_session_id"):
-        session_id = configurable.mcp_session_id
-    elif isinstance(config, dict):
-        session_id = config.get("mcp_session_id")
+    # Get MCP tools from registry if available
+    mcp_tools = []
+    registry_key = None
     
-    if session_id and session_id in _MCP_CLIENT_REGISTRY:  # USE THE SINGLE REGISTRY
-        # Get tools directly from client in registry
-        client = _MCP_CLIENT_REGISTRY[session_id]
-        mcp_tools = client.get_tools()
-        logger.info(f"Using live MCP client with session ID {session_id} for research tools")
+    if hasattr(configurable, "mcp_tool_registry_key"):
+        registry_key = configurable.mcp_tool_registry_key
+    elif isinstance(config, dict) and "configurable" in config and "mcp_tool_registry_key" in config["configurable"]:
+        registry_key = config["configurable"]["mcp_tool_registry_key"]
+    
+    if registry_key and registry_key in _TOOL_REGISTRY:
+        mcp_tools = _TOOL_REGISTRY[registry_key]
+        logger.info(f"Retrieved {len(mcp_tools)} tools from registry with key {registry_key}")
+    else:
+        logger.warning(f"No MCP tools found in registry with key {registry_key}")
+    
+    if mcp_tools:
+        logger.info(f"Using {len(mcp_tools)} tools: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
         tool_list.extend(mcp_tools)
     
-    # Fall back to tools stored in configurable
-    else:
-        # Properly check for mcp_tools in the configurable
-        mcp_tools = []
-        if hasattr(configurable, "mcp_tools"):
-            mcp_tools = configurable.mcp_tools
-        
-        if mcp_tools:
-            logger.info(f"MCP tools found in configurable for research: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
-            tool_list.extend(mcp_tools)
-        else:
-            logger.warning("No MCP tools found in research config")
+    # Create and return the tool dictionary
+    tool_dict = {tool.name: tool for tool in tool_list if hasattr(tool, 'name')}
+    logger.info(f"Returning {len(tool_dict)} named tools")
     
-    # Return tools and their name-keyed dictionary
-    return tool_list, {tool.name: tool for tool in tool_list}
+    return tool_list, tool_dict
 
 async def supervisor(state: ReportState, config: RunnableConfig):
     """LLM decides whether to call a tool or not"""
@@ -528,33 +455,15 @@ graph = supervisor_builder.compile()
 # Context manager for working with MCP directly
 from contextlib import asynccontextmanager
 
-# Option 1 using the registry
-
-# TODO: Implement direct tool approach (Option 2)
-# -----------------------------------------------
-# The current implementation (Option 1) uses a proxy approach with a registry
-# to maintain client references across serialization boundaries. This works but
-# isn't the most elegant solution.
-#
-# Will work on Option 2 which aligns closer with langchain-mcp-adapters demo 
-# documentation this weekend. Option 2 would use the tools directly without a
-# tool registry. I had some issues with the langgraph pickle/asyncio context
-# manager when trying to implement this approach initially.
-# 
-# Current implementation considerations:
-# 1. We use SerializableMCPToolProxy to avoid references to async resources
-# 2. The global _MCP_CLIENT_REGISTRY maintains client instances by session ID
-# 3. Each proxy looks up its client at execution time using server_name
-# 4. The proxy's _arun method finds the correct tool by name from all client tools
-
+# Then modify the create_mcp_research_graph function
 @asynccontextmanager
 async def create_mcp_research_graph(config: RunnableConfig):
-    """Create a research graph with MCP integration using proxy tools."""
+    """Create a research graph with MCP integration using direct tools approach."""
     # Extract MCP servers from config
     configurable = Configuration.from_runnable_config(config)
     mcp_servers = getattr(configurable, "mcp_servers", None)
     
-    logger.info(f"Starting create_mcp_research_graph_with_proxy with servers: {mcp_servers}")
+    logger.info(f"Starting create_mcp_research_graph with servers: {mcp_servers}")
     
     # Ensure we have a dictionary for modifying config
     config_dict = dict(config) if config else {}
@@ -563,12 +472,8 @@ async def create_mcp_research_graph(config: RunnableConfig):
     if "thread_id" not in config_dict:
         config_dict["thread_id"] = str(uuid.uuid4())
     
-    # Generate a unique session ID for this graph instance
-    session_id = str(uuid.uuid4())
-    logger.info(f"Generated session ID: {session_id}")
-    config_dict["mcp_session_id"] = session_id
-    
     # Set up MCP client if servers are configured
+    client = None
     if mcp_servers:
         try:
             # Create and start the client
@@ -578,59 +483,66 @@ async def create_mcp_research_graph(config: RunnableConfig):
             await client.__aenter__()  # Call the async enter method explicitly
             logger.info("MCP client initialized successfully")
             
-            # Store in global registry for later access by tools
-            logger.info(f"Storing client in registry with key '{session_id}'")
-            _MCP_CLIENT_REGISTRY[session_id] = client
-            logger.info(f"Registry state after storing client: {list(_MCP_CLIENT_REGISTRY.keys())}")
+            # Get tools directly and use them without proxies
+            mcp_tools = client.get_tools()
+            logger.info(f"Retrieved {len(mcp_tools)} tools directly from MCP client: {[t.name for t in mcp_tools if hasattr(t, 'name')]}")
             
-            # Get tools from the client to create proxies
-            actual_tools = client.get_tools()
-            logger.info(f"Retrieved {len(actual_tools)} tools from MCP client: {[t.name for t in actual_tools if hasattr(t, 'name')]}")
+            # CHANGE: Store tools in global registry instead of config
+            tool_registry_key = str(uuid.uuid4())
+            _TOOL_REGISTRY[tool_registry_key] = mcp_tools
             
-            # Create proxy tools for serialization safety
-            logger.info("Creating proxy tools")
-            mcp_proxies = []
-            for tool in actual_tools:
-                try:
-                    tool_name = getattr(tool, 'name', f"unknown-{id(tool)}")
-                    proxy = SerializableMCPToolProxy(
-                        name=tool_name,
-                        description=getattr(tool, 'description', ''),
-                        args_schema=getattr(tool, "args_schema", {}),
-                        server_name=session_id
-                    )
-                    mcp_proxies.append(proxy)
-                    logger.info(f"Created proxy for tool: {tool_name}")
-                except Exception as e:
-                    logger.error(f"Error creating proxy for tool {getattr(tool, 'name', 'unknown')}: {e}", exc_info=True)
-            
-            # Store proxies in config
-            logger.info(f"Storing {len(mcp_proxies)} proxy tools in config")
+            # Only store the registry key in config
             if "configurable" not in config_dict:
                 config_dict["configurable"] = {}
-            config_dict["configurable"]["mcp_tools"] = mcp_proxies
+            config_dict["configurable"]["mcp_tool_registry_key"] = tool_registry_key
             
-            # Configure graph with session ID and proxies
-            logger.info("Configuring graph with MCP proxy tools")
+            # Configure graph with the key reference
+            logger.info("Configuring graph with MCP tool registry key")
             configured_graph = graph.with_config(config_dict)
             
             # Yield the configured graph
-            logger.info("Yielding configured graph with proxy tools")
+            logger.info("Yielding configured graph with tool registry reference")
             yield configured_graph
             
+            # Clean up registry after use
+            if tool_registry_key in _TOOL_REGISTRY:
+                del _TOOL_REGISTRY[tool_registry_key]
+            
         except Exception as e:
-            logger.error(f"Error in create_mcp_research_graph_with_proxy: {e}", exc_info=True)
+            logger.error(f"Error in create_mcp_research_graph: {e}", exc_info=True)
             raise
         finally:
-            # Clean up client when context exits
-            logger.info(f"Context exiting, cleaning up client for session '{session_id}'")
-            client = _MCP_CLIENT_REGISTRY.pop(session_id, None)
+            # Clean up client
+            logger.info("Context exiting, cleaning up client")
             if client:
                 logger.info("Closing MCP client")
                 await client.__aexit__(None, None, None)
                 logger.info("MCP client closed")
-            else:
-                logger.warning(f"No client found for session '{session_id}' during cleanup")
     else:
         logger.warning("No MCP servers configured, using standard graph")
         yield graph.with_config(config_dict)
+
+# Utility function for using the context manager
+async def run_with_mcp(query, config: RunnableConfig):
+    """
+    Run a research query using the multi-agent system with direct MCP integration.
+    
+    Args:
+        query: The research query
+        config: RunnableConfig containing MCP configuration
+        
+    Returns:
+        The research results
+    """
+    async with create_mcp_research_graph(config) as research_graph:
+        # Create input message
+        messages = [{"role": "user", "content": query}]
+        
+        # Run the graph
+        response = await research_graph.ainvoke({"messages": messages})
+        
+        # Log the final report
+        if "final_report" in response:
+            logger.info(f"Generated report with {len(response['final_report'])} characters")
+        
+        return response
