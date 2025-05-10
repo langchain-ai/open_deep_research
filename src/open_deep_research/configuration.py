@@ -1,12 +1,23 @@
 import os
 from enum import Enum
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, field
+from pathlib import Path
 from typing import Any, Optional, Dict 
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
-from dataclasses import dataclass
 
+# Get the path to the example_mcp_server.py relative to this file
+def default_mcp_servers() -> Dict[str, Dict[str, Any]]:
+    example_server_path = str(Path(__file__).parent.joinpath("example_mcp_server.py").resolve())
+    return {
+        "patient_data": {
+            "transport": "stdio",
+            "command": "python",
+            "args": [example_server_path],
+        }
+    }
+    
 DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-provided topic:
 
 1. Introduction (no research needed)
@@ -52,6 +63,9 @@ class Configuration:
     # Multi-agent specific configuration
     supervisor_model: str = "openai:gpt-4.1" # Model for supervisor agent in multi-agent setup
     researcher_model: str = "openai:gpt-4.1" # Model for research agents in multi-agent setup 
+
+    # MCP configuration
+    mcp_servers: Optional[Dict[str, Dict[str, Any]]] = field(default_factory=default_mcp_servers)
 
     @classmethod
     def from_runnable_config(
