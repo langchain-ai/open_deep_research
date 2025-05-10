@@ -1261,7 +1261,7 @@ async def duckduckgo_search(search_queries: List[str]):
         return "No valid search results found. Please try different search queries or use a different search API."
 
 @tool
-async def tavily_search(queries: List[str], max_results: int = 5, topic: str = "general") -> str:
+async def tavily_search(queries: List[str]) -> str:
     """
     Fetches results from Tavily search API.
     
@@ -1274,8 +1274,8 @@ async def tavily_search(queries: List[str], max_results: int = 5, topic: str = "
     # Use tavily_search_async with include_raw_content=True to get content directly
     search_results = await tavily_search_async(
         queries,
-        max_results=max_results,
-        topic=topic,
+        max_results=5,
+        topic="general",
         include_raw_content=True
     )
 
