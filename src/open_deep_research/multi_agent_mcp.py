@@ -1,4 +1,4 @@
-# src/open_deep_research/multi_agent_mcp_v2.py
+# src/open_deep_research/mcp_2.py
 from typing import List, Annotated, TypedDict, operator, Literal, Dict, Any, Optional
 from pydantic import BaseModel, Field
 import asyncio
@@ -20,8 +20,9 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 import logging
 logger = logging.getLogger(__name__)
 
-# This registry stores our mcp tools without being serialized
-_TOOL_REGISTRY = {}
+# Using context variables to store MCP tools
+from contextvars import ContextVar
+_mcp_tools = ContextVar('mcp_tools', default=None)
 
 @tool
 class Section(BaseModel):
@@ -105,24 +106,14 @@ def get_supervisor_tools(config: RunnableConfig):
     # Standard tools
     tool_list = [search_tool, Sections, Introduction, Conclusion]
     
-    # Get MCP tools from registry if available
-    mcp_tools = []
-    registry_key = None
-    
-    if hasattr(configurable, "mcp_tool_registry_key"):
-        registry_key = configurable.mcp_tool_registry_key
-    elif isinstance(config, dict) and "configurable" in config and "mcp_tool_registry_key" in config["configurable"]:
-        registry_key = config["configurable"]["mcp_tool_registry_key"]
-    
-    if registry_key and registry_key in _TOOL_REGISTRY:
-        mcp_tools = _TOOL_REGISTRY[registry_key]
-        logger.info(f"Retrieved {len(mcp_tools)} tools from registry with key {registry_key}")
-    else:
-        logger.warning(f"No MCP tools found in registry with key {registry_key}")
-    
-    if mcp_tools:
-        logger.info(f"Using {len(mcp_tools)} tools: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
-        tool_list.extend(mcp_tools)
+    # MODIFIED: Get MCP tools from context var
+    try:
+        mcp_tools = _mcp_tools.get()
+        if mcp_tools:
+            logger.info(f"Retrieved {len(mcp_tools)} tools from context")
+            tool_list.extend(mcp_tools)
+    except LookupError:
+        logger.warning("No MCP tools found in context")
     
     # Create and return the tool dictionary
     tool_dict = {tool.name: tool for tool in tool_list if hasattr(tool, 'name')}
@@ -143,24 +134,14 @@ def get_research_tools(config: RunnableConfig):
     # Standard tools
     tool_list = [search_tool, Section]
     
-    # Get MCP tools from registry if available
-    mcp_tools = []
-    registry_key = None
-    
-    if hasattr(configurable, "mcp_tool_registry_key"):
-        registry_key = configurable.mcp_tool_registry_key
-    elif isinstance(config, dict) and "configurable" in config and "mcp_tool_registry_key" in config["configurable"]:
-        registry_key = config["configurable"]["mcp_tool_registry_key"]
-    
-    if registry_key and registry_key in _TOOL_REGISTRY:
-        mcp_tools = _TOOL_REGISTRY[registry_key]
-        logger.info(f"Retrieved {len(mcp_tools)} tools from registry with key {registry_key}")
-    else:
-        logger.warning(f"No MCP tools found in registry with key {registry_key}")
-    
-    if mcp_tools:
-        logger.info(f"Using {len(mcp_tools)} tools: {[getattr(t, 'name', str(t)) for t in mcp_tools]}")
-        tool_list.extend(mcp_tools)
+    # Get MCP tools from context var
+    try:
+        mcp_tools = _mcp_tools.get()
+        if mcp_tools:
+            logger.info(f"Retrieved {len(mcp_tools)} tools from context")
+            tool_list.extend(mcp_tools)
+    except LookupError:
+        logger.warning("No MCP tools found in context")
     
     # Create and return the tool dictionary
     tool_dict = {tool.name: tool for tool in tool_list if hasattr(tool, 'name')}
@@ -180,8 +161,7 @@ async def supervisor(state: ReportState, config: RunnableConfig):
     # Initialize the model
     llm = init_chat_model(model=supervisor_model)
     
-    # If sections have been completed, but we don't yet have the final report, 
-    # then we need to initiate writing the introduction and conclusion
+    # If sections have been completed, but we don't yet have the final report, then we need to initiate writing the introduction and conclusion
     if state.get("completed_sections") and not state.get("final_report"):
         research_complete_message = {"role": "user", "content": "Research is complete. Now write the introduction and conclusion for the report. Here are the completed main body sections: \n\n" + "\n\n".join([s.content for s in state["completed_sections"]])}
         messages = messages + [research_complete_message]
@@ -222,7 +202,7 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
         # No tool calls, just continue
         return Command(goto="supervisor", update={"messages": result})
     
-    # Process all tool calls
+    # First process all tool calls to ensure we respond to each one (required for OpenAI)
     for tool_call in tool_calls:
         # Get the tool
         tool_name = tool_call.get("name")
@@ -253,15 +233,17 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
                 "tool_call_id": tool_call.get("id", "unknown")
             })
             
-            # Store special tool results exactly as in original implementation
+            # Store special tool results for processing after all tools have been called
             if tool_name == "Sections":
                 sections_list = observation.sections
             elif tool_name == "Introduction":
+                # Format introduction with proper H1 heading if not already formatted
                 if not observation.content.startswith("# "):
                     intro_content = f"# {observation.name}\n\n{observation.content}"
                 else:
                     intro_content = observation.content
             elif tool_name == "Conclusion":
+                # Format conclusion with proper H2 heading if not already formatted
                 if not observation.content.startswith("## "):
                     conclusion_content = f"## {observation.name}\n\n{observation.content}"
                 else:
@@ -275,17 +257,25 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
                 "tool_call_id": tool_call.get("id", "unknown")
             })
     
-    # Match original implementation's decision flow exactly
+    # After processing all tool calls, decide what to do next
     if sections_list:
+        # Send the sections to the research agents
         return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], 
                       update={"messages": result})
     elif intro_content:
+        # Store introduction while waiting for conclusion
+        # Append to messages to guide the LLM to write conclusion next
         result.append({"role": "user", "content": "Introduction written. Now write a conclusion section."})
         return Command(goto="supervisor", update={"final_report": intro_content, "messages": result})
     elif conclusion_content:
+        # Get all sections and combine in proper order: Introduction, Body Sections, Conclusion
         intro = state.get("final_report", "")
         body_sections = "\n\n".join([s.content for s in state["completed_sections"]])
+
+        # Assemble final report in correct order
         complete_report = f"{intro}\n\n{body_sections}\n\n{conclusion_content}"
+
+        # Append to messages to indicate completion
         result.append({"role": "user", "content": "Report is now complete with introduction, body sections, and conclusion."})
         return Command(goto="supervisor", update={"final_report": complete_report, "messages": result})
     else:
@@ -293,15 +283,12 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
     
 async def supervisor_should_continue(state: ReportState) -> Literal["supervisor_tools", END]:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
-    messages = state["messages"]
-    if not messages:
-        return END
-        
+
+    messages = state["messages"]    
     last_message = messages[-1]
 
-    # Check if the message has tool_calls attribute and it's not empty
-    tool_calls = getattr(last_message, "tool_calls", None)
-    if tool_calls:
+    # If the LLM makes a tool call, then perform an action
+    if last_message.tool_calls:
         return "supervisor_tools"
     
     # Else end because the supervisor asked a question or is finished
@@ -310,6 +297,7 @@ async def supervisor_should_continue(state: ReportState) -> Literal["supervisor_
 
 async def research_agent(state: SectionState, config: RunnableConfig):
     """LLM decides whether to call a tool or not"""
+    
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
     researcher_model = get_config_value(configurable.researcher_model)
@@ -455,72 +443,27 @@ graph = supervisor_builder.compile()
 # Context manager for working with MCP directly
 from contextlib import asynccontextmanager
 
-# Then modify the create_mcp_research_graph function
 @asynccontextmanager
 async def create_mcp_research_graph(config: RunnableConfig):
-    """Create a research graph with MCP integration using direct tools approach."""
+    """Create a research graph with MCP integration following the documentation pattern."""
     # Extract MCP servers from config
     configurable = Configuration.from_runnable_config(config)
     mcp_servers = getattr(configurable, "mcp_servers", None)
     
     logger.info(f"Starting create_mcp_research_graph with servers: {mcp_servers}")
     
-    # Ensure we have a dictionary for modifying config
-    config_dict = dict(config) if config else {}
-    
-    # Ensure thread_id
-    if "thread_id" not in config_dict:
-        config_dict["thread_id"] = str(uuid.uuid4())
-    
-    # Set up MCP client if servers are configured
-    client = None
     if mcp_servers:
-        try:
-            # Create and start the client
-            logger.info(f"Creating MultiServerMCPClient with servers: {mcp_servers}")
-            client = MultiServerMCPClient(mcp_servers)
-            logger.info("Initializing MCP client")
-            await client.__aenter__()  # Call the async enter method explicitly
-            logger.info("MCP client initialized successfully")
+        async with MultiServerMCPClient(mcp_servers) as client:
+            # Set mcp tools in context variable
+            _mcp_tools.set(client.get_tools())
+            logger.info(f"Set {len(client.get_tools())} MCP tools in context")
             
-            # Get tools directly and use them without proxies
-            mcp_tools = client.get_tools()
-            logger.info(f"Retrieved {len(mcp_tools)} tools directly from MCP client: {[t.name for t in mcp_tools if hasattr(t, 'name')]}")
-            
-            # CHANGE: Store tools in global registry instead of config
-            tool_registry_key = str(uuid.uuid4())
-            _TOOL_REGISTRY[tool_registry_key] = mcp_tools
-            
-            # Only store the registry key in config
-            if "configurable" not in config_dict:
-                config_dict["configurable"] = {}
-            config_dict["configurable"]["mcp_tool_registry_key"] = tool_registry_key
-            
-            # Configure graph with the key reference
-            logger.info("Configuring graph with MCP tool registry key")
-            configured_graph = graph.with_config(config_dict)
-            
-            # Yield the configured graph
-            logger.info("Yielding configured graph with tool registry reference")
-            yield configured_graph
-            
-            # Clean up registry after use
-            if tool_registry_key in _TOOL_REGISTRY:
-                del _TOOL_REGISTRY[tool_registry_key]
-            
-        except Exception as e:
-            logger.error(f"Error in create_mcp_research_graph: {e}", exc_info=True)
-            raise
-        finally:
-            # Clean up client
-            logger.info("Context exiting, cleaning up client")
-            if client:
-                logger.info("Closing MCP client")
-                await client.__aexit__(None, None, None)
-                logger.info("MCP client closed")
+            # Use the existing compiled graph
+            yield graph.with_config(config)
     else:
+        # No MCP servers configured, use standard graph
         logger.warning("No MCP servers configured, using standard graph")
-        yield graph.with_config(config_dict)
+        yield graph.with_config(config)
 
 # Utility function for using the context manager
 async def run_with_mcp(query, config: RunnableConfig):
