@@ -225,7 +225,7 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig) -> Comman
             else:
                 observation = tool.invoke(tool_call.get("args", {}))
 
-            # Append to messages - Keep format exactly like original implementation
+            # Append to messages
             result.append({
                 "role": "tool", 
                 "content": observation,
@@ -442,6 +442,7 @@ graph = supervisor_builder.compile()
 
 # Context manager for working with MCP directly
 from contextlib import asynccontextmanager
+from langgraph.checkpoint.memory import MemorySaver
 
 @asynccontextmanager
 async def create_mcp_research_graph(config: RunnableConfig):
@@ -451,41 +452,18 @@ async def create_mcp_research_graph(config: RunnableConfig):
     mcp_servers = getattr(configurable, "mcp_servers", None)
     
     logger.info(f"Starting create_mcp_research_graph with servers: {mcp_servers}")
-    
+
+    checkpointer = MemorySaver()
+    workflow = supervisor_builder.compile(name="research_team", checkpointer=checkpointer)
+            
     if mcp_servers:
         async with MultiServerMCPClient(mcp_servers) as client:
             # Set mcp tools in context variable
             _mcp_tools.set(client.get_tools())
             logger.info(f"Set {len(client.get_tools())} MCP tools in context")
-            
-            # Use the existing compiled graph
-            yield graph.with_config(config)
+            # yield the compiled graph
+            yield workflow
     else:
         # No MCP servers configured, use standard graph
         logger.warning("No MCP servers configured, using standard graph")
-        yield graph.with_config(config)
-
-# Utility function for using the context manager
-async def run_with_mcp(query, config: RunnableConfig):
-    """
-    Run a research query using the multi-agent system with direct MCP integration.
-    
-    Args:
-        query: The research query
-        config: RunnableConfig containing MCP configuration
-        
-    Returns:
-        The research results
-    """
-    async with create_mcp_research_graph(config) as research_graph:
-        # Create input message
-        messages = [{"role": "user", "content": query}]
-        
-        # Run the graph
-        response = await research_graph.ainvoke({"messages": messages})
-        
-        # Log the final report
-        if "final_report" in response:
-            logger.info(f"Generated report with {len(response['final_report'])} characters")
-        
-        return response
+        yield workflow
