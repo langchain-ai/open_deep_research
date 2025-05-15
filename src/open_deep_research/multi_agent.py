@@ -123,7 +123,9 @@ async def supervisor(state: ReportState, config: RunnableConfig):
     # Invoke
     return {
         "messages": [
-            await llm.bind_tools(supervisor_tool_list, parallel_tool_calls=False).ainvoke(
+            # Invoke LLM with tools - parallel_tool_calls=False parameter removed as sequential processing is the default
+            # and the code already processes tool calls one at a time in the supervisor_tools function
+            await llm.bind_tools(supervisor_tool_list).ainvoke(
                 [
                     {"role": "system",
                      "content": SUPERVISOR_INSTRUCTIONS,
