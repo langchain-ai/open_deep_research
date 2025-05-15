@@ -1,4 +1,5 @@
 from typing import Literal
+import builtins  # For explicit access to built-in functions
 
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -61,6 +62,9 @@ async def generate_pitch_plan(state: PitchState, config: RunnableConfig):
 
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
+    
+    # Get pitch organization from config
+    pitch_organization = config.get("configurable", {}).get("pitch_organization", "Standard startup pitch format with Problem, Solution, Market, Business Model, Team, and Call to Action slides")
 
     # Set writer model (model used for pitch planning)
     writer_provider = get_config_value(configurable.writer_provider)
@@ -70,7 +74,12 @@ async def generate_pitch_plan(state: PitchState, config: RunnableConfig):
     structured_llm = writer_model.with_structured_output(Slides)
 
     # Format system instructions
-    system_instructions = pitch_planner_instructions.format(topic=topic, feedback=feedback)
+    system_instructions = pitch_planner_instructions.format(
+        topic=topic, 
+        pitch_organization=pitch_organization, 
+        context="", 
+        feedback=feedback or ""
+    )
 
     # Generate slides plan
     results = await structured_llm.ainvoke([
@@ -98,6 +107,7 @@ async def generate_tagline(state: PitchState, config: RunnableConfig):
 
     # Inputs
     topic = state["topic"]
+    slides = state["slides"]
 
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
@@ -110,7 +120,7 @@ async def generate_tagline(state: PitchState, config: RunnableConfig):
     structured_llm = writer_model.with_structured_output(Tagline)
     
     # Format system instructions
-    system_instructions = tagline_instructions.format(topic=topic)
+    system_instructions = tagline_instructions.format(topic=topic, slides=slides)
     
     # Generate tagline
     result = await structured_llm.ainvoke([
@@ -329,7 +339,7 @@ async def write_slide(state: SlideState, config: RunnableConfig) -> Command[Lite
     slide_grader_instructions_formatted = slide_grader_instructions.format(
         topic=topic, 
         slide_description=slide.description,
-        slide=slide.content, 
+        slide_content=slide.content, 
         number_of_follow_up_queries=configurable.number_of_queries
     )
 
@@ -383,6 +393,7 @@ async def suggest_visuals(state: SlideState, config: RunnableConfig):
     
     # Get the current slide
     slide = state["current_slide"]
+    topic = state["topic"]
     
     # Get configuration
     configurable = Configuration.from_runnable_config(config)
@@ -395,8 +406,8 @@ async def suggest_visuals(state: SlideState, config: RunnableConfig):
     
     # Format visual suggestion instructions
     system_instructions = visual_suggestion_instructions.format(
+        topic=topic,
         slide_name=slide.name,
-        slide_description=slide.description,
         slide_content=slide.content
     )
     
@@ -545,8 +556,19 @@ def include_non_research_slides(state: PitchState):
     # Return completed non-research slides to be added to the state
     return {"completed_slides": non_research_slides}
 
-# Add this step after human feedback
-builder.add_edge("human_feedback", include_non_research_slides)
-builder.add_edge(include_non_research_slides, "build_slide_with_web_research")
+# Add nodes
+builder.add_node("include_non_research_slides", include_non_research_slides)
+
+# Add edges
+builder.add_edge("human_feedback", "include_non_research_slides")
+builder.add_conditional_edges(
+    "include_non_research_slides",
+    lambda state: [
+        Send("build_slide_with_web_research", {"topic": state["topic"], "slide": s, "search_iterations": 0}) 
+        for s in state["slides"] 
+        if s.research
+    ],
+    ["build_slide_with_web_research"]
+)
 
 graph = builder.compile()
