@@ -393,3 +393,252 @@ Before each search query or when writing the section, think through:
 - Always follow markdown formatting
 - Stay within the 200 word limit for the main content
 """
+
+## Pitch Deck Generation Prompts
+
+pitch_planner_instructions="""I want a plan for a concise, impactful AI engineering pitch deck.
+
+<Project topic>
+The topic of the project is:
+{topic}
+</Project topic>
+
+<Pitch organization>
+The pitch deck should follow this organization: 
+{pitch_organization}
+</Pitch organization>
+
+<Context>
+Here is context to use to plan the slides of the pitch deck: 
+{context}
+</Context>
+
+<Task>
+Generate a list of 5-7 slides for the pitch deck. Your plan should be focused on addressing three key perspectives:
+1. Executive's Nightmare: The critical business risk/problem your solution addresses
+2. User's Journey: The pain points and experience of your target users
+3. Team Gap: How your team's unique skills solve this problem
+
+Each slide should have the fields:
+
+- Name - Name for this slide (e.g., Problem, Solution, Market, Impact, Team, Call to Action)
+- Description - Brief overview of the main points to cover on this slide (50-100 words max)
+- Research - Whether to perform web research for this slide. IMPORTANT: At least 2 slides MUST have Research=True.
+- Content - The content of the slide, which you will leave blank for now.
+- Visual - Suggestion for a visual element (chart, image, mockup, etc.) for this slide.
+
+Pitch deck guidelines:
+- Ensure each slide has a distinct purpose with no content overlap
+- Focus on persuasive storytelling rather than technical depth
+- Aim for boldness and clarity in messaging
+- Target a 3-minute verbal presentation
+- Make every slide visually memorable and impact-oriented
+
+Before submitting, review your structure to ensure it follows a logical narrative flow that builds excitement.
+</Task>
+
+<Feedback>
+Here is feedback on the pitch structure from review (if any):
+{feedback}
+</Feedback>
+
+<Format>
+Call the Slides tool 
+</Format>
+"""
+
+tagline_instructions="""Create a catchy, memorable tagline for an AI engineering project pitch.
+
+<Project topic>
+{topic}
+</Project topic>
+
+<Project slides>
+{slides}
+</Project slides>
+
+<Task>
+Generate a powerful 5-10 word tagline that captures the essence of this project.
+
+The tagline should:
+1. Communicate the core value proposition 
+2. Be memorable and easy to repeat
+3. Create excitement and interest
+4. Use simple, impactful language
+5. Avoid technical jargon unless it's effective
+
+Great taglines often:
+- Highlight transformation (before/after)
+- Use evocative language that creates an emotional response
+- Reference the key problem or solution
+- Create a sense of urgency or importance
+</Task>
+
+<Format>
+Call the Tagline tool 
+</Format>
+"""
+
+slide_writer_instructions="""Write one slide for an AI engineering pitch deck.
+
+<Task>
+1. Review the project topic, slide name, and slide description carefully.
+2. If present, review any existing slide content. 
+3. Then, look at the provided source material.
+4. Write concise, persuasive slide content that will grab the audience's attention.
+</Task>
+
+<Writing Guidelines>
+- If existing slide content is not populated, write from scratch
+- If existing slide content is populated, enhance it with the source material
+- Strict 50-100 word limit - pitch decks must be concise
+- Use simple, bold language that executives can understand
+- Focus on solving the "Executive's Nightmare" - what keeps decision-makers up at night
+- Address the "User's Journey" - the human pain points your solution resolves
+- Highlight the "Team Gap" - why your specific team is uniquely suited to solve this problem
+- Use language that shows confidence and "swagger" - avoid hedging words
+</Writing Guidelines>
+
+<Visual Suggestion>
+Based on your content, suggest one powerful visual element (chart, image, screenshot, etc.) that would strengthen this slide.
+</Visual Suggestion>
+
+<Final Check>
+1. Verify that the content is concise enough for a 3-minute pitch (50-100 words)
+2. Confirm the message is clear to a non-technical audience
+3. Ensure it addresses at least one key perspective (Executive, User, or Team)
+4. Check that it contributes to a persuasive overall narrative
+</Final Check>
+"""
+
+slide_writer_inputs=""" 
+<Project topic>
+{topic}
+</Project topic>
+
+<Slide name>
+{slide_name}
+</Slide name>
+
+<Slide description>
+{slide_description}
+</Slide description>
+
+<Existing slide content (if populated)>
+{slide_content}
+</Existing slide content>
+
+<Source material>
+{context}
+</Source material>
+"""
+
+slide_grader_instructions="""Review a pitch deck slide relative to the specified topic:
+
+<Project topic>
+{topic}
+</Project topic>
+
+<Slide description>
+{slide_description}
+</Slide description>
+
+<Slide content>
+{slide_content}
+</Slide content>
+
+<Task>
+Evaluate whether the slide content effectively communicates its intended message for a pitch deck.
+
+Evaluate the slide on these criteria:
+1. Clarity: Is the main message immediately clear? (1-5)
+2. Conciseness: Is it brief enough for a 3-minute pitch? (1-5)
+3. Impact: Does it create an emotional response or urgency? (1-5)
+4. Relevance: Does it address one of the key perspectives (Executive, User, Team)? (1-5)
+5. Persuasiveness: Does it contribute to convincing the audience? (1-5)
+
+If the slide scores below 4 on any criterion, generate {number_of_follow_up_queries} follow-up search queries to gather information to improve it.
+</Task>
+
+<Format>
+Call the Feedback tool and output with the following schema:
+
+grade: Literal["pass","fail"] = Field(
+    description="Evaluation result indicating whether the slide meets requirements ('pass') or needs revision ('fail')."
+)
+follow_up_queries: List[SearchQuery] = Field(
+    description="List of follow-up search queries to improve the slide."
+)
+</Format>
+"""
+
+visual_suggestion_instructions="""Suggest a powerful visual element for a pitch deck slide.
+
+<Project topic>
+{topic}
+</Project topic>
+
+<Slide name>
+{slide_name}
+</Slide name>
+
+<Slide content>
+{slide_content}
+</Slide content>
+
+<Task>
+Suggest a specific visual element that would strengthen this slide's message. The visual should:
+
+1. Instantly communicate the slide's main message
+2. Be memorable and emotionally resonant
+3. Support the narrative without requiring explanation
+4. Be appropriate for the slide type (e.g., problem, solution, market)
+
+Be specific about:
+- The type of visual (chart, image, diagram, screenshot, mockup)
+- Key elements to include
+- Style recommendations (color scheme, layout, emphasis)
+- Any data sources or tools that could help create it
+</Task>
+
+<Format>
+Call the Visual tool 
+</Format>
+"""
+
+discord_post_instructions="""Format a pitch project for sharing in a Discord community.
+
+<Project topic>
+{topic}
+</Project topic>
+
+<Tagline>
+{tagline}
+</Tagline>
+
+<Pitch slides>
+{slides}
+</Pitch slides>
+
+<Task>
+Create an engaging Discord post that showcases this project in a way that will generate excitement and feedback. 
+
+Your post should include:
+1. An attention-grabbing title
+2. The project tagline
+3. A brief (2-3 sentence) overview of the project
+4. The most impressive achievement or insight
+5. A clear call to action for community feedback
+6. Suggestion for an image that would make the post stand out
+
+Format the post using Discord markdown for readability:
+- Use bold, italics, and headers appropriately
+- Add line breaks for readability
+- Include 2-3 relevant emojis to add personality
+- Keep the entire post under 250 words
+</Task>
+
+<Format>
+Call the DiscordPost tool 
+</Format>
+"""
