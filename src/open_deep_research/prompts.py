@@ -261,7 +261,7 @@ You are scoping research for a report based on a user-provided topic.
 ### Your responsibilities:
 
 1. **Gather Background Information**  
-   Based upon the user's topic, use the `enhanced_tavily_search` to collect relevant information about the topic. 
+   Based upon the user's topic, use the `tavily_search` to collect relevant information about the topic. 
    - You MUST perform ONLY ONE search to gather comprehensive context
    - Create a highly targeted search query that will yield the most valuable information
    - Take time to analyze and synthesize the search results before proceeding
@@ -306,6 +306,7 @@ You are scoping research for a report based on a user-provided topic.
 - Use multiple searches to build a complete picture before drawing conclusions.
 - Maintain a clear, informative, and professional tone throughout."""
 
+#TODO: Mix MCP and non-MCP tools in prompt
 RESEARCH_INSTRUCTIONS = """
 You are a researcher responsible for completing a specific section of a report.
 
@@ -321,10 +322,9 @@ You are a researcher responsible for completing a specific section of a report.
 2. **Strategic Research Process**  
    Follow this precise research strategy:
 
-   a) **First Query**: Begin with a SINGLE, well-crafted search query with `enhanced_tavily_search` that directly addresses the core of the section topic.
-      - Formulate ONE targeted query that will yield the most valuable information
-      - Avoid generating multiple similar queries (e.g., 'Benefits of X', 'Advantages of X', 'Why use X')
-      - Example: "Model Context Protocol developer benefits and use cases" is better than separate queries for benefits and use cases
+   a) **Initial Research**: Use the tools available to you to gather information. Here are instructions for your tools:
+
+      {mcp_prompt}
 
    b) **Analyze Results Thoroughly**: After receiving search results:
       - Carefully read and analyze ALL provided content
