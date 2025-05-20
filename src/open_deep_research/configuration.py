@@ -53,6 +53,13 @@ class Configuration:
     supervisor_model: str = "openai:gpt-4.1" # Model for supervisor agent in multi-agent setup
     researcher_model: str = "openai:gpt-4.1" # Model for research agents in multi-agent setup 
 
+    # Pitch deck specific configuration
+    pitch_structure: str = "pitch-deck"  # Defaults to standard pitch deck structure
+    enable_mcp: bool = False  # Whether to enable MCP integration for pitch decks
+    mcp_server_url: Optional[str] = None  # URL for MCP server if enabled
+    include_visuals: bool = True  # Whether to include visual suggestions in pitch decks
+    discord_integration: bool = True  # Whether to format content for Discord sharing
+
     @classmethod
     def from_runnable_config(
         cls, config: Optional[RunnableConfig] = None
