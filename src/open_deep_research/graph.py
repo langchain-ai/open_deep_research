@@ -1,12 +1,16 @@
-from typing import Literal
+from typing import Literal, Dict, Any
 
 from langchain.chat_models import init_chat_model
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
 from langgraph.constants import Send
 from langgraph.graph import START, END, StateGraph
 from langgraph.types import interrupt, Command
+
+
+
 
 from open_deep_research.state import (
     ReportStateInput,
@@ -78,10 +82,33 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
         report_structure = str(report_structure)
 
     # Set writer model (model used for query writing)
-    writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model_kwargs = get_config_value(configurable.writer_model_kwargs or {})
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs) 
+    
+    # Check if OPENAI_API_KEY is set and not empty
+    import os
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    
+    # Initialize the model
+    try:
+        # Try using OpenAI with explicit API key
+        if openai_api_key and len(openai_api_key) > 20:
+            # Use OpenAI models when OpenAI API key is available
+            writer_model = init_chat_model(
+                model="gpt-4o", 
+                model_provider="openai",
+                model_kwargs={"openai_api_key": openai_api_key}
+            )
+        elif ':' in writer_model_name:
+            writer_provider, model_name = writer_model_name.split(':', 1)
+            writer_model = init_chat_model(model=model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs)
+        else:
+            writer_provider = get_config_value(configurable.writer_provider)
+            writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs)
+    except Exception as e:
+        # Fallback to Groq if there's an error with OpenAI
+        print(f"Error initializing OpenAI model: {e}. Falling back to Groq.")
+        writer_model = init_chat_model(model="llama-3.3-70b-versatile", model_provider="groq") 
     structured_llm = writer_model.with_structured_output(Queries)
 
     # Format system instructions
@@ -109,19 +136,35 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     planner_message = """Generate the sections of the report. Your response must include a 'sections' field containing a list of sections. 
                         Each section must have: name, description, research, and content fields."""
 
-    # Run the planner
-    if planner_model == "claude-3-7-sonnet-latest":
-        # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
-        planner_llm = init_chat_model(model=planner_model, 
-                                      model_provider=planner_provider, 
-                                      max_tokens=20_000, 
-                                      thinking={"type": "enabled", "budget_tokens": 16_000})
-
-    else:
-        # With other models, thinking tokens are not specifically allocated
-        planner_llm = init_chat_model(model=planner_model, 
-                                      model_provider=planner_provider,
-                                      model_kwargs=planner_model_kwargs)
+    # Check if OPENAI_API_KEY is set and not empty
+    import os
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    
+    # Initialize the planner model
+    try:
+        # Try using OpenAI with explicit API key
+        if openai_api_key and len(openai_api_key) > 20:
+            # Use OpenAI models when OpenAI API key is available
+            planner_llm = init_chat_model(
+                model="gpt-4o", 
+                model_provider="openai",
+                model_kwargs={"openai_api_key": openai_api_key}
+            )
+        elif planner_model == "claude-3-7-sonnet-latest":
+            # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
+            planner_llm = init_chat_model(model=planner_model, 
+                                        model_provider=planner_provider, 
+                                        max_tokens=20_000, 
+                                        thinking={"type": "enabled", "budget_tokens": 16_000})
+        else:
+            # With other models, thinking tokens are not specifically allocated
+            planner_llm = init_chat_model(model=planner_model, 
+                                        model_provider=planner_provider,
+                                        model_kwargs=planner_model_kwargs)
+    except Exception as e:
+        # Fallback to Groq if there's an error with OpenAI
+        print(f"Error initializing OpenAI model: {e}. Falling back to Groq.")
+        planner_llm = init_chat_model(model="llama-3.3-70b-versatile", model_provider="groq")
     
     # Generate the report sections
     structured_llm = planner_llm.with_structured_output(Sections)

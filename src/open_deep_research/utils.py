@@ -6,11 +6,19 @@ import concurrent
 import aiohttp
 import httpx
 import time
+import logging
 from typing import List, Optional, Dict, Any, Union, Literal
 from urllib.parse import unquote
 
+# Get module-level logger
+logger = logging.getLogger(__name__)
+
 from exa_py import Exa
-from linkup import LinkupClient
+# Handle potential import error with LinkupClient
+try:
+    from linkup import LinkupClient
+except (ImportError, AttributeError):
+    LinkupClient = None
 from tavily import AsyncTavilyClient
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.aio import SearchClient as AsyncAzureAISearchClient
@@ -27,6 +35,7 @@ from langchain_core.tools import tool
 from langsmith import traceable
 
 from open_deep_research.state import Section
+from open_deep_research.cache import cached_search
     
 def get_config_value(value):
     """
@@ -142,6 +151,7 @@ Content:
     return formatted_str
 
 @traceable
+@cached_search
 async def tavily_search_async(search_queries, max_results: int = 5, topic: Literal["general", "news", "finance"] = "general", include_raw_content: bool = True):
     """
     Performs concurrent web searches with the Tavily API
@@ -171,9 +181,12 @@ async def tavily_search_async(search_queries, max_results: int = 5, topic: Liter
                     ]
                 }
     """
-    tavily_async_client = AsyncTavilyClient()
-    search_tasks = []
-    for query in search_queries:
+    try:
+        logger.info(f"Performing Tavily search for {len(search_queries)} queries")
+        tavily_async_client = AsyncTavilyClient()
+        search_tasks = []
+        
+        for query in search_queries:
             search_tasks.append(
                 tavily_async_client.search(
                     query,
@@ -183,9 +196,13 @@ async def tavily_search_async(search_queries, max_results: int = 5, topic: Liter
                 )
             )
 
-    # Execute all searches concurrently
-    search_docs = await asyncio.gather(*search_tasks)
-    return search_docs
+        # Execute all searches concurrently
+        search_docs = await asyncio.gather(*search_tasks)
+        logger.info(f"Completed Tavily search for {len(search_queries)} queries")
+        return search_docs
+    except Exception as e:
+        logger.error(f"Error in tavily_search_async: {e}")
+        raise
 
 @traceable
 async def azureaisearch_search_async(search_queries: list[str], max_results: int = 5, topic: str = "general", include_raw_content: bool = True) -> list[dict]:
@@ -872,29 +889,37 @@ async def linkup_search(search_queries, depth: Optional[str] = "standard"):
                 ]
             }
     """
-    client = LinkupClient()
-    search_tasks = []
-    for query in search_queries:
-        search_tasks.append(
-                client.async_search(
-                    query,
-                    depth,
-                    output_type="searchResults",
+    # Check if LinkupClient is available
+    if LinkupClient is None:
+        logger.warning("LinkupClient is not available. Returning empty results.")
+        return [{"results": [], "error": "LinkupClient is not available"} for _ in search_queries]
+    
+    try:
+        client = LinkupClient()
+        search_tasks = []
+        for query in search_queries:
+            search_tasks.append(
+                    client.async_search(
+                        query,
+                        depth,
+                        output_type="searchResults",
+                    )
                 )
+
+        search_results = []
+        for response in await asyncio.gather(*search_tasks):
+            search_results.append(
+                {
+                    "results": [
+                        {"title": result.name, "url": result.url, "content": result.content}
+                        for result in response.results
+                    ],
+                }
             )
-
-    search_results = []
-    for response in await asyncio.gather(*search_tasks):
-        search_results.append(
-            {
-                "results": [
-                    {"title": result.name, "url": result.url, "content": result.content}
-                    for result in response.results
-                ],
-            }
-        )
-
-    return search_results
+        return search_results
+    except Exception as e:
+        logger.error(f"Error in linkup_search: {e}")
+        return [{"results": [], "error": str(e)} for _ in search_queries]
 
 @traceable
 async def google_search_async(search_queries: Union[str, List[str]], max_results: int = 5, include_raw_content: bool = True):
@@ -1216,8 +1241,9 @@ async def scrape_pages(titles: List[str], urls: List[str]) -> str:
         
     return  formatted_output
 
-@tool
-async def duckduckgo_search(search_queries: List[str]):
+@traceable
+@cached_search
+def duckduckgo_search(search_queries: List[str]):
     """Perform searches using DuckDuckGo with retry logic to handle rate limits
     
     Args:
@@ -1227,106 +1253,64 @@ async def duckduckgo_search(search_queries: List[str]):
         List[dict]: List of search results
     """
     
-    async def process_single_query(query):
-        # Execute synchronous search in the event loop's thread pool
-        loop = asyncio.get_event_loop()
-        
-        def perform_search():
-            max_retries = 3
-            retry_count = 0
-            backoff_factor = 2.0
-            last_exception = None
-            
-            while retry_count <= max_retries:
-                try:
-                    results = []
-                    with DDGS() as ddgs:
-                        # Change query slightly and add delay between retries
-                        if retry_count > 0:
-                            # Random delay with exponential backoff
-                            delay = backoff_factor ** retry_count + random.random()
-                            print(f"Retry {retry_count}/{max_retries} for query '{query}' after {delay:.2f}s delay")
-                            time.sleep(delay)
-                            
-                            # Add a random element to the query to bypass caching/rate limits
-                            modifiers = ['about', 'info', 'guide', 'overview', 'details', 'explained']
-                            modified_query = f"{query} {random.choice(modifiers)}"
-                        else:
-                            modified_query = query
-                        
-                        # Execute search
-                        ddg_results = list(ddgs.text(modified_query, max_results=5))
-                        
-                        # Format results
-                        for i, result in enumerate(ddg_results):
-                            results.append({
-                                'title': result.get('title', ''),
-                                'url': result.get('href', ''),
-                                'content': result.get('body', ''),
-                                'score': 1.0 - (i * 0.1),  # Simple scoring mechanism
-                                'raw_content': result.get('body', '')
-                            })
-                        
-                        # Return successful results
-                        return {
-                            'query': query,
-                            'follow_up_questions': None,
-                            'answer': None,
-                            'images': [],
-                            'results': results
-                        }
-                except Exception as e:
-                    # Store the exception and retry
-                    last_exception = e
-                    retry_count += 1
-                    print(f"DuckDuckGo search error: {str(e)}. Retrying {retry_count}/{max_retries}")
-                    
-                    # If not a rate limit error, don't retry
-                    if "Ratelimit" not in str(e) and retry_count >= 1:
-                        print(f"Non-rate limit error, stopping retries: {str(e)}")
-                        break
-            
-            # If we reach here, all retries failed
-            print(f"All retries failed for query '{query}': {str(last_exception)}")
-            # Return empty results but with query info preserved
-            return {
-                'query': query,
-                'follow_up_questions': None,
-                'answer': None,
-                'images': [],
-                'results': [],
-                'error': str(last_exception)
-            }
-            
-        return await loop.run_in_executor(None, perform_search)
-
-    # Process queries with delay between them to reduce rate limiting
-    search_docs = []
-    urls = []
-    titles = []
-    for i, query in enumerate(search_queries):
-        # Add delay between queries (except first one)
-        if i > 0:
-            delay = 2.0 + random.random() * 2.0  # Random delay 2-4 seconds
-            await asyncio.sleep(delay)
-        
-        # Process the query
-        result = await process_single_query(query)
-        search_docs.append(result)
-        
-        # Safely extract URLs and titles from results, handling empty result cases
-        if result['results'] and len(result['results']) > 0:
-            for res in result['results']:
-                if 'url' in res and 'title' in res:
-                    urls.append(res['url'])
-                    titles.append(res['title'])
+    results = []
     
-    # If we got any valid URLs, scrape the pages
-    if urls:
-        return await scrape_pages(titles, urls)
-    else:
-        # Return a formatted error message if no valid URLs were found
-        return "No valid search results found. Please try different search queries or use a different search API."
+    logger.info(f"Performing DuckDuckGo search for {len(search_queries)} queries")
+    
+    for query in search_queries:
+        query_results = []
+        max_retries = 3
+        retry_delay = 2  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                with DDGS() as ddgs:
+                    logger.debug(f"DuckDuckGo search attempt {attempt+1} for query: {query}")
+                    ddgs_results = list(ddgs.text(query, max_results=10))
+                    
+                    # Process results
+                    for result in ddgs_results:
+                        # Extract relevant fields
+                        title = result.get('title', '')
+                        url = result.get('href', '')
+                        content = result.get('body', '')
+                        
+                        # Add to query results
+                        query_results.append({
+                            'title': title,
+                            'url': url,
+                            'content': content,
+                            'score': 1.0,  # DuckDuckGo doesn't provide scores
+                            'raw_content': None  # DuckDuckGo doesn't provide raw content
+                        })
+                    
+                    logger.debug(f"DuckDuckGo search successful for query: {query} with {len(ddgs_results)} results")
+                    # If we got here, the search was successful
+                    break
+            except Exception as e:
+                logger.warning(f"Error searching DuckDuckGo (attempt {attempt+1}/{max_retries}): {e}")
+                if attempt < max_retries - 1:
+                    # Wait before retrying
+                    time.sleep(retry_delay)
+                    # Increase delay for next retry
+                    retry_delay *= 2
+                else:
+                    # All retries failed
+                    logger.error(f"Failed to search DuckDuckGo after {max_retries} attempts for query: {query}")
+        
+        # Add results for this query
+        results.append({
+            'query': query,
+            'follow_up_questions': None,
+            'answer': None,
+            'images': [],
+            'results': query_results
+        })
+    
+    logger.info(f"Completed DuckDuckGo search for {len(search_queries)} queries")
+    return results
+                # This is part of an old implementation that's been replaced.
+                # The new implementation is above at line ~1230
 
 @tool
 async def tavily_search(queries: List[str], max_results: int = 5, topic: Literal["general", "news", "finance"] = "general") -> str:

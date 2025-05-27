@@ -1,11 +1,10 @@
 import os
 from enum import Enum
 from dataclasses import dataclass, fields
-from typing import Any, Optional, Dict 
+from typing import Any, Optional, Dict, ClassVar, Type, cast
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
-from dataclasses import dataclass
 
 DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-provided topic:
 
@@ -20,6 +19,11 @@ DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-
    - Provide a concise summary of the report"""
 
 class SearchAPI(Enum):
+    """Enumeration of supported search APIs.
+    
+    This enum defines all the search APIs that can be used for research.
+    The value of each enum member is the string identifier used in configuration.
+    """
     PERPLEXITY = "perplexity"
     TAVILY = "tavily"
     EXA = "exa"
@@ -31,39 +35,61 @@ class SearchAPI(Enum):
 
 @dataclass(kw_only=True)
 class Configuration:
-    """The configurable fields for the chatbot."""
+    """Configuration class for the research system.
+    
+    This class defines all configurable parameters for both the graph-based and
+    multi-agent implementations of the research system. It provides default values
+    for all parameters and methods to create a Configuration instance from a
+    RunnableConfig.
+    """
     # Common configuration
-    report_structure: str = DEFAULT_REPORT_STRUCTURE # Defaults to the default report structure
-    search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None
+    report_structure: str = DEFAULT_REPORT_STRUCTURE  # Structure template for the report
+    search_api: SearchAPI = SearchAPI.TAVILY  # Search API to use for research
+    search_api_config: Optional[Dict[str, Any]] = None  # Additional configuration for search API
     
     # Graph-specific configuration
-    number_of_queries: int = 2 # Number of search queries to generate per iteration
-    max_search_depth: int = 2 # Maximum number of reflection + search iterations
-    planner_provider: str = "anthropic"  # Defaults to Anthropic as provider
-    planner_model: str = "claude-3-7-sonnet-latest" # Defaults to claude-3-7-sonnet-latest
-    planner_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for planner_model
-    writer_provider: str = "anthropic" # Defaults to Anthropic as provider
-    writer_model: str = "claude-3-5-sonnet-latest" # Defaults to claude-3-5-sonnet-latest
-    writer_model_kwargs: Optional[Dict[str, Any]] = None # kwargs for writer_model
-    search_api: SearchAPI = SearchAPI.TAVILY # Default to TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None 
+    number_of_queries: int = 2  # Number of search queries to generate per iteration
+    max_search_depth: int = 2  # Maximum number of reflection + search iterations
+    planner_provider: str = "groq"  # Provider for the planner model
+    planner_model: str = "groq:llama-3.3-70b-versatile"  # Model for planning report sections
+    planner_model_kwargs: Optional[Dict[str, Any]] = None  # Additional kwargs for planner model
+    writer_provider: str = "groq"  # Provider for the writer model
+    writer_model: str = "groq:llama-3.3-70b-versatile"  # Model for writing report sections
+    writer_model_kwargs: Optional[Dict[str, Any]] = None  # Additional kwargs for writer model
     
     # Multi-agent specific configuration
-    supervisor_model: str = "openai:gpt-4.1" # Model for supervisor agent in multi-agent setup
-    researcher_model: str = "openai:gpt-4.1" # Model for research agents in multi-agent setup 
+    supervisor_model: str = "groq:llama-3.3-70b-versatile"  # Model for supervisor agent
+    researcher_model: str = "groq:llama-3.3-70b-versatile"  # Model for research agents
 
     @classmethod
     def from_runnable_config(
         cls, config: Optional[RunnableConfig] = None
     ) -> "Configuration":
-        """Create a Configuration instance from a RunnableConfig."""
+        """Create a Configuration instance from a RunnableConfig.
+        
+        This method extracts configuration values from either environment variables
+        or the configurable section of a RunnableConfig. Environment variables take
+        precedence over values in the RunnableConfig.
+        
+        Args:
+            config: Optional RunnableConfig containing configuration values
+            
+        Returns:
+            A new Configuration instance with values from the RunnableConfig and/or
+            environment variables
+        """
+        # Extract configurable dict from RunnableConfig if it exists
         configurable = (
             config["configurable"] if config and "configurable" in config else {}
         )
-        values: dict[str, Any] = {
+        
+        # For each field in the Configuration class, try to get its value from
+        # environment variables first, then from the configurable dict
+        values: Dict[str, Any] = {
             f.name: os.environ.get(f.name.upper(), configurable.get(f.name))
             for f in fields(cls)
             if f.init
         }
-        return cls(**{k: v for k, v in values.items() if v})
+        
+        # Create a new Configuration instance with non-None values
+        return cls(**{k: v for k, v in values.items() if v is not None})
