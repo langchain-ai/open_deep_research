@@ -148,8 +148,9 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
     # Run the appropriate agent based on the parameter
     if research_agent == "multi_agent":
 
+        topic_query = "What is model context protocol?"
         # Initial messages
-        initial_msg = [{"role": "user", "content": "What is model context protocol?"}]
+        initial_msg = [{"role": "user", "content": topic_query}]
         followup_msg = [{"role": "user", "content": "high-level overview of MCP, tell me about interesting specific MCP servers, developer audience, just focus on MCP. generate the report now and don't ask any more follow-up questions."}]
 
         # Checkpointer for the multi-agent approach
@@ -219,7 +220,7 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
     # Evaluate the report against our quality criteria
     eval_result = criteria_eval_structured_llm.invoke([
         {"role": "system", "content": RESPONSE_CRITERIA_SYSTEM_PROMPT},
-        {"role": "user", "content": f"""\n\n Report: \n\n{report}\n\nEvaluate whether the report meets the criteria and provide detailed justification for your evaluation."""}
+        {"role": "user", "content": f"""User input: {topic_query}\n\nReport: \n\n{report}\n\nEvaluate whether the report meets the criteria and provide detailed justification for your evaluation."""}
     ])
 
     # Extract section headers for analysis
