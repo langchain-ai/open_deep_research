@@ -16,7 +16,7 @@ DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-
    - Each section should focus on a sub-topic of the user-provided topic
    
 3. Conclusion
-   - Aim for 1 structural element (either a list of table) that distills the main body sections 
+   - Aim for 1 structural element (either a list or table) that distills the main body sections 
    - Provide a concise summary of the report"""
 
 class SearchAPI(Enum):
