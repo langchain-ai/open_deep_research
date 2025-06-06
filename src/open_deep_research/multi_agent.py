@@ -4,6 +4,7 @@ import operator
 import warnings
 
 from langchain.chat_models import init_chat_model
+from langchain_core.messages import ToolMessage
 from langchain_core.tools import tool, BaseTool
 from langchain_core.runnables import RunnableConfig
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -67,24 +68,6 @@ class Sections(BaseModel):
         description="Sections of the report.",
     )
 
-class Introduction(BaseModel):
-    """Introduction to the report."""
-    name: str = Field(
-        description="Name for the report.",
-    )
-    content: str = Field(
-        description="The content of the introduction, giving an overview of the report."
-    )
-
-class Conclusion(BaseModel):
-    """Conclusion to the report."""
-    name: str = Field(
-        description="Name for the conclusion of the report.",
-    )
-    content: str = Field(
-        description="The content of the conclusion, summarizing the report."
-    )
-
 class Question(BaseModel):
     """Ask a follow-up question to clarify the report scope."""
     question: str = Field(
@@ -98,6 +81,9 @@ class FinishResearch(BaseModel):
 # No-op tool to indicate that the report writing is complete
 class FinishReport(BaseModel):
     """Finish the report."""
+    content: str = Field(
+        description="Content of the final report."
+    )
 
 ## State
 class ReportStateOutput(TypedDict):
@@ -164,7 +150,7 @@ def get_supervisor_tools(config: RunnableConfig) -> list[BaseTool]:
     """Get supervisor tools based on configuration"""
     configurable = Configuration.from_runnable_config(config)
     search_tool = get_search_tool(config)
-    tools = [tool(Sections), tool(Introduction), tool(Conclusion), tool(FinishReport)]
+    tools = [tool(Sections), tool(FinishReport)]
     if configurable.ask_for_clarification:
         tools.append(tool(Question))
     if search_tool is not None:
@@ -175,7 +161,7 @@ def get_supervisor_tools(config: RunnableConfig) -> list[BaseTool]:
 async def get_research_tools(config: RunnableConfig) -> list[BaseTool]:
     """Get research tools based on configuration"""
     search_tool = get_search_tool(config)
-    tools = [tool(Section), tool(FinishResearch)]
+    tools = [tool(FinishResearch)]
     if search_tool is not None:
         tools.append(search_tool)  # Add search tool, if available
     existing_tool_names = {cast(BaseTool, tool).name for tool in tools}
@@ -276,57 +262,22 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
             return Command(goto=END, update={"messages": result, "question_asked": True})
         elif tool_call["name"] == "Sections":
             sections_list = cast(Sections, observation).sections
-        elif tool_call["name"] == "Introduction":
-            # Format introduction with proper H1 heading if not already formatted
-            observation = cast(Introduction, observation)
-            if not observation.content.startswith("# "):
-                intro_content = f"# {observation.name}\n\n{observation.content}"
-            else:
-                intro_content = observation.content
-        elif tool_call["name"] == "Conclusion":
-            # Format conclusion with proper H2 heading if not already formatted
-            observation = cast(Conclusion, observation)
-            if not observation.content.startswith("## "):
-                conclusion_content = f"## {observation.name}\n\n{observation.content}"
-            else:
-                conclusion_content = observation.content
-        elif tool_call["name"] in search_tool_names and configurable.include_source_str:
-            source_str += cast(str, observation)
+        elif tool_call["name"] == "FinishReport":
+            final_report = cast(FinishReport, observation).content
+            return Command(goto=END, update={"final_report": final_report})
+
+    if state["source_str"]:
+        result.append(
+            {"role": "user", "content": f"Research is now complete. Now write a final report based using the following research results: {state['source_str']}."}
+        )
 
     # After processing all tool calls, decide what to do next
     if sections_list:
         # Send the sections to the research agents
         return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], update={"messages": result})
-    elif intro_content:
-        # Store introduction while waiting for conclusion
-        # Append to messages to guide the LLM to write conclusion next
-        result.append({"role": "user", "content": "Introduction written. Now write a conclusion section."})
-        state_update = {
-            "final_report": intro_content,
-            "messages": result,
-        }
-    elif conclusion_content:
-        # Get all sections and combine in proper order: Introduction, Body Sections, Conclusion
-        intro = state.get("final_report", "")
-        body_sections = "\n\n".join([s.content for s in state["completed_sections"]])
-        
-        # Assemble final report in correct order
-        complete_report = f"{intro}\n\n{body_sections}\n\n{conclusion_content}"
-        
-        # Append to messages to indicate completion
-        result.append({"role": "user", "content": "Report is now complete with introduction, body sections, and conclusion."})
-
-        state_update = {
-            "final_report": complete_report,
-            "messages": result,
-        }
     else:
         # Default case (for search tools, etc.)
         state_update = {"messages": result}
-
-    # Include source string for evaluation
-    if configurable.include_source_str and source_str:
-        state_update["source_str"] = source_str
 
     return Command(goto="supervisor", update=state_update)
 
@@ -336,7 +287,7 @@ async def supervisor_should_continue(state: ReportState) -> str:
     messages = state["messages"]
     last_message = messages[-1]
     # End because the supervisor asked a question or is finished
-    if not last_message.tool_calls or (len(last_message.tool_calls) == 1 and last_message.tool_calls[0]["name"] == "FinishReport"):
+    if not last_message.tool_calls or (isinstance(last_message, ToolMessage) and last_message.name == "FinishReport"):
         # Exit the graph
         return END
 
@@ -386,7 +337,6 @@ async def research_agent_tools(state: SectionState, config: RunnableConfig):
     configurable = Configuration.from_runnable_config(config)
 
     result = []
-    completed_section = None
     source_str = ""
     
     # Get tools based on configuration
@@ -413,10 +363,6 @@ async def research_agent_tools(state: SectionState, config: RunnableConfig):
                        "content": observation, 
                        "name": tool_call["name"], 
                        "tool_call_id": tool_call["id"]})
-        
-        # Store the section observation if a Section tool was called
-        if tool_call["name"] == "Section":
-            completed_section = cast(Section, observation)
 
         # Store the source string if a search tool was called
         if tool_call["name"] in search_tool_names and configurable.include_source_str:
@@ -424,10 +370,7 @@ async def research_agent_tools(state: SectionState, config: RunnableConfig):
     
     # After processing all tools, decide what to do next
     state_update = {"messages": result}
-    if completed_section:
-        # Write the completed section to state and return to the supervisor
-        state_update["completed_sections"] = [completed_section]
-    if configurable.include_source_str and source_str:
+    if source_str:
         state_update["source_str"] = source_str
 
     return state_update
