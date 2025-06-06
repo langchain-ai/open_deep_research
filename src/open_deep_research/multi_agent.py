@@ -21,7 +21,7 @@ from open_deep_research.utils import (
     load_mcp_server_config
 )
 
-from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
+from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS, FINAL_REPORT_WRITER_INSTRUCTIONS
 
 ## Tools factory - will be initialized based on configuration
 def get_search_tool(config: RunnableConfig):
@@ -302,22 +302,14 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
         # Append to messages to guide the LLM to write conclusion next
         result.append({"role": "user", "content": "Introduction written. Now write a conclusion section."})
         state_update = {
-            "final_report": intro_content,
+            "completed_sections": [Section(name="Introduction", description="Introduction to the report", content=intro_content)],
             "messages": result,
         }
     elif conclusion_content:
-        # Get all sections and combine in proper order: Introduction, Body Sections, Conclusion
-        intro = state.get("final_report", "")
-        body_sections = "\n\n".join([s.content for s in state["completed_sections"]])
-        
-        # Assemble final report in correct order
-        complete_report = f"{intro}\n\n{body_sections}\n\n{conclusion_content}"
-        
         # Append to messages to indicate completion
         result.append({"role": "user", "content": "Report is now complete with introduction, body sections, and conclusion."})
-
         state_update = {
-            "final_report": complete_report,
+            "completed_sections": [Section(name="Conclusion", description="Conclusion to the report", content=conclusion_content)],
             "messages": result,
         }
     else:
@@ -330,6 +322,34 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
 
     return Command(goto="supervisor", update=state_update)
 
+
+def supervisor_write_final_report(state: ReportState, config: RunnableConfig):
+    introduction = ""
+    report_sections = []
+    conclusion = ""
+
+    for section in state["completed_sections"]:
+        if section.name == "Introduction":
+            introduction = section.content
+        elif section.name == "Conclusion":
+            conclusion = section.content
+        else:
+            report_sections.append(section.content)
+
+    report_sections = "\n\n".join(report_sections)
+    if not introduction or not conclusion or not report_sections:
+        raise ValueError("Introduction, conclusion, and report sections are required to write a final report.")
+
+    messages = [
+        {"role": "system", "content": FINAL_REPORT_WRITER_INSTRUCTIONS.format(introduction=introduction, report_sections=report_sections, conclusion=conclusion, today=get_today_str())},
+        {"role": "user", "content": "Now please write a final report based on the provided information."}
+    ]
+    configurable = Configuration.from_runnable_config(config)
+    llm = init_chat_model(model=get_config_value(configurable.supervisor_model))
+    final_report = llm.invoke(messages)
+    return {"final_report": final_report.content}
+
+
 async def supervisor_should_continue(state: ReportState) -> str:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
 
@@ -337,8 +357,8 @@ async def supervisor_should_continue(state: ReportState) -> str:
     last_message = messages[-1]
     # End because the supervisor asked a question or is finished
     if not last_message.tool_calls or (len(last_message.tool_calls) == 1 and last_message.tool_calls[0]["name"] == "FinishReport"):
-        # Exit the graph
-        return END
+        # Write the final report and then exit the graph
+        return "supervisor_write_final_report"
 
     # If the LLM makes a tool call, then perform an action
     return "supervisor_tools"
@@ -462,6 +482,7 @@ research_builder.add_edge("research_agent_tools", "research_agent")
 supervisor_builder = StateGraph(ReportState, input=MessagesState, output=ReportStateOutput, config_schema=Configuration)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
+supervisor_builder.add_node("supervisor_write_final_report", supervisor_write_final_report)
 supervisor_builder.add_node("research_team", research_builder.compile())
 
 # Flow of the supervisor agent
@@ -469,7 +490,7 @@ supervisor_builder.add_edge(START, "supervisor")
 supervisor_builder.add_conditional_edges(
     "supervisor",
     supervisor_should_continue,
-    ["supervisor_tools", END]
+    ["supervisor_tools", "supervisor_write_final_report"]
 )
 supervisor_builder.add_edge("research_team", "supervisor")
 
