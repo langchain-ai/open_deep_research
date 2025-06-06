@@ -153,6 +153,17 @@ The multi-agent implementation uses a supervisor-researcher architecture:
 
 This implementation focuses on efficiency and parallelization, making it ideal for faster report generation with less direct user involvement.
 
+You can customize the multi-agent implementation through several parameters:
+
+- `supervisor_model`: Model for the supervisor agent (default: "anthropic:claude-3-5-sonnet-latest")
+- `researcher_model`: Model for researcher agents (default: "anthropic:claude-3-5-sonnet-latest") 
+- `number_of_queries`: Number of search queries to generate per section (default: 2)
+- `search_api`: API to use for web searches (default: "tavily", options include "duckduckgo", "none")
+- `ask_for_clarification`: Whether the supervisor should ask clarifying questions before research (default: false) - **Important**: Set to `true` to enable the Question tool for the supervisor agent
+- `mcp_server_config`: Configuration for MCP servers (optional)
+- `mcp_prompt`: Additional instructions for using MCP tools (optional)
+- `mcp_tools_to_include`: Specific MCP tools to include (optional)
+
 ## MCP (Model Context Protocol) Support
 
 The multi-agent implementation (`src/open_deep_research/multi_agent.py`) supports MCP servers to extend research capabilities beyond web search. MCP tools are available to research agents alongside or instead of traditional search tools, enabling access to local files, databases, APIs, and other data sources.
@@ -211,7 +222,7 @@ MCP server config:
 
 MCP prompt: 
 ```
-Step 1: Use the `list_allowed_directories` tool to get the list of allowed directories. Step 2: Use the `read_file` tool to read files in the allowed directory.
+Use the `list_allowed_directories` tool to get the list of allowed directories, use the `list_directory` tool to get the list of files in the allowed directory, and use the `read_file` tool to read files in the allowed directory.
 ```
 
 MCP tools: 
@@ -221,7 +232,7 @@ list_directory
 read_file
 ```
 
-Example test case that you can provide: 
+Example test topic and follow-up feedback that you can provide that will reference the included file: 
 
 Topic:
 ```
@@ -233,6 +244,10 @@ Follow-up to the question asked by the research agent:
 ```
 I just want a single section report on vibe coding that highlights an interesting / fun example
 ```
+
+Resulting trace: 
+
+https://smith.langchain.com/public/d871311a-f288-4885-8f70-440ab557c3cf/r
 
 ### Configuration Options
 

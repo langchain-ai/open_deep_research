@@ -29,7 +29,7 @@ from open_deep_research.prompts import (
     section_writer_inputs
 )
 
-from open_deep_research.configuration import Configuration
+from open_deep_research.configuration import WorkflowConfiguration
 from open_deep_research.utils import (
     format_sections, 
     get_config_value, 
@@ -67,7 +67,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     feedback = " /// ".join(feedback_list) if feedback_list else ""
 
     # Get configuration
-    configurable = Configuration.from_runnable_config(config)
+    configurable = WorkflowConfiguration.from_runnable_config(config)
     report_structure = configurable.report_structure
     number_of_queries = configurable.number_of_queries
     search_api = get_config_value(configurable.search_api)
@@ -484,7 +484,7 @@ section_builder.add_edge("search_web", "write_section")
 # Outer graph for initial report plan compiling results from each section -- 
 
 # Add nodes
-builder = StateGraph(ReportState, input=ReportStateInput, output=ReportStateOutput, config_schema=Configuration)
+builder = StateGraph(ReportState, input=ReportStateInput, output=ReportStateOutput, config_schema=WorkflowConfiguration)
 builder.add_node("generate_report_plan", generate_report_plan)
 builder.add_node("human_feedback", human_feedback)
 builder.add_node("build_section_with_web_research", section_builder.compile())
