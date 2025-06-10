@@ -7,6 +7,11 @@ import asyncio
 from pydantic import BaseModel, Field
 from langchain.chat_models import init_chat_model
 from langsmith import testing as t
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+from rich.markdown import Markdown
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
@@ -14,6 +19,9 @@ from langgraph.types import Command
 # Import the report generation agents
 from open_deep_research.graph import builder
 from open_deep_research.multi_agent import supervisor_builder
+
+# Initialize rich console with force_terminal to ensure output even when pytest captures stdout
+console = Console(force_terminal=True, width=120)
 
 class CriteriaGrade(BaseModel):
     """Score the response against specific criteria."""
@@ -26,14 +34,14 @@ def get_evaluation_llm(eval_model=None):
     
     Args:
         eval_model: Model identifier to use for evaluation
-                    Format: "provider:model_name" (e.g., "openai:gpt-4-turbo")
+                    Format: "provider:model_name" (e.g., "anthropic:claude-3-7-sonnet-latest")
                     If None, it will use environment variable or default
     
     Returns:
         Structured LLM for generating evaluation grades
     """
     # Use provided model, then environment variable, then default
-    model_to_use = eval_model or os.environ.get("EVAL_MODEL", "openai:gpt-4-turbo")
+    model_to_use = eval_model or os.environ.get("EVAL_MODEL", "anthropic:claude-3-7-sonnet-latest")
     
     criteria_eval_llm = init_chat_model(model_to_use)
     return criteria_eval_llm.with_structured_output(CriteriaGrade)
@@ -85,7 +93,7 @@ def search_api(request):
 @pytest.fixture
 def eval_model(request):
     """Get the evaluation model from command line or environment variable."""
-    return request.config.getoption("--eval-model") or os.environ.get("EVAL_MODEL", "openai:gpt-4-turbo")
+    return request.config.getoption("--eval-model") or os.environ.get("EVAL_MODEL", "anthropic:claude-3-7-sonnet-latest")
 
 @pytest.fixture
 def models(request, research_agent):
@@ -131,9 +139,21 @@ def models(request, research_agent):
 @pytest.mark.langsmith
 def test_response_criteria_evaluation(research_agent, search_api, models, eval_model):
     """Test if a report meets the specified quality criteria."""
-    print(f"Testing {research_agent} report generation with {search_api} search...")
-    print(f"Models: {models}")
-    print(f"Eval model: {eval_model}")
+    console.print(Panel.fit(
+        f"[bold blue]Testing {research_agent} report generation with {search_api} search[/bold blue]",
+        title="Test Configuration"
+    ))
+    
+    # Create a table for model configuration
+    models_table = Table(title="Model Configuration")
+    models_table.add_column("Parameter", style="cyan")
+    models_table.add_column("Value", style="green")
+    
+    for key, value in models.items():
+        models_table.add_row(key, str(value))
+    models_table.add_row("eval_model", eval_model)
+    
+    console.print(models_table)
     
     # Log inputs to LangSmith
     t.log_inputs({
@@ -149,8 +169,7 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
     if research_agent == "multi_agent":
 
         # Initial messages
-        initial_msg = [{"role": "user", "content": "What is model context protocol?"}]
-        followup_msg = [{"role": "user", "content": "high-level overview of MCP, tell me about interesting specific MCP servers, developer audience, just focus on MCP. generate the report now and don't ask any more follow-up questions."}]
+        initial_msg = [{"role": "user", "content": "Give me a high-level overview of MCP (model context protocol). Keep the report to 3 main body sections. One section on the origins of MPC, one section on interesting examples of MCP servers, and one section on the future roadmap for MCP. Report should be written for a developer audience."}]
 
         # Checkpointer for the multi-agent approach
         checkpointer = MemorySaver()
@@ -162,24 +181,24 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
             "search_api": search_api,
             "supervisor_model": models.get("supervisor_model"),
             "researcher_model": models.get("researcher_model"),
+            "ask_for_clarification": False, # Don't ask for clarification from the user and proceed to write the report
+            "process_search_results": "summarize", # Optionally summarize 
         }
         
         thread_config = {"configurable": config}
 
         # Run the workflow with asyncio
         asyncio.run(graph.ainvoke({"messages": initial_msg}, config=thread_config))
-        asyncio.run(graph.ainvoke({"messages": followup_msg}, config=thread_config))
         
         # Get the final state once both invocations are complete
         final_state = graph.get_state(thread_config)
-        print(f"Final state values: {final_state.values}")
         report = final_state.values.get('final_report', "No report generated")
-        print(f"Report length: {len(report)}")
+        console.print(f"[bold green]Report generated with length: {len(report)} characters[/bold green]")
 
     elif research_agent == "graph":
         
         # Topic query 
-        topic_query = "What is model context protocol? high-level overview of MCP, tell me about interesting specific MCP servers, developer audience, just focus on MCP"
+        topic_query = "Give me a high-level overview of MCP (model context protocol). Keep the report to 3 main body sections. One section on the origins of MPC, one section on interesting examples of MCP servers, and one section on the future roadmap for MCP. Report should be written for a developer audience."
    
         # Checkpointer for the graph approach
         checkpointer = MemorySaver()
@@ -202,10 +221,11 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
                 if '__interrupt__' in event:
                     interrupt_value = event['__interrupt__'][0].value
 
-            # Pass True to approve the report plan 
+            # Pass True to approve the report plan and proceed to write the report
             async for event in graph.astream(Command(resume=True), thread, stream_mode="updates"):
-                print(event)
-                print("\n")
+                # console.print(f"[dim]{event}[/dim]")
+                # console.print()
+                None
             
             final_state = graph.get_state(thread)
             report = final_state.values.get('final_report', "No report generated")
@@ -226,10 +246,39 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
     import re
     section_headers = re.findall(r'##\s+([^\n]+)', report)
     
-    # Print the evaluation results
-    print(f"Evaluation result: {'PASSED' if eval_result.grade else 'FAILED'}")
-    print(f"Report contains {len(section_headers)} sections: {', '.join(section_headers)}")
-    print(f"Justification: {eval_result.justification}")
+    # Display the generated report
+    console.print(Panel(
+        Markdown(report),
+        title="Generated Report",
+        border_style="blue"
+    ))
+    
+    # Create evaluation results display
+    result_color = "green" if eval_result.grade else "red"
+    result_text = "PASSED" if eval_result.grade else "FAILED"
+    
+    console.print(Panel.fit(
+        f"[bold {result_color}]{result_text}[/bold {result_color}]",
+        title="Evaluation Result"
+    ))
+    
+    # Create sections table
+    sections_table = Table(title="Report Structure Analysis")
+    sections_table.add_column("Section", style="cyan")
+    sections_table.add_column("Header", style="yellow")
+    
+    for i, header in enumerate(section_headers, 1):
+        sections_table.add_row(f"Section {i}", header)
+    
+    console.print(sections_table)
+    console.print(f"[bold]Total sections found: {len(section_headers)}[/bold]")
+    
+    # Display justification in a panel
+    console.print(Panel(
+        eval_result.justification,
+        title="Evaluation Justification",
+        border_style="yellow"
+    ))
     
     # Log outputs to LangSmith
     t.log_outputs({

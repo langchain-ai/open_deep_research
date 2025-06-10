@@ -12,7 +12,7 @@ dependencies = [
     "langgraph>=0.2.55",
     "langchain-community>=0.3.9",
     "langchain-openai>=0.3.7",
-    "langchain-anthropic>=0.3.9",
+    "langchain-anthropic>=0.3.15",
     "langchain-mcp-adapters>=0.1.6",
     "langchain-deepseek>=0.1.2",
     "langchain-tavily",
@@ -33,7 +33,11 @@ dependencies = [
     "markdownify>=0.11.6",
     "azure-identity>=1.21.0",
     "azure-search>=1.0.0b2",
-    "azure-search-documents>=11.5.2"
+    "azure-search-documents>=11.5.2",
+    "rich>=13.0.0",
+    "langgraph-cli[inmem]>=0.3.1",
+    "langsmith>=0.3.37",
+    "langchain-core>=0.3.64",
 ]
 
 [project.optional-dependencies]
@@ -44,10 +48,11 @@ requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["open_deep_research"]
+packages = ["open_deep_research", "tests"]
 
 [tool.setuptools.package-dir]
 "open_deep_research" = "src/open_deep_research"
+"tests" = "tests"
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]

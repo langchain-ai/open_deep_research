@@ -1357,7 +1357,8 @@ async def duckduckgo_search(search_queries: List[str]):
 
 TAVILY_SEARCH_DESCRIPTION = (
     "A search engine optimized for comprehensive, accurate, and trusted results. "
-    "Useful for when you need to answer questions about current events."
+    "Useful for when you need to answer questions about current events. "
+    "Even if you only have a single query, make sure it is passed in as a list, not a string! "
 )
 
 @tool(description=TAVILY_SEARCH_DESCRIPTION)
