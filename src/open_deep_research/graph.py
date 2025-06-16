@@ -72,6 +72,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     number_of_queries = configurable.number_of_queries
     search_api = get_config_value(configurable.search_api)
     search_api_config = configurable.search_api_config or {}  # Get the config dict, default to empty
+    search_api_custom_function = configurable.search_api_custom_function 
     params_to_pass = get_search_params(search_api, search_api_config)  # Filter parameters
 
     # Convert JSON object to string if necessary
@@ -101,7 +102,8 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     query_list = [query.search_query for query in results.queries]
 
     # Search the web with parameters
-    source_str = await select_and_execute_search(search_api, query_list, params_to_pass)
+    source_str = await select_and_execute_search(search_api, query_list, params_to_pass, search_api_custom_function)
+
 
     # Format system instructions
     system_instructions_sections = report_planner_instructions.format(topic=topic, report_organization=report_structure, context=source_str, feedback=feedback)
@@ -255,13 +257,14 @@ async def search_web(state: SectionState, config: RunnableConfig):
     configurable = WorkflowConfiguration.from_runnable_config(config)
     search_api = get_config_value(configurable.search_api)
     search_api_config = configurable.search_api_config or {}  # Get the config dict, default to empty
+    search_api_custom_function = configurable.search_api_custom_function
     params_to_pass = get_search_params(search_api, search_api_config)  # Filter parameters
 
     # Web search
     query_list = [query.search_query for query in search_queries]
 
     # Search the web with parameters
-    source_str = await select_and_execute_search(search_api, query_list, params_to_pass)
+    source_str = await select_and_execute_search(search_api, query_list, params_to_pass, search_api_custom_function)
 
     return {"source_str": source_str, "search_iterations": state["search_iterations"] + 1}
 
