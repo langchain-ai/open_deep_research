@@ -1,6 +1,6 @@
 from open_deep_research.configuration import DEFAULT_REPORT_STRUCTURE, SearchAPI
 from dataclasses import dataclass, fields
-from typing import Optional, Dict, Any, Literal
+from typing import Optional, Dict, Any, Literal, Awaitable, Callable
 from langchain_core.runnables import RunnableConfig
 import os
 
@@ -29,6 +29,8 @@ class WorkflowConfiguration:
     writer_provider: str = "anthropic"
     writer_model: str = "claude-3-7-sonnet-latest"
     writer_model_kwargs: Optional[Dict[str, Any]] = None
+    search_api_custom_function: Optional[Callable[..., Awaitable[Any]]] = None  # Async function for custom search logic; use with `"search_api": "customsearch"`.
+
 
     @classmethod
     def from_runnable_config(
