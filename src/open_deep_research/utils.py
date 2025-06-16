@@ -9,7 +9,7 @@ import hashlib
 import aiohttp
 import httpx
 import time
-from typing import List, Optional, Dict, Any, Union, Literal, Annotated, cast
+from typing import List, Optional, Dict, Any, Union, Literal, Annotated, cast, Callable, Awaitable
 from urllib.parse import unquote
 from collections import defaultdict
 import itertools
@@ -1498,7 +1498,7 @@ async def azureaisearch_search(queries: List[str], max_results: int = 5, topic: 
         return "No valid search results found. Please try different search queries or use a different search API."
 
 
-async def select_and_execute_search(search_api: str, query_list: list[str], params_to_pass: dict) -> str:
+async def select_and_execute_search(search_api: str, query_list: list[str], params_to_pass: dict, search_api_custom_function: Optional[Callable[..., Awaitable[Any]]]) -> str:
     """Select and execute the appropriate search API.
     
     Args:
@@ -1533,6 +1533,10 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
         search_results = await google_search_async(query_list, **params_to_pass)
     elif search_api == "azureaisearch":
         search_results = await azureaisearch_search_async(query_list, **params_to_pass)
+    elif search_api == "customsearch":
+        if search_api_custom_function is None or not callable(search_api_custom_function):
+            raise ValueError("For 'customsearch', you must provide a valid async function as 'search_api_custom_function'.")
+        search_results = await search_api_custom_function(query_list, **params_to_pass)
     else:
         raise ValueError(f"Unsupported search API: {search_api}")
 

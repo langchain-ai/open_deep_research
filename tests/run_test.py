@@ -39,6 +39,8 @@ def main():
     # Search API configuration
     parser.add_argument("--search-api", choices=["tavily", "duckduckgo"], 
                         help="Search API to use for content retrieval")
+    parser.add_argument("--search-api-custom-function", help="Dotted path to a custom async search function")
+
     
     args = parser.parse_args()
     
@@ -159,6 +161,8 @@ def add_model_configs(cmd, args):
         cmd.append(f"--eval-model={args.eval_model}")
     if args.search_api:
         cmd.append(f"--search-api={args.search_api}")
+    if args.search_api_custom_function:
+        cmd.append(f"--search-api-custom-function={args.search_api_custom_function}")
     if args.max_search_depth:
         cmd.append(f"--max-search-depth={args.max_search_depth}")
 

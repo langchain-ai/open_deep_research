@@ -140,6 +140,8 @@ You can customize the research assistant workflow through several parameters:
 - `writer_model`: Model for writing the report (default: "claude-3-5-sonnet-latest")
 - `writer_model_kwargs`: Additional parameter for writer_model
 - `search_api`: API to use for web searches (default: "tavily", options include "perplexity", "exa", "arxiv", "pubmed", "linkup")
+- `search_api_custom_function`: *(optional)*  
+  Async function for custom search logic; use with `"search_api": "customsearch"`.
 
 ## 2. Multi-Agent Implementation (`src/open_deep_research/multi_agent.py`)
 

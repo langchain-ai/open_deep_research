@@ -8,6 +8,7 @@ def pytest_addoption(parser):
     """Add command-line options to pytest."""
     parser.addoption("--research-agent", action="store", help="Agent type: multi_agent or graph")
     parser.addoption("--search-api", action="store", help="Search API to use")
+    parser.addoption("--search-api-custom-function", action="store", help="# Async function tool for custom search logic")
     parser.addoption("--eval-model", action="store", help="Model for evaluation")
     parser.addoption("--supervisor-model", action="store", help="Model for supervisor agent")
     parser.addoption("--researcher-model", action="store", help="Model for researcher agent")

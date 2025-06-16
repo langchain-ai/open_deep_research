@@ -1,7 +1,7 @@
 import os
 from enum import Enum
 from dataclasses import dataclass, fields, field
-from typing import Any, Optional, Dict, Literal
+from typing import Any, Optional, Dict, Literal, Awaitable, Callable
 
 from langchain_core.runnables import RunnableConfig
 
@@ -50,6 +50,8 @@ class WorkflowConfiguration:
     writer_provider: str = "anthropic"
     writer_model: str = "claude-3-7-sonnet-latest"
     writer_model_kwargs: Optional[Dict[str, Any]] = None
+    search_api_custom_function: Optional[Callable[..., Awaitable[Any]]] = None  # Async function for custom search logic; use with `"search_api": "customsearch"`.
+
 
     @classmethod
     def from_runnable_config(
