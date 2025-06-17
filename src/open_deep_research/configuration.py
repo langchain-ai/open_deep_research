@@ -38,6 +38,7 @@ class WorkflowConfiguration:
     process_search_results: Literal["summarize", "split_and_rerank"] | None = None
     summarization_model_provider: str = "anthropic"
     summarization_model: str = "claude-3-5-haiku-latest"
+    summarization_model_kwargs: Optional[Dict[str, Any]] = None
     max_structured_output_retries: int = 3
     include_source_str: bool = False
     
@@ -75,12 +76,18 @@ class MultiAgentConfiguration:
     process_search_results: Literal["summarize", "split_and_rerank"] | None = None
     summarization_model_provider: str = "anthropic"
     summarization_model: str = "claude-3-5-haiku-latest"
+    summarization_model_kwargs: Optional[Dict[str, Any]] = None
     include_source_str: bool = False
     
     # Multi-agent specific configuration
     number_of_queries: int = 2 # Number of search queries to generate per section
-    supervisor_model: str = "anthropic:claude-3-7-sonnet-latest"
-    researcher_model: str = "anthropic:claude-3-7-sonnet-latest"
+    supervisor_model_provider: str = "anthropic"
+    supervisor_model: str = "claude-3-7-sonnet-latest"
+    supervisor_model_kwargs: Optional[Dict[str, Any]] = None
+ 
+    researcher_model_provider: str = "anthropic"
+    researcher_model: str = "claude-3-7-sonnet-latest"
+    researcher_model_kwargs: Optional[Dict[str, Any]] = None
     ask_for_clarification: bool = False # Whether to ask for clarification from the user
     # MCP server configuration
     mcp_server_config: Optional[Dict[str, Any]] = None

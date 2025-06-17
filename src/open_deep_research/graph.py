@@ -82,7 +82,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model_kwargs = get_config_value(configurable.writer_model_kwargs or {})
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs) 
+    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, **writer_model_kwargs) 
     structured_llm = writer_model.with_structured_output(Queries)
 
     # Format system instructions
@@ -127,7 +127,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
         # With other models, thinking tokens are not specifically allocated
         planner_llm = init_chat_model(model=planner_model, 
                                       model_provider=planner_provider,
-                                      model_kwargs=planner_model_kwargs)
+                                      **planner_model_kwargs)
     
     # Generate the report sections
     structured_llm = planner_llm.with_structured_output(Sections)
@@ -217,7 +217,7 @@ async def generate_queries(state: SectionState, config: RunnableConfig):
     writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model_kwargs = get_config_value(configurable.writer_model_kwargs or {})
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs) 
+    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, **writer_model_kwargs) 
     structured_llm = writer_model.with_structured_output(Queries)
 
     # Format system instructions
@@ -302,8 +302,7 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
     writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model_kwargs = get_config_value(configurable.writer_model_kwargs or {})
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs) 
-
+    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, **writer_model_kwargs) 
     section_content = await writer_model.ainvoke([SystemMessage(content=section_writer_instructions),
                                            HumanMessage(content=section_writer_inputs_formatted)])
     
@@ -324,7 +323,6 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
     planner_provider = get_config_value(configurable.planner_provider)
     planner_model = get_config_value(configurable.planner_model)
     planner_model_kwargs = get_config_value(configurable.planner_model_kwargs or {})
-
     if planner_model == "claude-3-7-sonnet-latest":
         # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
         reflection_model = init_chat_model(model=planner_model, 
@@ -333,11 +331,10 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
                                            thinking={"type": "enabled", "budget_tokens": 16_000}).with_structured_output(Feedback)
     else:
         reflection_model = init_chat_model(model=planner_model, 
-                                           model_provider=planner_provider, model_kwargs=planner_model_kwargs).with_structured_output(Feedback)
+                                           model_provider=planner_provider, **planner_model_kwargs).with_structured_output(Feedback)
     # Generate feedback
     feedback = await reflection_model.ainvoke([SystemMessage(content=section_grader_instructions_formatted),
                                         HumanMessage(content=section_grader_message)])
-
     # If the section is passing or the max search depth is reached, publish the section to completed sections 
     if feedback.grade == "pass" or state["search_iterations"] >= configurable.max_search_depth:
         # Publish the section to completed sections 
@@ -382,8 +379,7 @@ async def write_final_sections(state: SectionState, config: RunnableConfig):
     writer_provider = get_config_value(configurable.writer_provider)
     writer_model_name = get_config_value(configurable.writer_model)
     writer_model_kwargs = get_config_value(configurable.writer_model_kwargs or {})
-    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, model_kwargs=writer_model_kwargs) 
-    
+    writer_model = init_chat_model(model=writer_model_name, model_provider=writer_provider, **writer_model_kwargs) 
     section_content = await writer_model.ainvoke([SystemMessage(content=system_instructions),
                                            HumanMessage(content="Generate a report section based on the provided sources.")])
     
