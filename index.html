@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Research Agent UI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding-bottom: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4a6baf;
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-weight: 600;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .card-header {
+            background-color: #f1f5fd;
+            border-bottom: 1px solid #e3e8f0;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .form-control, .btn {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(74, 107, 175, 0.25);
+            border-color: #4a6baf;
+        }
+        .btn-primary {
+            background-color: #4a6baf;
+            border-color: #4a6baf;
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #3a5a9f;
+            border-color: #3a5a9f;
+        }
+        .nav-tabs {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #495057;
+            padding: 0.8rem 1.2rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            background-color: #f8f9fa;
+        }
+        .nav-tabs .nav-link.active {
+            color: #4a6baf;
+            background-color: #fff;
+            border-bottom: 3px solid #4a6baf;
+        }
+        .progress {
+            height: 0.8rem;
+            border-radius: 0.4rem;
+            margin: 1rem 0;
+        }
+        .thinking-step {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a6baf;
+        }
+        .thinking-step .emoji {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+        .thinking-step .agent-name {
+            font-weight: 600;
+            color: #4a6baf;
+        }
+        .thinking-step .timestamp {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+        .thinking-step .content {
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
+        }
+        #reportContent {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        #reportContent img {
+            max-width: 100%;
+            height: auto;
+        }
+        #reportContent table {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-collapse: collapse;
+        }
+        #reportContent table th,
+        #reportContent table td {
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+        }
+        #reportContent table th {
+            background-color: #f8f9fa;
+        }
+        #reportContent blockquote {
+            padding: 0.5rem 1rem;
+            margin-left: 0;
+            border-left: 4px solid #e9ecef;
+            color: #6c757d;
+        }
+        #reportContent pre {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        #reportContent code {
+            padding: 0.2rem 0.4rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .agent-supervisor {
+            border-left-color: #28a745;
+        }
+        .agent-researcher {
+            border-left-color: #007bff;
+        }
+        .agent-planner {
+            border-left-color: #6f42c1;
+        }
+        .agent-writer {
+            border-left-color: #fd7e14;
+        }
+        .agent-search {
+            border-left-color: #dc3545;
+        }
+        .hidden {
+            display: none;
+        }
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        #errorMessage {
+            color: #dc3545;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1><i class="bi bi-search"></i> Deep Research Agent</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Research Query
+            </div>
+            <div class="card-body">
+                <form id="researchForm">
+                    <div class="mb-3">
+                        <label for="topic" class="form-label">Enter your research topic or question:</label>
+                        <textarea class="form-control" id="topic" rows="3" placeholder="e.g., The impact of artificial intelligence on healthcare" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="implementationType" class="form-label">Implementation Type:</label>
+                            <select class="form-control" id="implementationType">
+                                <option value="workflow">Workflow-based (Graph)</option>
+                                <option value="multiagent">Multi-Agent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="searchApi" class="form-label">Search API:</label>
+                            <select class="form-control" id="searchApi">
+                                <option value="tavily">Tavily</option>
+                                <option value="perplexity">Perplexity</option>
+                                <option value="exa">Exa</option>
+                                <option value="arxiv">ArXiv</option>
+                                <option value="pubmed">PubMed</option>
+                                <option value="linkup">Linkup</option>
+                                <option value="duckduckgo">DuckDuckGo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="bi bi-search"></i> Start Research
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="cancelBtn" disabled>
+                        <i class="bi bi-x-circle"></i> Cancel Research
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="researchResults" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    Research Progress
+                </div>
+                <div class="card-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div id="progressStatus" class="text-center mb-3">Initializing research...</div>
+                    
+                    <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="thinking-tab" data-bs-toggle="tab" data-bs-target="#thinking" type="button" role="tab" aria-controls="thinking" aria-selected="true">
+                                <i class="bi bi-lightbulb"></i> Thinking Steps
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab" aria-controls="report" aria-selected="false">
+                                <i class="bi bi-file-text"></i> Final Report
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="resultTabsContent">
+                        <div class="tab-pane fade show active" id="thinking" role="tabpanel" aria-labelledby="thinking-tab">
+                            <div id="thinkingSteps"></div>
+                        </div>
+                        <div class="tab-pane fade" id="report" role="tabpanel" aria-labelledby="report-tab">
+                            <div id="reportContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="errorMessage" class="hidden"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://127.0.0.1:2024';
+        
+        // DOM Elements
+        const researchForm = document.getElementById('researchForm');
+        const topicInput = document.getElementById('topic');
+        const implementationTypeSelect = document.getElementById('implementationType');
+        const searchApiSelect = document.getElementById('searchApi');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const researchResults = document.getElementById('researchResults');
+        const progressBar = document.getElementById('progressBar');
+        const progressStatus = document.getElementById('progressStatus');
+        const thinkingSteps = document.getElementById('thinkingSteps');
+        const reportContent = document.getElementById('reportContent');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Global variables
+        let threadId = null;
+        let pollingInterval = null;
+        let currentProgress = 0;
+        let isResearchComplete = false;
+        
+        // Agent/Tool emojis mapping
+        const agentEmojis = {
+            'supervisor': '🧠',
+            'researcher': '🔍',
+            'planner': '📝',
+            'writer': '✍️',
+            'search': '🌐',
+            'section': '📄',
+            'query': '❓',
+            'feedback': '📊',
+            'default': '🤖'
+        };
+        
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up form submission
+            researchForm.addEventListener('submit', startResearch);
+            
+            // Set up cancel button
+            cancelBtn.addEventListener('click', cancelResearch);
+            
+            // Initialize syntax highlighting
+            hljs.highlightAll();
+        });
+        
+        // Start research process
+        async function startResearch(event) {
+            event.preventDefault();
+            
+            // Reset UI
+            resetUI();
+            
+            // Get form values
+            const topic = topicInput.value.trim();
+            const implementationType = implementationTypeSelect.value;
+            const searchApi = searchApiSelect.value;
+            
+            if (!topic) {
+                showError('Please enter a research topic or question.');
+                return;
+            }
+            
+            // Update UI to show research is starting
+            submitBtn.disabled = true;
+            cancelBtn.disabled = false;
+            researchResults.classList.remove('hidden');
+            
+            try {
+                // Determine which graph to use based on implementation type
+                let graphName;
+                if (implementationType === 'workflow') {
+                    graphName = 'open_deep_research';
+                } else {
+                    graphName = 'open_deep_research_multi_agent';
+                }
+                
+                // Create a new thread
+                const threadResponse = await fetch(`${API_BASE_URL}/threads`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!threadResponse.ok) {
+                    throw new Error(`Failed to create thread: ${threadResponse.statusText}`);
+                }
+                
+                const threadData = await threadResponse.json();
+                threadId = threadData.thread_id;
+                
+                // Add thinking step for thread creation
+                addThinkingStep('system', 'System', 'Thread created successfully. Starting research process...');
+                
+                // Start the research process
+                const startResponse = await fetch(`${API_BASE_URL}/graphs/${graphName}/threads/${threadId}/runs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        input: {
+                            topic: topic
+                        },
+                        configurable: {
+                            search_api: searchApi
+                        }
+                    })
+                });
+                
+                if (!startResponse.ok) {
+                    throw new Error(`Failed to start research: ${startResponse.statusText}`);
+                }
+                
+                const startData = await startResponse.json();
+                const runId = startData.run_id;
+                
+                // Add thinking step for research start
+                addThinkingStep('system', 'System', `Research started with run ID: ${runId}`);
+                
+                // Start polling for updates
+                startPolling(graphName, threadId, runId);
+                
+            } catch (error) {
+                console.error('Error starting research:', error);
+                showError(`Error starting research: ${error.message}`);
+                resetUI(true);
+            }
+        }
+        
+        // Poll for updates on the research process
+        function startPolling(graphName, threadId, runId) {
+            // Update progress bar initially
+            updateProgress(5, 'Initializing research...');
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    // Get the current state of the run
+                    const stateResponse = await fetch(`${API_BASE_URL}/graphs/${graphName}/threads/${threadId}/runs/${runId}`);
+                    
+                    if (!stateResponse.ok) {
+                        throw new Error(`Failed to get run state: ${stateResponse.statusText}`);
+                    }
+                    
+                    const stateData = await stateResponse.json();
+                    
+                    // Process the state data
+                    processStateUpdate(stateData);
+                    
+                    // Check if research is complete
+                    if (stateData.status === 'complete') {
+                        finishResearch(graphName, threadId, runId);
+                    }
+                    
+                } catch (error) {
+                    console.error('Error polling for updates:', error);
+                    showError(`Error getting research updates: ${error.message}`);
+                    clearInterval(pollingInterval);
+                }
+            }, 2000); // Poll every 2 seconds
+        }
+        
+        // Process state updates from the API
+        function processStateUpdate(stateData) {
+            // Extract relevant information from state data
+            const status = stateData.status;
+            const steps = stateData.steps || [];
+            
+            // Calculate progress based on steps and status
+            let progressPercentage;
+            let statusMessage;
+            
+            if (status === 'complete') {
+                progressPercentage = 100;
+                statusMessage = 'Research complete!';
+                isResearchComplete = true;
+            } else {
+                // Calculate progress based on steps and expected total
+                // This is an estimate since we don't know exactly how many steps will be needed
+                const estimatedTotalSteps = 20; // Adjust based on typical research flow
+                const completedSteps = steps.length;
+                progressPercentage = Math.min(Math.floor((completedSteps / estimatedTotalSteps) * 100), 95);
+                statusMessage = `Processing step ${completedSteps}...`;
+            }
+            
+            // Update progress UI
+            updateProgress(progressPercentage, statusMessage);
+            
+            // Process new steps
+            processSteps(steps);
+        }
+        
+        // Process steps from the state data
+        function processSteps(steps) {
+            // Get the current number of steps displayed
+            const currentStepCount = thinkingSteps.children.length;
+            
+            // Process only new steps
+            for (let i = currentStepCount; i < steps.length; i++) {
+                const step = steps[i];
+                
+                // Determine the agent/tool type from the step data
+                let agentType = 'default';
+                let agentName = 'Agent';
+                
+                // Extract agent type from step data
+                if (step.type === 'node') {
+                    agentType = step.node.toLowerCase();
+                    agentName = capitalizeFirstLetter(step.node);
+                } else if (step.type === 'edge') {
+                    if (step.edge.includes('supervisor')) {
+                        agentType = 'supervisor';
+                        agentName = 'Supervisor';
+                    } else if (step.edge.includes('research')) {
+                        agentType = 'researcher';
+                        agentName = 'Researcher';
+                    } else if (step.edge.includes('plan')) {
+                        agentType = 'planner';
+                        agentName = 'Planner';
+                    } else if (step.edge.includes('write')) {
+                        agentType = 'writer';
+                        agentName = 'Writer';
+                    } else if (step.edge.includes('search')) {
+                        agentType = 'search';
+                        agentName = 'Search Tool';
+                    } else if (step.edge.includes('section')) {
+                        agentType = 'section';
+                        agentName = 'Section Builder';
+                    } else if (step.edge.includes('query')) {
+                        agentType = 'query';
+                        agentName = 'Query Generator';
+                    } else if (step.edge.includes('feedback')) {
+                        agentType = 'feedback';
+                        agentName = 'Feedback Analyzer';
+                    }
+                }
+                
+                // Create a readable description of the step
+                let stepContent = '';
+                
+                if (step.type === 'node') {
+                    stepContent = `Processing node: ${step.node}`;
+                    if (step.input) {
+                        stepContent += `\nInput: ${JSON.stringify(step.input, null, 2)}`;
+                    }
+                } else if (step.type === 'edge') {
+                    stepContent = `Following edge: ${step.edge}`;
+                    if (step.output) {
+                        stepContent += `\nOutput: ${JSON.stringify(step.output, null, 2)}`;
+                    }
+                }
+                
+                // Add the thinking step to the UI
+                addThinkingStep(agentType, agentName, stepContent);
+            }
+        }
+        
+        // Finish the research process
+        async function finishResearch(graphName, threadId, runId) {
+            // Clear polling interval
+            clearInterval(pollingInterval);
+            
+            try {
+                // Get the final state
+                const finalStateResponse = await fetch(`${API_BASE_URL}/graphs/${graphName}/threads/${threadId}/runs/${runId}`);
+                
+                if (!finalStateResponse.ok) {
+                    throw new Error(`Failed to get final state: ${finalStateResponse.statusText}`);
+                }
+                
+                const finalStateData = await finalStateResponse.json();
+                
+                // Extract the final report from the state data
+                if (finalStateData.output && finalStateData.output.final_report) {
+                    const finalReport = finalStateData.output.final_report;
+                    
+                    // Display the final report
+                    displayFinalReport(finalReport);
+                    
+                    // Add final thinking step
+                    addThinkingStep('system', 'System', 'Research complete! Final report is now available.');
+                    
+                    // Update progress to 100%
+                    updateProgress(100, 'Research complete!');
+                } else {
+                    throw new Error('No final report found in the research output.');
+                }
+                
+            } catch (error) {
+                console.error('Error finishing research:', error);
+                showError(`Error getting final report: ${error.message}`);
+            } finally {
+                // Reset UI partially
+                submitBtn.disabled = false;
+                cancelBtn.disabled = true;
+            }
+        }
+        
+        // Cancel the research process
+        async function cancelResearch() {
+            if (!threadId) return;
+            
+            try {
+                // Clear polling interval
+                clearInterval(pollingInterval);
+                
+                // Add thinking step for cancellation
+                addThinkingStep('system', 'System', 'Research cancelled by user.');
+                
+                // Update progress
+                updateProgress(0, 'Research cancelled');
+                
+                // Reset UI
+                resetUI(true);
+                
+            } catch (error) {
+                console.error('Error cancelling research:', error);
+                showError(`Error cancelling research: ${error.message}`);
+            }
+        }
+        
+        // Add a thinking step to the UI
+        function addThinkingStep(agentType, agentName, content) {
+            const stepElement = document.createElement('div');
+            stepElement.className = `thinking-step agent-${agentType}`;
+            
+            // Get the appropriate emoji for this agent/tool
+            const emoji = agentEmojis[agentType] || agentEmojis['default'];
+            
+            // Create timestamp
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Create the step content
+            stepElement.innerHTML = `
+                <div>
+                    <span class="emoji">${emoji}</span>
+                    <span class="agent-name">${agentName}</span>
+                    <span class="timestamp">${timestamp}</span>
+                </div>
+                <div class="content">${content}</div>
+            `;
+            
+            // Add to the thinking steps container
+            thinkingSteps.appendChild(stepElement);
+            
+            // Scroll to the bottom
+            thinkingSteps.scrollTop = thinkingSteps.scrollHeight;
+        }
+        
+        // Display the final report
+        function displayFinalReport(reportMarkdown) {
+            // Convert markdown to HTML
+            const reportHtml = marked.parse(reportMarkdown);
+            
+            // Set the report content
+            reportContent.innerHTML = reportHtml;
+            
+            // Apply syntax highlighting to code blocks
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+            
+            // Show the report tab if research is complete
+            if (isResearchComplete) {
+                document.getElementById('report-tab').classList.remove('disabled');
+            }
+        }
+        
+        // Update the progress bar and status
+        function updateProgress(percentage, statusText) {
+            // Only update if the new percentage is higher
+            if (percentage > currentProgress) {
+                currentProgress = percentage;
+                progressBar.style.width = `${percentage}%`;
+                progressBar.setAttribute('aria-valuenow', percentage);
+                progressStatus.textContent = statusText;
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+        
+        // Reset the UI
+        function resetUI(keepResults = false) {
+            // Clear global variables
+            threadId = null;
+            clearInterval(pollingInterval);
+            currentProgress = 0;
+            isResearchComplete = false;
+            
+            // Reset form elements
+            submitBtn.disabled = false;
+            cancelBtn.disabled = true;
+            
+            // Hide error message
+            errorMessage.classList.add('hidden');
+            
+            if (!keepResults) {
+                // Hide results section
+                researchResults.classList.add('hidden');
+                
+                // Clear thinking steps and report
+                thinkingSteps.innerHTML = '';
+                reportContent.innerHTML = '';
+                
+                // Reset progress bar
+                progressBar.style.width = '0%';
+                progressBar.setAttribute('aria-valuenow', 0);
+                progressStatus.textContent = 'Initializing research...';
+            }
+        }
+        
+        // Helper function to capitalize the first letter of a string
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>
