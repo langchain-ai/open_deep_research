@@ -1413,8 +1413,10 @@ async def tavily_search(
             model=configurable.summarization_model,
             model_provider=configurable.summarization_model_provider,
             max_retries=configurable.max_structured_output_retries,
+            **configurable.summarization_model_kwargs,
             **extra_kwargs
         )
+
         summarization_tasks = [
             noop() if not result.get("raw_content") else summarize_webpage(summarization_model, result['raw_content'][:max_char_to_include])
             for result in unique_results.values()

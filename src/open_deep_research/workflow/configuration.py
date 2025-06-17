@@ -17,6 +17,7 @@ class WorkflowConfiguration:
     process_search_results: Literal["summarize", "split_and_rerank"] | None = "summarize"
     summarization_model_provider: str = "anthropic"
     summarization_model: str = "claude-3-5-haiku-latest"
+    summarization_model_kwargs: Optional[Dict[str, Any]] = None
     max_structured_output_retries: int = 3
     include_source_str: bool = False
     
