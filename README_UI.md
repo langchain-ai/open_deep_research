@@ -2,6 +2,36 @@
 
 A simple web-based user interface for interacting with the Open Deep Research agent API.
 
+## Recent Updates
+
+### Fixed API Request Issue (2025-06-19)
+
+The UI has been updated to fix an issue with the API request to the `/threads` endpoint. The error was:
+
+```
+orjson.JSONDecodeError: Input is a zero-length, empty document: line 1 column 1 (char 0)
+```
+
+The fix involved adding a JSON body to the thread creation request. The request now includes metadata about the research topic, search API, and implementation type:
+
+```javascript
+const threadResponse = await fetch(`${API_BASE_URL}/threads`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        metadata: {
+            topic: topic,
+            search_api: searchApi,
+            implementation_type: implementationType
+        }
+    })
+});
+```
+
+This ensures that the API receives a valid JSON body instead of an empty document, which was causing the error.
+
 ## Features
 
 - **Research Query Input**: Enter your research topic or question
@@ -92,6 +122,7 @@ A simple web-based user interface for interacting with the Open Deep Research ag
 - **CORS Errors**: If you encounter CORS issues, try using a CORS browser extension or proxy
 - **Long-running Research**: Complex topics may take several minutes to complete
 - **Browser Compatibility**: If you experience issues, try using a different browser
+- **JSON Decode Errors**: If you see errors like `JSONDecodeError: Input is a zero-length, empty document`, ensure all API requests include a proper JSON body, even if it's just an empty object `{}`
 
 ## Notes
 
