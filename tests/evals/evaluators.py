@@ -14,8 +14,12 @@ eval_model = ChatAnthropic(
 
 class OverallQualityScore(BaseModel):
     """Score the overall quality of the report against specific criteria."""
-    reasoning: str = Field(description="The reason for the score, including specific examples from the report.")
-    score: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    research_depth: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    source_quality: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    analytical_rigor: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    practical_value: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    balance_and_objectivity: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    writing_quality: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
 
 
 class RelevanceScore(BaseModel):
@@ -51,8 +55,7 @@ def _format_input_query(inputs: dict) -> str:
 
 def eval_overall_quality(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
-    final_report = outputs["messages"][0]["content"]
-
+    final_report = outputs["final_report"]
     user_input_content = f"""User input: {query}\n\nReport: \n\n{final_report}\n\nEvaluate whether the report meets the criteria and provide detailed justification for your evaluation."""
     if isinstance(eval_model, ChatAnthropic):
         user_input_content = [{
@@ -60,19 +63,23 @@ def eval_overall_quality(inputs: dict, outputs: dict):
             "text": user_input_content,
             "cache_control": {"type": "ephemeral", "ttl": "1h"}
         }]
-
     eval_result = cast(OverallQualityScore, eval_model.with_structured_output(OverallQualityScore).invoke([
         {"role": "system", "content": OVERALL_QUALITY_PROMPT.format(today=get_today_str())},
         {"role": "user", "content": user_input_content}
     ]))
-    # normalize to 0-1
-    return {"key": "overall_quality_score", "score": eval_result.score / 5, "comment": eval_result.reasoning}
+    return [
+        {"key": "research_depth_score", "score": eval_result.research_depth / 5},
+        {"key": "source_quality_score", "score": eval_result.source_quality / 5},
+        {"key": "analytical_rigor_score", "score": eval_result.analytical_rigor / 5},
+        {"key": "practical_value_score", "score": eval_result.practical_value / 5},
+        {"key": "balance_and_objectivity_score", "score": eval_result.balance_and_objectivity / 5},
+        {"key": "writing_quality_score", "score": eval_result.writing_quality / 5},
+    ]
 
 
 def eval_relevance(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
-    final_report = outputs["messages"][0]["content"]
-
+    final_report = outputs["final_report"]
     user_input_content = f"""User input: {query}\n\nReport: \n\n{final_report}\n\nEvaluate whether the report meets the criteria and provide detailed justification for your evaluation."""
     if isinstance(eval_model, ChatAnthropic):
         user_input_content = [{
@@ -85,14 +92,12 @@ def eval_relevance(inputs: dict, outputs: dict):
         {"role": "system", "content": RELEVANCE_PROMPT.format(today=get_today_str())},
         {"role": "user", "content": user_input_content}
     ]))
-    # normalize to 0-1
     return {"key": "relevance_score", "score": eval_result.score / 5, "comment": eval_result.reasoning}
 
 
 def eval_structure(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
-    final_report = outputs["messages"][0]["content"]
-
+    final_report = outputs["final_report"]
     user_input_content = f"""User input: {query}\n\nReport: \n\n{final_report}\n\nEvaluate whether the report meets the criteria and provide detailed justification for your evaluation."""
     if isinstance(eval_model, ChatAnthropic):
         user_input_content = [{
@@ -105,8 +110,7 @@ def eval_structure(inputs: dict, outputs: dict):
         {"role": "system", "content": STRUCTURE_PROMPT.format(today=get_today_str())},
         {"role": "user", "content": user_input_content}
     ]))
-    # normalize to 0-1
-    return {"key": "structure_score", "score": eval_result.score / 5, "comment": eval_result.reasoning}
+    return {"key": "structure_and_cohesiveness_score", "score": eval_result.score / 5, "comment": eval_result.reasoning}
 
 
 def eval_groundedness(inputs: dict, outputs: dict):
