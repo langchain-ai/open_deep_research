@@ -1,43 +1,54 @@
 from typing import Literal
+
+from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, get_buffer_string
+
+# Load environment variables
+load_dotenv()
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    get_buffer_string,
+)
 from langchain_core.runnables import RunnableConfig
 from langgraph.constants import Send
-from langgraph.graph import START, END, StateGraph
-from langgraph.types import interrupt, Command
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, interrupt
 
-from open_deep_research.workflow.configuration import WorkflowConfiguration
-from open_deep_research.workflow.state import (
-    ReportStateInput,
-    ReportStateOutput,
-    ReportState,
-    SectionState,
-    SectionOutputState,
-    ClarifyWithUser,
-    SectionOutput
-)
 from open_deep_research.state import (
-    Sections,
-    Queries,
     Feedback,
-)
-from open_deep_research.workflow.prompts import (
-    clarify_with_user_instructions,
-    report_planner_query_writer_instructions,
-    report_planner_instructions,
-    query_writer_instructions, 
-    section_writer_instructions,
-    final_section_writer_instructions,
-    section_grader_instructions,
-    section_writer_inputs
+    Queries,
+    Sections,
 )
 from open_deep_research.utils import (
-    format_sections, 
-    get_config_value, 
-    get_search_params, 
+    format_sections,
+    get_config_value,
+    get_search_params,
+    get_today_str,
     select_and_execute_search,
-    get_today_str
 )
+from open_deep_research.workflow.configuration import WorkflowConfiguration
+from open_deep_research.workflow.prompts import (
+    clarify_with_user_instructions,
+    final_section_writer_instructions,
+    query_writer_instructions,
+    report_planner_instructions,
+    report_planner_query_writer_instructions,
+    section_grader_instructions,
+    section_writer_inputs,
+    section_writer_instructions,
+)
+from open_deep_research.workflow.state import (
+    ClarifyWithUser,
+    ReportState,
+    ReportStateInput,
+    ReportStateOutput,
+    SectionOutput,
+    SectionOutputState,
+    SectionState,
+)
+
 
 ## Nodes
 def initial_router(state: ReportState, config: RunnableConfig):

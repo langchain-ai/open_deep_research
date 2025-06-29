@@ -1,41 +1,42 @@
 from typing import Literal
 
+from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
+
+# Load environment variables
+load_dotenv()
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
-
 from langgraph.constants import Send
-from langgraph.graph import START, END, StateGraph
-from langgraph.types import interrupt, Command
-
-from open_deep_research.state import (
-    ReportStateInput,
-    ReportStateOutput,
-    Sections,
-    ReportState,
-    SectionState,
-    SectionOutputState,
-    Queries,
-    Feedback
-)
-
-from open_deep_research.prompts import (
-    report_planner_query_writer_instructions,
-    report_planner_instructions,
-    query_writer_instructions, 
-    section_writer_instructions,
-    final_section_writer_instructions,
-    section_grader_instructions,
-    section_writer_inputs
-)
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, interrupt
 
 from open_deep_research.configuration import WorkflowConfiguration
+from open_deep_research.prompts import (
+    final_section_writer_instructions,
+    query_writer_instructions,
+    report_planner_instructions,
+    report_planner_query_writer_instructions,
+    section_grader_instructions,
+    section_writer_inputs,
+    section_writer_instructions,
+)
+from open_deep_research.state import (
+    Feedback,
+    Queries,
+    ReportState,
+    ReportStateInput,
+    ReportStateOutput,
+    SectionOutputState,
+    Sections,
+    SectionState,
+)
 from open_deep_research.utils import (
-    format_sections, 
-    get_config_value, 
-    get_search_params, 
+    format_sections,
+    get_config_value,
+    get_search_params,
+    get_today_str,
     select_and_execute_search,
-    get_today_str
 )
 
 ## Nodes -- 
@@ -56,7 +57,6 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     Returns:
         Dict containing the generated sections
     """
-
     # Inputs
     topic = state["topic"]
 
@@ -156,7 +156,6 @@ def human_feedback(state: ReportState, config: RunnableConfig) -> Command[Litera
     Returns:
         Command to either regenerate plan or start section writing
     """
-
     # Get sections
     topic = state["topic"]
     sections = state['sections']
@@ -204,7 +203,6 @@ async def generate_queries(state: SectionState, config: RunnableConfig):
     Returns:
         Dict containing the generated search queries
     """
-
     # Get state 
     topic = state["topic"]
     section = state["section"]
@@ -247,7 +245,6 @@ async def search_web(state: SectionState, config: RunnableConfig):
     Returns:
         Dict with search results and updated iteration count
     """
-
     # Get state
     search_queries = state["search_queries"]
 
@@ -282,7 +279,6 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
     Returns:
         Command to either complete section or do more research
     """
-
     # Get state 
     topic = state["topic"]
     section = state["section"]
@@ -366,7 +362,6 @@ async def write_final_sections(state: SectionState, config: RunnableConfig):
     Returns:
         Dict containing the newly written section
     """
-
     # Get configuration
     configurable = WorkflowConfiguration.from_runnable_config(config)
 
@@ -405,7 +400,6 @@ def gather_completed_sections(state: ReportState):
     Returns:
         Dict with formatted sections as context
     """
-
     # List of completed sections
     completed_sections = state["completed_sections"]
 
@@ -428,7 +422,6 @@ def compile_final_report(state: ReportState, config: RunnableConfig):
     Returns:
         Dict containing the complete report
     """
-
     # Get configuration
     configurable = WorkflowConfiguration.from_runnable_config(config)
 
@@ -460,7 +453,6 @@ def initiate_final_section_writing(state: ReportState):
     Returns:
         List of Send commands for parallel section writing
     """
-
     # Kick off section writing in parallel via Send() API for any sections that do not require research
     return [
         Send("write_final_sections", {"topic": state["topic"], "section": s, "report_sections_from_research": state["report_sections_from_research"]}) 

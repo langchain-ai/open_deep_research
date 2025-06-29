@@ -1,26 +1,28 @@
-from typing import List, Annotated, TypedDict, Literal, cast
-from pydantic import BaseModel, Field
 import operator
 import warnings
+from typing import Annotated, List, Literal, TypedDict, cast
 
+from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain_core.tools import tool, BaseTool
-from langchain_core.runnables import RunnableConfig
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.graph import MessagesState
 
+# Load environment variables
+load_dotenv()
+from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import BaseTool, tool
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import Command, Send
-from langgraph.graph import START, END, StateGraph
+from pydantic import BaseModel, Field
 
 from open_deep_research.configuration import MultiAgentConfiguration
+from open_deep_research.prompts import RESEARCH_INSTRUCTIONS, SUPERVISOR_INSTRUCTIONS
 from open_deep_research.utils import (
-    get_config_value,
-    tavily_search,
     duckduckgo_search,
+    get_config_value,
     get_today_str,
+    tavily_search,
 )
 
-from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
 
 ## Tools factory - will be initialized based on configuration
 def get_search_tool(config: RunnableConfig):
@@ -187,7 +189,6 @@ async def get_research_tools(config: RunnableConfig) -> list[BaseTool]:
 
 async def supervisor(state: ReportState, config: RunnableConfig):
     """LLM decides whether to call a tool or not"""
-
     # Messages
     messages = state["messages"]
 
@@ -336,7 +337,6 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
 
 async def supervisor_should_continue(state: ReportState) -> str:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
-
     messages = state["messages"]
     last_message = messages[-1]
     # End because the supervisor asked a question or is finished
@@ -349,7 +349,6 @@ async def supervisor_should_continue(state: ReportState) -> str:
 
 async def research_agent(state: SectionState, config: RunnableConfig):
     """LLM decides whether to call a tool or not"""
-    
     # Get configuration
     configurable = MultiAgentConfiguration.from_runnable_config(config)
     researcher_model = get_config_value(configurable.researcher_model)
@@ -443,7 +442,6 @@ async def research_agent_tools(state: SectionState, config: RunnableConfig):
 
 async def research_agent_should_continue(state: SectionState) -> str:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
-
     messages = state["messages"]
     last_message = messages[-1]
 

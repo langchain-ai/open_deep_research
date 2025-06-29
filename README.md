@@ -295,13 +295,52 @@ thread = {"configurable": {"thread_id": str(uuid.uuid4()),
                            }}
 ```
 
+## Google Gemini Configuration
+
+To use Google Gemini models, you'll need to set up your Google API key in the `.env` file:
+
+```bash
+GOOGLE_API_KEY=your_google_api_key_here
+```
+
+### Multi-Agent Configuration with Google Gemini:
+```python
+config = {
+    "configurable": {
+        "supervisor_model": "google_genai:gemini-2.5-pro",
+        "researcher_model": "google_genai:gemini-2.5-flash",
+        "search_api": "tavily"
+    }
+}
+```
+
+### Graph-based Configuration with Google Gemini:
+```python
+config = {
+    "configurable": {
+        "planner_provider": "google_genai",
+        "planner_model": "gemini-2.5-pro",
+        "writer_provider": "google_genai", 
+        "writer_model": "gemini-2.5-pro",
+        "search_api": "tavily"
+    }
+}
+```
+
+### Available Google Models:
+- `gemini-2.5-pro`: Latest and most capable model for complex reasoning tasks
+- `gemini-2.5-flash`: Latest fast model optimized for speed and efficiency
+- `gemini-1.5-pro`: Previous generation capable model for complex reasoning tasks
+- `gemini-1.5-flash`: Previous generation faster model optimized for speed
+- `gemini-1.0-pro`: Legacy generation model
+
 ## Model Considerations
 
 (1) You can use models supported with [the `init_chat_model()` API](https://python.langchain.com/docs/how_to/chat_models_universal_init/). See full list of supported integrations [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html).
 
 (2) ***The workflow planner and writer models need to support structured outputs***: Check whether structured outputs are supported by the model you are using [here](https://python.langchain.com/docs/integrations/chat/).
 
-(3) ***The agent models need to support tool calling:*** Ensure tool calling is well supoorted; tests have been done with Claude 3.7, o3, o3-mini, and gpt4.1. See [here](https://smith.langchain.com/public/adc5d60c-97ee-4aa0-8b2c-c776fb0d7bd6/d).
+(3) ***The agent models need to support tool calling:*** Ensure tool calling is well supported; tests have been done with Claude 3.7, o3, o3-mini, gpt4.1, and Google Gemini models. See [here](https://smith.langchain.com/public/adc5d60c-97ee-4aa0-8b2c-c776fb0d7bd6/d).
 
 (4) With Groq, there are token per minute (TPM) limits if you are on the `on_demand` service tier:
 - The `on_demand` service tier has a limit of `6000 TPM`

@@ -1,7 +1,7 @@
 import os
+from dataclasses import dataclass, fields
 from enum import Enum
-from dataclasses import dataclass, fields, field
-from typing import Any, Optional, Dict, Literal
+from typing import Any, Dict, Literal
 
 from langchain_core.runnables import RunnableConfig
 
@@ -34,26 +34,26 @@ class WorkflowConfiguration:
     # Common configuration
     report_structure: str = DEFAULT_REPORT_STRUCTURE
     search_api: SearchAPI = SearchAPI.TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None
+    search_api_config: Dict[str, Any] | None = None
     process_search_results: Literal["summarize", "split_and_rerank"] | None = None
-    summarization_model_provider: str = "anthropic"
-    summarization_model: str = "claude-3-5-haiku-latest"
+    summarization_model_provider: str = "google_genai"  # Options: "anthropic", "openai", "google_genai", "groq", "deepseek", etc.
+    summarization_model: str = "gemini-2.5-flash"  # For Google: "gemini-1.5-flash", "gemini-1.5-pro", etc.
     max_structured_output_retries: int = 3
     include_source_str: bool = False
     
     # Workflow-specific configuration
     number_of_queries: int = 2 # Number of search queries to generate per iteration
     max_search_depth: int = 2 # Maximum number of reflection + search iterations
-    planner_provider: str = "anthropic"
-    planner_model: str = "claude-3-7-sonnet-latest"
-    planner_model_kwargs: Optional[Dict[str, Any]] = None
-    writer_provider: str = "anthropic"
-    writer_model: str = "claude-3-7-sonnet-latest"
-    writer_model_kwargs: Optional[Dict[str, Any]] = None
+    planner_provider: str = "google_genai"  # Options: "anthropic", "openai", "google_genai", "groq", "deepseek", etc.
+    planner_model: str = "gemini-2.5-flash"  # For Google: "gemini-1.5-pro", "gemini-1.5-flash", etc.
+    planner_model_kwargs: Dict[str, Any] | None = None
+    writer_provider: str = "google_genai"  # Options: "anthropic", "openai", "google_genai", "groq", "deepseek", etc.
+    writer_model: str = "gemini-2.5-flash"  # For Google: "gemini-1.5-pro", "gemini-1.5-flash", etc.
+    writer_model_kwargs: Dict[str, Any] | None = None
 
     @classmethod
     def from_runnable_config(
-        cls, config: Optional[RunnableConfig] = None
+        cls, config: RunnableConfig | None = None
     ) -> "WorkflowConfiguration":
         """Create a WorkflowConfiguration instance from a RunnableConfig."""
         configurable = (
@@ -71,25 +71,25 @@ class MultiAgentConfiguration:
     """Configuration for the multi-agent implementation (multi_agent.py)."""
     # Common configuration
     search_api: SearchAPI = SearchAPI.TAVILY
-    search_api_config: Optional[Dict[str, Any]] = None
+    search_api_config: Dict[str, Any] | None = None
     process_search_results: Literal["summarize", "split_and_rerank"] | None = None
-    summarization_model_provider: str = "anthropic"
-    summarization_model: str = "claude-3-5-haiku-latest"
+    summarization_model_provider: str = "google_genai"  # Options: "anthropic", "openai", "google_genai", "groq", "deepseek", etc.
+    summarization_model: str = "gemini-2.5-flash"  # For Google: "gemini-1.5-flash", "gemini-1.5-pro", etc.
     include_source_str: bool = False
     
     # Multi-agent specific configuration
     number_of_queries: int = 2 # Number of search queries to generate per section
-    supervisor_model: str = "anthropic:claude-3-7-sonnet-latest"
-    researcher_model: str = "anthropic:claude-3-7-sonnet-latest"
+    supervisor_model: str = "google_genai:gemini-2.5-flash"  # Options: "google_genai:gemini-1.5-pro", "openai:gpt-4o", etc.
+    researcher_model: str = "google_genai:gemini-2.5-flash"  # Options: "google_genai:gemini-1.5-flash", "openai:gpt-4o", etc.
     ask_for_clarification: bool = False # Whether to ask for clarification from the user
     # MCP server configuration
-    mcp_server_config: Optional[Dict[str, Any]] = None
-    mcp_prompt: Optional[str] = None
-    mcp_tools_to_include: Optional[list[str]] = None
+    mcp_server_config: Dict[str, Any] | None = None
+    mcp_prompt: str | None = None
+    mcp_tools_to_include: list[str] | None = None
 
     @classmethod
     def from_runnable_config(
-        cls, config: Optional[RunnableConfig] = None
+        cls, config: RunnableConfig | None = None
     ) -> "MultiAgentConfiguration":
         """Create a MultiAgentConfiguration instance from a RunnableConfig."""
         configurable = (
