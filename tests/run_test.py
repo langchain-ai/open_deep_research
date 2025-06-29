@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+import argparse
 import os
 import subprocess
 import sys
-import argparse
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.rule import Rule
@@ -16,6 +17,10 @@ Example usage:
 python tests/run_test.py --all  # Run all agents with rich output
 python tests/run_test.py --agent multi_agent --supervisor-model "anthropic:claude-3-7-sonnet-latest"
 python tests/run_test.py --agent graph --search-api tavily
+
+# Google Gemini examples:
+python tests/run_test.py --agent multi_agent --supervisor-model "google_genai:gemini-2.5-pro" --researcher-model "google_genai:gemini-2.5-flash"
+python tests/run_test.py --agent graph --planner-provider "google_genai" --planner-model "gemini-2.5-pro" --writer-provider "google_genai" --writer-model "gemini-2.5-pro"
 """
 
 def main():
@@ -79,7 +84,7 @@ def main():
         agent_config = agents[agent]
         
         # Set up LangSmith environment for this agent
-        project_name = f"ODR: Pytest"
+        project_name = "ODR: Pytest"
         os.environ["LANGSMITH_PROJECT"] = project_name
         os.environ["LANGSMITH_TEST_SUITE"] = project_name
         
@@ -123,11 +128,11 @@ def run_test(agent, agent_config, args):
     ))
     
     # Run the command with real-time output (no capture)
-    console.print(f"\n[yellow]Starting test execution...[/yellow]\n")
+    console.print("\n[yellow]Starting test execution...[/yellow]\n")
     result = subprocess.run(cmd)
     
     # Display results with rich formatting
-    console.print(f"\n[yellow]Test execution completed.[/yellow]")
+    console.print("\n[yellow]Test execution completed.[/yellow]")
     if result.returncode == 0:
         console.print(Panel(
             f"[bold green]✅ Test for {agent} PASSED[/bold green]",
