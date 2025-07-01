@@ -460,13 +460,17 @@ def initiate_final_section_writing(state: ReportState):
     Returns:
         List of Send commands for parallel section writing
     """
-
-    # Kick off section writing in parallel via Send() API for any sections that do not require research
-    return [
+    test_list = [
         Send("write_final_sections", {"topic": state["topic"], "section": s, "report_sections_from_research": state["report_sections_from_research"]}) 
         for s in state["sections"] 
         if not s.research
     ]
+    if test_list:
+        return test_list
+    else:
+        return "compile_final_report"
+
+
 
 # Report section sub-graph -- 
 
@@ -496,7 +500,7 @@ builder.add_node("compile_final_report", compile_final_report)
 builder.add_edge(START, "generate_report_plan")
 builder.add_edge("generate_report_plan", "human_feedback")
 builder.add_edge("build_section_with_web_research", "gather_completed_sections")
-builder.add_conditional_edges("gather_completed_sections", initiate_final_section_writing, ["write_final_sections"])
+builder.add_conditional_edges("gather_completed_sections", initiate_final_section_writing, ["write_final_sections", "compile_final_report"])
 builder.add_edge("write_final_sections", "compile_final_report")
 builder.add_edge("compile_final_report", END)
 
