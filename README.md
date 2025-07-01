@@ -23,6 +23,14 @@ Then edit the `.env` file to customize the environment variables (for model sele
 cp .env.example .env
 ```
 
+If you plan to use Google Custom Search, export the credentials as environment
+variables instead of adding them to the ``.env`` file:
+
+```bash
+export GOOGLE_API_KEY=your-key
+export GOOGLE_CX=your-cse-id
+```
+
 Launch the assistant with the LangGraph server locally, which will open in your browser:
 
 #### Mac
