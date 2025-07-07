@@ -15,10 +15,10 @@ from langgraph.graph import START, END, StateGraph
 from open_deep_research.configuration import MultiAgentConfiguration
 from open_deep_research.utils import (
     get_config_value,
-    tavily_search,
     duckduckgo_search,
     get_today_str,
 )
+from open_deep_research.tools import tavily_search, crawl_url
 
 from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
 
@@ -466,13 +466,11 @@ research_builder.add_conditional_edges(
     ["research_agent_tools", END]
 )
 research_builder.add_edge("research_agent_tools", "research_agent")
-
 # Supervisor workflow
 supervisor_builder = StateGraph(ReportState, input=MessagesState, output=ReportStateOutput, config_schema=MultiAgentConfiguration)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
 supervisor_builder.add_node("research_team", research_builder.compile())
-
 # Flow of the supervisor agent
 supervisor_builder.add_edge(START, "supervisor")
 supervisor_builder.add_conditional_edges(
@@ -481,5 +479,22 @@ supervisor_builder.add_conditional_edges(
     ["supervisor_tools", END]
 )
 supervisor_builder.add_edge("research_team", "supervisor")
-
 graph = supervisor_builder.compile()
+class ScrapeRequest(BaseModel):
+    """Request payload for scraping a URL."""
+    url: str
+class ScrapeResult(BaseModel):
+    """Scraping result containing Markdown."""
+    markdown: str
+    url: str
+async def scraper_agent(req: ScrapeRequest) -> ScrapeResult:
+    """Return Markdown content for ``req.url`` using Crawl4AI."""
+    md = await crawl_url(req.url)
+    return ScrapeResult(markdown=md, url=req.url)
+if __name__ == "__main__":
+    import asyncio
+    test_url = "https://en.wikipedia.org/wiki/List_of_countries_by_population"
+    # now that the package is installed in editable mode:
+    from open_deep_research.multi_agent import scraper_agent
+    res = asyncio.run(scraper_agent(ScrapeRequest(url=test_url)))
+    print("Scrape preview:", res.markdown[:200])
