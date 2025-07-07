@@ -1,0 +1,24 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install --upgrade pip
+          pip install -e .
+          pip install playwright
+          playwright install --with-deps
+          pip install pytest ruff black
+      - name: Auto-format & lint-fix
+        run: |
+          black .
+          ruff --fix .
+      - run: ruff check .
+      - run: black --check .
+      - run: pytest -q
