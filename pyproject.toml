@@ -37,6 +37,11 @@ dependencies = [
     "rich>=13.0.0",
     "langgraph-cli[inmem]>=0.3.1",
     "langsmith>=0.3.37",
+    "langchain-google-vertexai>=2.0.25",
+    "langchain-google-genai>=2.1.5",
+    "ipykernel>=6.29.5",
+    "supabase>=2.15.3",
+    "mcp>=1.9.4",
 ]
 
 [project.optional-dependencies]
@@ -47,10 +52,11 @@ requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["open_deep_research", "tests"]
+packages = ["open_deep_research", "legacy", "tests"]
 
 [tool.setuptools.package-dir]
 "open_deep_research" = "src/open_deep_research"
+"legacy" = "src/legacy"
 "tests" = "tests"
 
 [tool.setuptools.package-data]

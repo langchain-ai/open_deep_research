@@ -17,8 +17,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 
 # Import the report generation agents
-from open_deep_research.graph import builder
-from open_deep_research.multi_agent import supervisor_builder
+from legacy.graph import builder
+from legacy.multi_agent import supervisor_builder
 
 # Initialize rich console with force_terminal to ensure output even when pytest captures stdout
 console = Console(force_terminal=True, width=120)
