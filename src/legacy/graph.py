@@ -8,7 +8,7 @@ from langgraph.constants import Send
 from langgraph.graph import START, END, StateGraph
 from langgraph.types import interrupt, Command
 
-from open_deep_research.state import (
+from legacy.state import (
     ReportStateInput,
     ReportStateOutput,
     Sections,
@@ -19,7 +19,7 @@ from open_deep_research.state import (
     Feedback
 )
 
-from open_deep_research.prompts import (
+from legacy.prompts import (
     report_planner_query_writer_instructions,
     report_planner_instructions,
     query_writer_instructions, 
@@ -29,8 +29,8 @@ from open_deep_research.prompts import (
     section_writer_inputs
 )
 
-from open_deep_research.configuration import WorkflowConfiguration
-from open_deep_research.utils import (
+from legacy.configuration import Configuration
+from legacy.utils import (
     format_sections, 
     get_config_value, 
     get_search_params, 
@@ -67,7 +67,7 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
     feedback = " /// ".join(feedback_list) if feedback_list else ""
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
     report_structure = configurable.report_structure
     number_of_queries = configurable.number_of_queries
     search_api = get_config_value(configurable.search_api)
@@ -210,7 +210,7 @@ async def generate_queries(state: SectionState, config: RunnableConfig):
     section = state["section"]
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
     number_of_queries = configurable.number_of_queries
 
     # Generate queries 
@@ -252,7 +252,7 @@ async def search_web(state: SectionState, config: RunnableConfig):
     search_queries = state["search_queries"]
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
     search_api = get_config_value(configurable.search_api)
     search_api_config = configurable.search_api_config or {}  # Get the config dict, default to empty
     params_to_pass = get_search_params(search_api, search_api_config)  # Filter parameters
@@ -289,7 +289,7 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
     source_str = state["source_str"]
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
 
     # Format system instructions
     section_writer_inputs_formatted = section_writer_inputs.format(topic=topic, 
@@ -368,7 +368,7 @@ async def write_final_sections(state: SectionState, config: RunnableConfig):
     """
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
 
     # Get state 
     topic = state["topic"]
@@ -430,7 +430,7 @@ def compile_final_report(state: ReportState, config: RunnableConfig):
     """
 
     # Get configuration
-    configurable = WorkflowConfiguration.from_runnable_config(config)
+    configurable = Configuration.from_runnable_config(config)
 
     # Get sections
     sections = state["sections"]
@@ -484,7 +484,7 @@ section_builder.add_edge("search_web", "write_section")
 # Outer graph for initial report plan compiling results from each section -- 
 
 # Add nodes
-builder = StateGraph(ReportState, input=ReportStateInput, output=ReportStateOutput, config_schema=WorkflowConfiguration)
+builder = StateGraph(ReportState, input=ReportStateInput, output=ReportStateOutput, config_schema=Configuration)
 builder.add_node("generate_report_plan", generate_report_plan)
 builder.add_node("human_feedback", human_feedback)
 builder.add_node("build_section_with_web_research", section_builder.compile())
