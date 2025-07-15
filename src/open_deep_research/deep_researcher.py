@@ -81,13 +81,16 @@ async def write_research_brief(state: AgentState, config: RunnableConfig)-> Comm
         goto="research_supervisor", 
         update={
             "research_brief": response.research_brief,
-            "supervisor_messages": [
-                SystemMessage(content=lead_researcher_prompt.format(
-                    date=get_today_str(),
-                    max_concurrent_research_units=configurable.max_concurrent_research_units
-                )),
-                HumanMessage(content=response.research_brief)
-            ]
+            "supervisor_messages": {
+                "type": "override",
+                "value": [
+                    SystemMessage(content=lead_researcher_prompt.format(
+                        date=get_today_str(),
+                        max_concurrent_research_units=configurable.max_concurrent_research_units
+                    )),
+                    HumanMessage(content=response.research_brief)
+                ]
+            }
         }
     )
 

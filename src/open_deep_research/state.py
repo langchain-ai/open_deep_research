@@ -52,14 +52,14 @@ class AgentInputState(MessagesState):
     """InputState is only 'messages'"""
 
 class AgentState(MessagesState):
-    supervisor_messages: Annotated[list[MessageLikeRepresentation], operator.add]
+    supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
     research_brief: Optional[str]
     raw_notes: Annotated[list[str], override_reducer] = []
     notes: Annotated[list[str], override_reducer] = []
     final_report: str
 
 class SupervisorState(TypedDict):
-    supervisor_messages: Annotated[list[MessageLikeRepresentation], operator.add]
+    supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
     research_brief: str
     notes: Annotated[list[str], override_reducer] = []
     research_iterations: int = 0
