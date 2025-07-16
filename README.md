@@ -4,8 +4,8 @@
 
 Deep research has broken out as one of the most popular agent applications. This is a simple, configurable, fully open source deep research agent that works across many model providers, search tools, and MCP servers. 
 
-* Read more in our blog 
-* See our video for a quick overview
+* Read more in our [blog](https://blog.langchain.com/open-deep-research/) 
+* See our [video](https://www.youtube.com/watch?v=agGiWUpxkhg) for a quick overview
 
 ### 🚀 Quickstart
 
