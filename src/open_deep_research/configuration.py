@@ -199,6 +199,18 @@ class Configuration(BaseModel):
             }
         }
     )
+    
+    # SSL/TLS Configuration
+    verify_ssl: bool = Field(
+        default=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "boolean",
+                "default": True,
+                "description": "Whether to verify SSL certificates. Set to False to bypass SSL verification for development/testing."
+            }
+        }
+    )
     mcp_prompt: Optional[str] = Field(
         default=None,
         optional=True,

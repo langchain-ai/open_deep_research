@@ -9,6 +9,8 @@ import hashlib
 import aiohttp
 import httpx
 import time
+import ssl
+import logging
 from typing import List, Optional, Dict, Any, Union, Literal, Annotated, cast
 from urllib.parse import unquote
 from collections import defaultdict
@@ -1204,34 +1206,52 @@ async def scrape_pages(titles: List[str], urls: List[str]) -> str:
              with clear section dividers and source attribution
     """
     
-    # Create an async HTTP client
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
-        pages = []
-        
-        # Fetch each URL and convert to markdown
-        for url in urls:
+    # Create an async HTTP client with SSL error handling
+    pages = []
+    
+    # Fetch each URL and convert to markdown
+    for url in urls:
+        try:
+            # Try with SSL verification first
             try:
-                # Fetch the content
-                response = await client.get(url)
-                response.raise_for_status()
-                
-                # Convert HTML to markdown if successful
-                if response.status_code == 200:
-                    # Handle different content types
-                    content_type = response.headers.get('Content-Type', '')
-                    if 'text/html' in content_type:
-                        # Convert HTML to markdown
-                        markdown_content = markdownify(response.text)
-                        pages.append(markdown_content)
-                    else:
-                        # For non-HTML content, just mention the content type
-                        pages.append(f"Content type: {content_type} (not converted to markdown)")
+                async with httpx.AsyncClient(
+                    follow_redirects=True, 
+                    timeout=30.0,
+                    limits=httpx.Limits(max_keepalive_connections=20, max_connections=100),
+                    headers={'User-Agent': 'OpenDeepResearch/1.0'}
+                ) as client:
+                    response = await client.get(url)
+                    response.raise_for_status()
+            except (httpx.ConnectError, ssl.SSLError) as ssl_error:
+                # If SSL fails, try without verification
+                logging.warning(f"SSL verification failed for {url}, retrying without SSL verification: {ssl_error}")
+                async with httpx.AsyncClient(
+                    follow_redirects=True, 
+                    timeout=30.0,
+                    verify=False,
+                    limits=httpx.Limits(max_keepalive_connections=20, max_connections=100),
+                    headers={'User-Agent': 'OpenDeepResearch/1.0'}
+                ) as client:
+                    response = await client.get(url)
+                    response.raise_for_status()
+            
+            # Convert HTML to markdown if successful
+            if response.status_code == 200:
+                # Handle different content types
+                content_type = response.headers.get('Content-Type', '')
+                if 'text/html' in content_type:
+                    # Convert HTML to markdown
+                    markdown_content = markdownify(response.text)
+                    pages.append(markdown_content)
                 else:
-                    pages.append(f"Error: Received status code {response.status_code}")
-        
-            except Exception as e:
-                # Handle any exceptions during fetch
-                pages.append(f"Error fetching URL: {str(e)}")
+                    # For non-HTML content, just mention the content type
+                    pages.append(f"Content type: {content_type} (not converted to markdown)")
+            else:
+                pages.append(f"Error: Received status code {response.status_code}")
+    
+        except Exception as e:
+            # Handle any exceptions during fetch
+            pages.append(f"Error fetching URL: {str(e)}")
         
         # Create formatted output
         formatted_output = f"Search results: \n\n"
