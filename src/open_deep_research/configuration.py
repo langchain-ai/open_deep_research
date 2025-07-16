@@ -209,6 +209,11 @@ class Configuration(BaseModel):
             }
         }
     )
+    
+    # Custom tools configuration
+    custom_tools: Optional[List[Any]] = Field(
+        default=None
+    )
 
 
     @classmethod
