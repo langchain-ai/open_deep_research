@@ -18,6 +18,15 @@ from open_deep_research.state import Summary, ResearchComplete
 from open_deep_research.configuration import SearchAPI, Configuration
 from open_deep_research.prompts import summarize_webpage_prompt
 
+import json
+import datetime
+import ssl
+import certifi
+
+import httpx
+from pydantic import BaseModel
+from langchain_core.tools import tool
+
 
 ##########################
 # Tavily Search Tool Utils
@@ -135,18 +144,25 @@ async def get_mcp_access_token(
             "resource": base_mcp_url.rstrip("/") + "/mcp",
             "subject_token_type": "urn:ietf:params:oauth:token-type:access_token",
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                base_mcp_url.rstrip("/") + "/oauth/token",
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-                data=form_data,
-            ) as token_response:
-                if token_response.status == 200:
-                    token_data = await token_response.json()
-                    return token_data
-                else:
-                    response_text = await token_response.text()
-                    logging.error(f"Token exchange failed: {response_text}")
+        
+        # Get SSL configuration from environment or use default
+        verify_ssl = os.getenv("OPEN_DEEP_RESEARCH_VERIFY_SSL", "true").lower() == "true"
+        
+        # Use our safe HTTP request function
+        response = await safe_http_request(
+            url=base_mcp_url.rstrip("/") + "/oauth/token",
+            method="POST",
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            data=form_data,
+            verify_ssl=verify_ssl,
+            timeout=30,
+            max_retries=3
+        )
+        
+        if response["status"] == 200:
+            return response["json"]
+        else:
+            logging.error(f"Token exchange failed: {response['text']}")
     except Exception as e:
         logging.error(f"Error during token exchange: {e}")
     return None
@@ -492,3 +508,167 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+##########################
+# SSL/TLS Error Handling Utils
+##########################
+
+def create_ssl_context(verify_ssl: bool = True) -> ssl.SSLContext:
+    """
+    Create an SSL context with proper error handling.
+    
+    Args:
+        verify_ssl (bool): Whether to verify SSL certificates. Set to False to bypass SSL verification.
+        
+    Returns:
+        ssl.SSLContext: Configured SSL context
+    """
+    if verify_ssl:
+        # Use certifi for certificate verification
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        ssl_context.check_hostname = True
+        ssl_context.verify_mode = ssl.CERT_REQUIRED
+    else:
+        # Create context that bypasses SSL verification (for development/testing only)
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        warnings.warn("SSL verification disabled. This should only be used for development/testing.")
+    
+    return ssl_context
+
+def create_aiohttp_session(verify_ssl: bool = True, timeout: int = 30) -> aiohttp.ClientSession:
+    """
+    Create an aiohttp session with proper SSL handling.
+    
+    Args:
+        verify_ssl (bool): Whether to verify SSL certificates
+        timeout (int): Timeout in seconds
+        
+    Returns:
+        aiohttp.ClientSession: Configured session
+    """
+    connector = aiohttp.TCPConnector(
+        ssl=create_ssl_context(verify_ssl),
+        limit=100,
+        limit_per_host=30,
+        ttl_dns_cache=300,
+        use_dns_cache=True,
+    )
+    
+    timeout_config = aiohttp.ClientTimeout(total=timeout)
+    
+    return aiohttp.ClientSession(
+        connector=connector,
+        timeout=timeout_config,
+        headers={
+            'User-Agent': 'OpenDeepResearch/1.0 (https://github.com/langchain-ai/open_deep_research)'
+        }
+    )
+
+def create_httpx_client(verify_ssl: bool = True, timeout: int = 30) -> httpx.AsyncClient:
+    """
+    Create an httpx client with proper SSL handling.
+    
+    Args:
+        verify_ssl (bool): Whether to verify SSL certificates
+        timeout (int): Timeout in seconds
+        
+    Returns:
+        httpx.AsyncClient: Configured client
+    """
+    if verify_ssl:
+        # Use certifi for certificate verification
+        limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
+        return httpx.AsyncClient(
+            follow_redirects=True,
+            timeout=timeout,
+            limits=limits,
+            headers={
+                'User-Agent': 'OpenDeepResearch/1.0 (https://github.com/langchain-ai/open_deep_research)'
+            }
+        )
+    else:
+        # Create client that bypasses SSL verification (for development/testing only)
+        limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
+        return httpx.AsyncClient(
+            follow_redirects=True,
+            timeout=timeout,
+            limits=limits,
+            verify=False,
+            headers={
+                'User-Agent': 'OpenDeepResearch/1.0 (https://github.com/langchain-ai/open_deep_research)'
+            }
+        )
+
+async def safe_http_request(
+    url: str,
+    method: str = "GET",
+    headers: Optional[Dict[str, str]] = None,
+    data: Optional[Dict[str, Any]] = None,
+    verify_ssl: bool = True,
+    timeout: int = 30,
+    max_retries: int = 3
+) -> Dict[str, Any]:
+    """
+    Make a safe HTTP request with retry logic and SSL error handling.
+    
+    Args:
+        url (str): URL to request
+        method (str): HTTP method
+        headers (Optional[Dict[str, str]]): Request headers
+        data (Optional[Dict[str, Any]]): Request data
+        verify_ssl (bool): Whether to verify SSL certificates
+        timeout (int): Timeout in seconds
+        max_retries (int): Maximum number of retries
+        
+    Returns:
+        Dict[str, Any]: Response data
+        
+    Raises:
+        Exception: If all retries fail
+    """
+    for attempt in range(max_retries):
+        try:
+            async with create_aiohttp_session(verify_ssl, timeout) as session:
+                if method.upper() == "GET":
+                    async with session.get(url, headers=headers) as response:
+                        response.raise_for_status()
+                        return {
+                            "status": response.status,
+                            "headers": dict(response.headers),
+                            "text": await response.text(),
+                            "json": await response.json() if response.headers.get('content-type', '').startswith('application/json') else None
+                        }
+                elif method.upper() == "POST":
+                    async with session.post(url, headers=headers, data=data) as response:
+                        response.raise_for_status()
+                        return {
+                            "status": response.status,
+                            "headers": dict(response.headers),
+                            "text": await response.text(),
+                            "json": await response.json() if response.headers.get('content-type', '').startswith('application/json') else None
+                        }
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+                    
+        except (aiohttp.ClientError, asyncio.TimeoutError, ssl.SSLError) as e:
+            if attempt == max_retries - 1:
+                # Last attempt failed, try without SSL verification if it was enabled
+                if verify_ssl:
+                    logging.warning(f"SSL verification failed for {url}, retrying without SSL verification")
+                    return await safe_http_request(url, method, headers, data, False, timeout, 1)
+                else:
+                    raise Exception(f"HTTP request failed after {max_retries} attempts: {str(e)}")
+            else:
+                # Wait before retry with exponential backoff
+                wait_time = (2 ** attempt) + (0.1 * attempt)
+                logging.warning(f"HTTP request attempt {attempt + 1} failed for {url}: {str(e)}. Retrying in {wait_time}s...")
+                await asyncio.sleep(wait_time)
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise Exception(f"HTTP request failed after {max_retries} attempts: {str(e)}")
+            else:
+                wait_time = (2 ** attempt) + (0.1 * attempt)
+                logging.warning(f"HTTP request attempt {attempt + 1} failed for {url}: {str(e)}. Retrying in {wait_time}s...")
+                await asyncio.sleep(wait_time)
