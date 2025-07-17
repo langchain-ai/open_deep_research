@@ -62,12 +62,21 @@ async def tavily_search(
     configurable = Configuration.from_runnable_config(config)
     max_char_to_include = 50_000   # NOTE: This can be tuned by the developer. This character count keeps us safely under input token limits for the latest models.
     model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model = init_chat_model(
-        model=configurable.summarization_model,
-        max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
-    ).with_structured_output(Summary).with_retry(stop_after_attempt=configurable.max_structured_output_retries)
+    summarization_model_args = {
+        "model": configurable.summarization_model,
+        "max_tokens": configurable.summarization_model_max_tokens,
+        "tags": ["langsmith:nostream"]
+    }
+
+    if model_api_key is not None:
+        summarization_model_args["api_key"] = model_api_key
+
+    summarization_model = (
+        init_chat_model(**summarization_model_args)
+        .with_structured_output(Summary)
+        .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
+    )
+
     async def noop():
         return None
     summarization_tasks = [
@@ -429,6 +438,13 @@ MODEL_TOKEN_LIMITS = {
     "ollama:llama2:13b": 4096,
     "ollama:llama2": 4096,
     "ollama:mistral": 32768,
+    "bedrock:us.amazon.nova-premier-v1:0": 1000000,
+    "bedrock:us.amazon.nova-pro-v1:0": 300000,
+    "bedrock:us.amazon.nova-lite-v1:0": 300000,
+    "bedrock:us.amazon.nova-micro-v1:0": 128000,
+    "bedrock:us.anthropic.claude-3-7-sonnet-20250219-v1:0": 200000,
+    "bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0": 200000,
+    "bedrock:us.anthropic.claude-opus-4-20250514-v1:0": 200000,
 }
 
 def get_model_token_limit(model_string):
