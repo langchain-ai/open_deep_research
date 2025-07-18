@@ -141,6 +141,16 @@ python tests/run_evaluate.py
 
 Follow the [quickstart](#-quickstart) to start LangGraph server locally and test the agent out on LangGraph Studio.
 
+#### Command-Line Usage
+
+To run the research process programmatically and save the final report to a file, you can use the `run_research.py` script.
+
+```bash
+python run_research.py "Your research query here"
+```
+
+This will create a `final_report.md` file in the root directory with the output.
+
 #### Hosted deployment
  
 You can easily deploy to [LangGraph Platform](https://langchain-ai.github.io/langgraph/concepts/#deployment-options). 
