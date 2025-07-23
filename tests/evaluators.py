@@ -2,7 +2,7 @@ from typing import cast
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
-from open_deep_research.utils import get_today_str
+from apex_deep_research.utils import get_today_str
 from tests.prompts import RELEVANCE_PROMPT, STRUCTURE_PROMPT, GROUNDEDNESS_PROMPT, OVERALL_QUALITY_PROMPT, CORRECTNESS_PROMPT, COMPLETENESS_PROMPT
 
 eval_model = ChatOpenAI(

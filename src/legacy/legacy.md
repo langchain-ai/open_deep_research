@@ -15,8 +15,8 @@ Open Deep Research is an experimental, fully open-source research assistant that
 
 Clone the repository:
 ```bash
-git clone https://github.com/langchain-ai/open_deep_research.git
-cd open_deep_research
+git clone https://github.com/langchain-ai/apex_deep_research.git
+cd apex_deep_research
 ```
 
 Then edit the `.env` file to customize the environment variables (for model selection, search tools, and other configuration settings):
@@ -214,7 +214,7 @@ MCP server config:
     "args": [
       "-y",
       "@modelcontextprotocol/server-filesystem",
-      "/Users/rlm/Desktop/Code/open_deep_research/src/legacy/files"
+      "/Users/rlm/Desktop/Code/apex_deep_research/src/legacy/files"
     ],
     "transport": "stdio"
   }
@@ -315,9 +315,9 @@ thread = {"configurable": {"thread_id": str(uuid.uuid4()),
 groq.APIError: Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.
 ```
 
-(6) Follow [here[(https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408) to use with OpenRouter.
+(6) Follow [here[(https://github.com/langchain-ai/apex_deep_research/issues/75#issuecomment-2811472408) to use with OpenRouter.
 
-(7) For working with local models via Ollama, see [here](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318).
+(7) For working with local models via Ollama, see [here](https://github.com/langchain-ai/apex_deep_research/issues/65#issuecomment-2743586318).
 
 ## Evaluation Systems
 

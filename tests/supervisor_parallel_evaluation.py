@@ -1,4 +1,4 @@
-from open_deep_research.deep_researcher import deep_researcher_builder
+from apex_deep_research.deep_researcher import deep_researcher_builder
 from langgraph.checkpoint.memory import MemorySaver
 import uuid
 import asyncio

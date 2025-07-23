@@ -1,5 +1,5 @@
 """
-Pytest configuration for open_deep_research tests.
+Pytest configuration for apex_deep_research tests.
 """
 
 import pytest
