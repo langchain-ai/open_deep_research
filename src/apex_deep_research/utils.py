@@ -14,9 +14,9 @@ from tavily import AsyncTavilyClient
 from langgraph.config import get_store
 from mcp import McpError
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from open_deep_research.state import Summary, ResearchComplete
-from open_deep_research.configuration import SearchAPI, Configuration
-from open_deep_research.prompts import summarize_webpage_prompt
+from apex_deep_research.state import Summary, ResearchComplete
+from apex_deep_research.configuration import SearchAPI, Configuration
+from apex_deep_research.prompts import summarize_webpage_prompt
 
 
 ##########################

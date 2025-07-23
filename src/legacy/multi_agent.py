@@ -41,7 +41,7 @@ def get_search_tool(config: RunnableConfig):
         raise NotImplementedError(
             f"The search API '{search_api}' is not yet supported in the multi-agent implementation. "
             f"Currently, only Tavily/DuckDuckGo/None is supported. Please use the graph-based implementation in "
-            f"src/open_deep_research/graph.py for other search APIs, or set search_api to 'tavily', 'duckduckgo', or 'none'."
+            f"src/apex_deep_research/graph.py for other search APIs, or set search_api to 'tavily', 'duckduckgo', or 'none'."
         )
 
     tool_metadata = {**(search_tool.metadata or {}), "type": "search"}

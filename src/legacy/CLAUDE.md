@@ -17,7 +17,7 @@ Open Deep Research offers two distinct approaches to automated research, each wi
 
 ### 1. Graph-based Workflow Implementation
 
-The **graph-based implementation** (`src/open_deep_research/graph.py`) follows a structured plan-and-execute workflow:
+The **graph-based implementation** (`src/apex_deep_research/graph.py`) follows a structured plan-and-execute workflow:
 
 **Characteristics:**
 - **Interactive Planning**: Uses a planner model to generate a structured report outline
@@ -33,7 +33,7 @@ The **graph-based implementation** (`src/open_deep_research/graph.py`) follows a
 
 ### 2. Multi-Agent Implementation
 
-The **multi-agent implementation** (`src/open_deep_research/multi_agent.py`) uses a supervisor-researcher architecture:
+The **multi-agent implementation** (`src/apex_deep_research/multi_agent.py`) uses a supervisor-researcher architecture:
 
 **Characteristics:**
 - **Supervisor Agent**: Manages overall research process and assembles final report

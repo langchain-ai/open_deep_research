@@ -11,8 +11,8 @@ Deep research has broken out as one of the most popular agent applications. This
 
 1. Clone the repository and activate a virtual environment:
 ```bash
-git clone https://github.com/langchain-ai/open_deep_research.git
-cd open_deep_research
+git clone https://github.com/langchain-ai/apex_deep_research.git
+cd apex_deep_research
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
@@ -83,8 +83,8 @@ All models are configured using [init_chat_model() API](https://python.langchain
 3. **Tool Calling**: All models must support tool calling functionality
 
 4. **Special Configurations**:
-   - For OpenRouter: Follow [this guide](https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408)
-   - For local models via Ollama: See [setup instructions](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318)
+   - For OpenRouter: Follow [this guide](https://github.com/langchain-ai/apex_deep_research/issues/75#issuecomment-2811472408)
+- For local models via Ollama: See [setup instructions](https://github.com/langchain-ai/apex_deep_research/issues/65#issuecomment-2743586318)
 
 #### Example MCP (Model Context Protocol) Servers
 
