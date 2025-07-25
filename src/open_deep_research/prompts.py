@@ -222,6 +222,14 @@ final_report_generation_prompt = """Based on all the research conducted, create 
 {research_brief}
 </Research Brief>
 
+For more context, here is all of the messages so far. Focus on the research brief above, but consider these messages as well for more context.
+<Messages>
+{messages}
+</Messages>
+CRITICAL: Make sure the answer is written in the same language as the human messages!
+For example, if the user's messages are in English, then MAKE SURE you write your response in English. If the user's messages are in Chinese, then MAKE SURE you write your entire response in Chinese.
+This is critical. The user will only understand the answer if it is written in the same language as their input message.
+
 Today's date is {date}.
 
 Here are the findings from the research that you conducted:
@@ -270,6 +278,12 @@ For each section of the report, do the following:
 - Use ## for section title (Markdown format) for each section of the report
 - Do NOT ever refer to yourself as the writer of the report. This should be a professional report without any self-referential language. 
 - Do not say what you are doing in the report. Just write the report without any commentary from yourself.
+- Each section should be as long as necessary to deeply answer the question with the information you have gathered. It is expected that sections will be fairly long and verbose. You are writing a deep research report, and users will expect a thorough answer.
+- Use bullet points to list out information when appropriate, but by default, write in paragraph form.
+
+REMEMBER:
+The brief and research may be in English, but you need to translate this information to the right language when writing the final answer.
+Make sure the final answer report is in the SAME language as the human messages in the message history.
 
 Format the report in clear markdown with proper structure and include source references where appropriate.
 

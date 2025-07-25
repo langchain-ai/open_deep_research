@@ -141,11 +141,9 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
         all_conduct_research_calls = [tool_call for tool_call in most_recent_message.tool_calls if tool_call["name"] == "ConductResearch"]
         conduct_research_calls = all_conduct_research_calls[:configurable.max_concurrent_research_units]
         overflow_conduct_research_calls = all_conduct_research_calls[configurable.max_concurrent_research_units:]
-        researcher_system_prompt = research_system_prompt.format(mcp_prompt=configurable.mcp_prompt or "", date=get_today_str())
         coros = [
             researcher_subgraph.ainvoke({
                 "researcher_messages": [
-                    SystemMessage(content=researcher_system_prompt),
                     HumanMessage(content=tool_call["args"]["research_topic"])
                 ],
                 "research_topic": tool_call["args"]["research_topic"]
@@ -206,9 +204,9 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
         "api_key": get_api_key_for_model(configurable.research_model, config),
         "tags": ["langsmith:nostream"]
     }
+    researcher_system_prompt = research_system_prompt.format(mcp_prompt=configurable.mcp_prompt or "", date=get_today_str())
     research_model = configurable_model.bind_tools(tools).with_retry(stop_after_attempt=configurable.max_structured_output_retries).with_config(research_model_config)
-    # NOTE: Need to add fault tolerance here.
-    response = await research_model.ainvoke(researcher_messages)
+    response = await research_model.ainvoke([SystemMessage(content=researcher_system_prompt)] + researcher_messages)
     return Command(
         goto="researcher_tools",
         update={
@@ -274,11 +272,10 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
     })
     researcher_messages = state.get("researcher_messages", [])
     # Update the system prompt to now focus on compression rather than research.
-    researcher_messages[0] = SystemMessage(content=compress_research_system_prompt.format(date=get_today_str()))
     researcher_messages.append(HumanMessage(content=compress_research_simple_human_message))
     while synthesis_attempts < 3:
         try:
-            response = await synthesizer_model.ainvoke(researcher_messages)
+            response = await synthesizer_model.ainvoke([SystemMessage(content=compress_research_system_prompt.format(date=get_today_str()))] + researcher_messages)
             return {
                 "compressed_research": str(response.content),
                 "raw_notes": ["\n".join([str(m.content) for m in filter_messages(researcher_messages, include_types=["tool", "ai"])])]
@@ -321,6 +318,7 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
     while current_retry <= max_retries:
         final_report_prompt = final_report_generation_prompt.format(
             research_brief=state.get("research_brief", ""),
+            messages=get_buffer_string(state.get("messages", [])),
             findings=findings,
             date=get_today_str()
         )
