@@ -74,6 +74,7 @@ async def tavily_search(
         noop() if not result.get("raw_content") else summarize_webpage(
             summarization_model, 
             result['raw_content'][:max_char_to_include],
+            timeout=configurable.summarization_timeout
         )
         for result in unique_results.values()
     ]
@@ -108,11 +109,11 @@ async def tavily_search_async(search_queries, max_results: int = 5, topic: Liter
     search_docs = await asyncio.gather(*search_tasks)
     return search_docs
 
-async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
+async def summarize_webpage(model: BaseChatModel, webpage_content: str, timeout: float = 60.0) -> str:
     try:
         summary = await asyncio.wait_for(
             model.ainvoke([HumanMessage(content=summarize_webpage_prompt.format(webpage_content=webpage_content, date=get_today_str()))]),
-            timeout=60.0
+            timeout=timeout
         )
         return f"""<summary>\n{summary.summary}\n</summary>\n\n<key_excerpts>\n{summary.key_excerpts}\n</key_excerpts>"""
     except (asyncio.TimeoutError, Exception) as e:
