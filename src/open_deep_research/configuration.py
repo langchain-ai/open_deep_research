@@ -128,6 +128,16 @@ class Configuration(BaseModel):
             }
         }
     )
+    summarization_timeout: float = Field(
+        default=60.0,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "number",
+                "default": 60.0,
+                "description": "Timeout in seconds for webpage summarization"
+            }
+        }
+    )
     research_model: str = Field(
         default="openai:gpt-4.1",
         metadata={
