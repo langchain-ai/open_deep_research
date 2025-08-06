@@ -3,6 +3,8 @@
 import asyncio
 import logging
 import os
+import random
+import time
 import warnings
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any, Dict, List, Literal, Optional
@@ -28,6 +30,8 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.config import get_store
 from mcp import McpError
 from tavily import AsyncTavilyClient
+from openai import AsyncOpenAI
+from duckduckgo_search import DDGS
 
 from open_deep_research.configuration import Configuration, SearchAPI
 from open_deep_research.prompts import summarize_webpage_prompt
@@ -66,7 +70,7 @@ async def tavily_search(
         include_raw_content=True,
         config=config
     )
-    
+
     # Step 2: Deduplicate results by URL to avoid processing the same content multiple times
     unique_results = {}
     for response in search_results:
@@ -74,13 +78,13 @@ async def tavily_search(
             url = result['url']
             if url not in unique_results:
                 unique_results[url] = {**result, "query": response['query']}
-    
+
     # Step 3: Set up the summarization model with configuration
     configurable = Configuration.from_runnable_config(config)
-    
+
     # Character limit to stay within model token limits (configurable)
     max_char_to_include = configurable.max_content_length
-    
+
     # Initialize summarization model with retry logic
     model_api_key = get_api_key_for_model(configurable.summarization_model, config)
     summarization_model = init_chat_model(
@@ -91,72 +95,72 @@ async def tavily_search(
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
-    
+
     # Step 4: Create summarization tasks (skip empty content)
     async def noop():
         """No-op function for results without raw content."""
         return None
-    
+
     summarization_tasks = [
-        noop() if not result.get("raw_content") 
+        noop() if not result.get("raw_content")
         else summarize_webpage(
-            summarization_model, 
+            summarization_model,
             result['raw_content'][:max_char_to_include]
         )
         for result in unique_results.values()
     ]
-    
+
     # Step 5: Execute all summarization tasks in parallel
     summaries = await asyncio.gather(*summarization_tasks)
-    
+
     # Step 6: Combine results with their summaries
     summarized_results = {
         url: {
-            'title': result['title'], 
+            'title': result['title'],
             'content': result['content'] if summary is None else summary
         }
         for url, result, summary in zip(
-            unique_results.keys(), 
-            unique_results.values(), 
+            unique_results.keys(),
+            unique_results.values(),
             summaries
         )
     }
-    
+
     # Step 7: Format the final output
     if not summarized_results:
         return "No valid search results found. Please try different search queries or use a different search API."
-    
+
     formatted_output = "Search results: \n\n"
     for i, (url, result) in enumerate(summarized_results.items()):
         formatted_output += f"\n\n--- SOURCE {i+1}: {result['title']} ---\n"
         formatted_output += f"URL: {url}\n\n"
         formatted_output += f"SUMMARY:\n{result['content']}\n\n"
         formatted_output += "\n\n" + "-" * 80 + "\n"
-    
+
     return formatted_output
 
 async def tavily_search_async(
-    search_queries, 
-    max_results: int = 5, 
-    topic: Literal["general", "news", "finance"] = "general", 
-    include_raw_content: bool = True, 
+    search_queries,
+    max_results: int = 5,
+    topic: Literal["general", "news", "finance"] = "general",
+    include_raw_content: bool = True,
     config: RunnableConfig = None
 ):
     """Execute multiple Tavily search queries asynchronously.
-    
+
     Args:
         search_queries: List of search query strings to execute
         max_results: Maximum number of results per query
         topic: Topic category for filtering results
         include_raw_content: Whether to include full webpage content
         config: Runtime configuration for API key access
-        
+
     Returns:
         List of search result dictionaries from Tavily API
     """
     # Initialize the Tavily client with API key from config
     tavily_client = AsyncTavilyClient(api_key=get_tavily_api_key(config))
-    
+
     # Create search tasks for parallel execution
     search_tasks = [
         tavily_client.search(
@@ -167,42 +171,42 @@ async def tavily_search_async(
         )
         for query in search_queries
     ]
-    
+
     # Execute all search queries in parallel and return results
     search_results = await asyncio.gather(*search_tasks)
     return search_results
 
 async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
     """Summarize webpage content using AI model with timeout protection.
-    
+
     Args:
         model: The chat model configured for summarization
         webpage_content: Raw webpage content to be summarized
-        
+
     Returns:
         Formatted summary with key excerpts, or original content if summarization fails
     """
     try:
         # Create prompt with current date context
         prompt_content = summarize_webpage_prompt.format(
-            webpage_content=webpage_content, 
+            webpage_content=webpage_content,
             date=get_today_str()
         )
-        
+
         # Execute summarization with timeout to prevent hanging
         summary = await asyncio.wait_for(
             model.ainvoke([HumanMessage(content=prompt_content)]),
             timeout=60.0  # 60 second timeout for summarization
         )
-        
+
         # Format the summary with structured sections
         formatted_summary = (
             f"<summary>\n{summary.summary}\n</summary>\n\n"
             f"<key_excerpts>\n{summary.key_excerpts}\n</key_excerpts>"
         )
-        
+
         return formatted_summary
-        
+
     except asyncio.TimeoutError:
         # Timeout during summarization - return original content
         logging.warning("Summarization timed out after 60 seconds, returning original content")
@@ -252,11 +256,11 @@ async def get_mcp_access_token(
     base_mcp_url: str,
 ) -> Optional[Dict[str, Any]]:
     """Exchange Supabase token for MCP access token using OAuth token exchange.
-    
+
     Args:
         supabase_token: Valid Supabase authentication token
         base_mcp_url: Base URL of the MCP server
-        
+
     Returns:
         Token data dictionary if successful, None if failed
     """
@@ -269,12 +273,12 @@ async def get_mcp_access_token(
             "resource": base_mcp_url.rstrip("/") + "/mcp",
             "subject_token_type": "urn:ietf:params:oauth:token-type:access_token",
         }
-        
+
         # Execute token exchange request
         async with aiohttp.ClientSession() as session:
             token_url = base_mcp_url.rstrip("/") + "/oauth/token"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            
+
             async with session.post(token_url, headers=headers, data=form_data) as response:
                 if response.status == 200:
                     # Successfully obtained token
@@ -284,43 +288,43 @@ async def get_mcp_access_token(
                     # Log error details for debugging
                     response_text = await response.text()
                     logging.error(f"Token exchange failed: {response_text}")
-                    
+
     except Exception as e:
         logging.error(f"Error during token exchange: {e}")
-    
+
     return None
 
 async def get_tokens(config: RunnableConfig):
     """Retrieve stored authentication tokens with expiration validation.
-    
+
     Args:
         config: Runtime configuration containing thread and user identifiers
-        
+
     Returns:
         Token dictionary if valid and not expired, None otherwise
     """
     store = get_store()
-    
+
     # Extract required identifiers from config
     thread_id = config.get("configurable", {}).get("thread_id")
     if not thread_id:
         return None
-        
+
     user_id = config.get("metadata", {}).get("owner")
     if not user_id:
         return None
-    
+
     # Retrieve stored tokens
     tokens = await store.aget((user_id, "tokens"), "data")
     if not tokens:
         return None
-    
+
     # Check token expiration
     expires_in = tokens.value.get("expires_in")  # seconds until expiration
     created_at = tokens.created_at  # datetime of token creation
     current_time = datetime.now(timezone.utc)
     expiration_time = created_at + timedelta(seconds=expires_in)
-    
+
     if current_time > expiration_time:
         # Token expired, clean up and return None
         await store.adelete((user_id, "tokens"), "data")
@@ -330,31 +334,31 @@ async def get_tokens(config: RunnableConfig):
 
 async def set_tokens(config: RunnableConfig, tokens: dict[str, Any]):
     """Store authentication tokens in the configuration store.
-    
+
     Args:
         config: Runtime configuration containing thread and user identifiers
         tokens: Token dictionary to store
     """
     store = get_store()
-    
+
     # Extract required identifiers from config
     thread_id = config.get("configurable", {}).get("thread_id")
     if not thread_id:
         return
-        
+
     user_id = config.get("metadata", {}).get("owner")
     if not user_id:
         return
-    
+
     # Store the tokens
     await store.aput((user_id, "tokens"), "data", tokens)
 
 async def fetch_tokens(config: RunnableConfig) -> dict[str, Any]:
     """Fetch and refresh MCP tokens, obtaining new ones if needed.
-    
+
     Args:
         config: Runtime configuration with authentication details
-        
+
     Returns:
         Valid token dictionary, or None if unable to obtain tokens
     """
@@ -362,17 +366,17 @@ async def fetch_tokens(config: RunnableConfig) -> dict[str, Any]:
     current_tokens = await get_tokens(config)
     if current_tokens:
         return current_tokens
-    
+
     # Extract Supabase token for new token exchange
     supabase_token = config.get("configurable", {}).get("x-supabase-access-token")
     if not supabase_token:
         return None
-    
+
     # Extract MCP configuration
     mcp_config = config.get("configurable", {}).get("mcp_config")
     if not mcp_config or not mcp_config.get("url"):
         return None
-    
+
     # Exchange Supabase token for MCP tokens
     mcp_tokens = await get_mcp_access_token(supabase_token, mcp_config.get("url"))
     if not mcp_tokens:
@@ -384,64 +388,64 @@ async def fetch_tokens(config: RunnableConfig) -> dict[str, Any]:
 
 def wrap_mcp_authenticate_tool(tool: StructuredTool) -> StructuredTool:
     """Wrap MCP tool with comprehensive authentication and error handling.
-    
+
     Args:
         tool: The MCP structured tool to wrap
-        
+
     Returns:
         Enhanced tool with authentication error handling
     """
     original_coroutine = tool.coroutine
-    
+
     async def authentication_wrapper(**kwargs):
         """Enhanced coroutine with MCP error handling and user-friendly messages."""
-        
+
         def _find_mcp_error_in_exception_chain(exc: BaseException) -> McpError | None:
             """Recursively search for MCP errors in exception chains."""
             if isinstance(exc, McpError):
                 return exc
-            
+
             # Handle ExceptionGroup (Python 3.11+) by checking attributes
             if hasattr(exc, 'exceptions'):
                 for sub_exception in exc.exceptions:
                     if found_error := _find_mcp_error_in_exception_chain(sub_exception):
                         return found_error
             return None
-        
+
         try:
             # Execute the original tool functionality
             return await original_coroutine(**kwargs)
-            
+
         except BaseException as original_error:
             # Search for MCP-specific errors in the exception chain
             mcp_error = _find_mcp_error_in_exception_chain(original_error)
             if not mcp_error:
                 # Not an MCP error, re-raise the original exception
                 raise original_error
-            
+
             # Handle MCP-specific error cases
             error_details = mcp_error.error
             error_code = getattr(error_details, "code", None)
             error_data = getattr(error_details, "data", None) or {}
-            
+
             # Check for authentication/interaction required error
             if error_code == -32003:  # Interaction required error code
                 message_payload = error_data.get("message", {})
                 error_message = "Required interaction"
-                
+
                 # Extract user-friendly message if available
                 if isinstance(message_payload, dict):
                     error_message = message_payload.get("text") or error_message
-                
+
                 # Append URL if provided for user reference
                 if url := error_data.get("url"):
                     error_message = f"{error_message} {url}"
-                
+
                 raise ToolException(error_message) from original_error
-            
+
             # For other MCP errors, re-raise the original
             raise original_error
-    
+
     # Replace the tool's coroutine with our enhanced version
     tool.coroutine = authentication_wrapper
     return tool
@@ -451,41 +455,41 @@ async def load_mcp_tools(
     existing_tool_names: set[str],
 ) -> list[BaseTool]:
     """Load and configure MCP (Model Context Protocol) tools with authentication.
-    
+
     Args:
         config: Runtime configuration containing MCP server details
         existing_tool_names: Set of tool names already in use to avoid conflicts
-        
+
     Returns:
         List of configured MCP tools ready for use
     """
     configurable = Configuration.from_runnable_config(config)
-    
+
     # Step 1: Handle authentication if required
     if configurable.mcp_config and configurable.mcp_config.auth_required:
         mcp_tokens = await fetch_tokens(config)
     else:
         mcp_tokens = None
-    
+
     # Step 2: Validate configuration requirements
     config_valid = (
-        configurable.mcp_config and 
-        configurable.mcp_config.url and 
-        configurable.mcp_config.tools and 
+        configurable.mcp_config and
+        configurable.mcp_config.url and
+        configurable.mcp_config.tools and
         (mcp_tokens or not configurable.mcp_config.auth_required)
     )
-    
+
     if not config_valid:
         return []
-    
+
     # Step 3: Set up MCP server connection
     server_url = configurable.mcp_config.url.rstrip("/") + "/mcp"
-    
+
     # Configure authentication headers if tokens are available
     auth_headers = None
     if mcp_tokens:
         auth_headers = {"Authorization": f"Bearer {mcp_tokens['access_token']}"}
-    
+
     mcp_server_config = {
         "server_1": {
             "url": server_url,
@@ -494,7 +498,7 @@ async def load_mcp_tools(
         }
     }
     # TODO: When Multi-MCP Server support is merged in OAP, update this code
-    
+
     # Step 4: Load tools from MCP server
     try:
         client = MultiServerMCPClient(mcp_server_config)
@@ -502,7 +506,7 @@ async def load_mcp_tools(
     except Exception:
         # If MCP server connection fails, return empty list
         return []
-    
+
     # Step 5: Filter and configure tools
     configured_tools = []
     for mcp_tool in available_mcp_tools:
@@ -512,15 +516,15 @@ async def load_mcp_tools(
                 f"MCP tool '{mcp_tool.name}' conflicts with existing tool name - skipping"
             )
             continue
-        
+
         # Only include tools specified in configuration
         if mcp_tool.name not in set(configurable.mcp_config.tools):
             continue
-        
+
         # Wrap tool with authentication handling and add to list
         enhanced_tool = wrap_mcp_authenticate_tool(mcp_tool)
         configured_tools.append(enhanced_tool)
-    
+
     return configured_tools
 
 
@@ -530,70 +534,90 @@ async def load_mcp_tools(
 
 async def get_search_tool(search_api: SearchAPI):
     """Configure and return search tools based on the specified API provider.
-    
+
     Args:
-        search_api: The search API provider to use (Anthropic, OpenAI, Tavily, or None)
-        
+        search_api: The search API provider to use (Anthropic, OpenAI, Tavily, Perplexity, DuckDuckGo, or None)
+
     Returns:
         List of configured search tool objects for the specified provider
     """
     if search_api == SearchAPI.ANTHROPIC:
         # Anthropic's native web search with usage limits
         return [{
-            "type": "web_search_20250305", 
-            "name": "web_search", 
+            "type": "web_search_20250305",
+            "name": "web_search",
             "max_uses": 5
         }]
-        
+
     elif search_api == SearchAPI.OPENAI:
         # OpenAI's web search preview functionality
         return [{"type": "web_search_preview"}]
-        
+
     elif search_api == SearchAPI.TAVILY:
         # Configure Tavily search tool with metadata
         search_tool = tavily_search
         search_tool.metadata = {
-            **(search_tool.metadata or {}), 
-            "type": "search", 
+            **(search_tool.metadata or {}),
+            "type": "search",
             "name": "web_search"
         }
         return [search_tool]
-        
+
+    elif search_api == SearchAPI.PERPLEXITY:
+        # Configure Perplexity Sonar search tool with metadata
+        search_tool = perplexity_search
+        search_tool.metadata = {
+            **(search_tool.metadata or {}),
+            "type": "search",
+            "name": "web_search"
+        }
+        return [search_tool]
+
+    elif search_api == SearchAPI.DUCKDUCKGO:
+        # Configure DuckDuckGo search tool with metadata
+        search_tool = duckduckgo_search
+        search_tool.metadata = {
+            **(search_tool.metadata or {}),
+            "type": "search",
+            "name": "web_search"
+        }
+        return [search_tool]
+
     elif search_api == SearchAPI.NONE:
         # No search functionality configured
         return []
-        
+
     # Default fallback for unknown search API types
     return []
-    
+
 async def get_all_tools(config: RunnableConfig):
     """Assemble complete toolkit including research, search, and MCP tools.
-    
+
     Args:
         config: Runtime configuration specifying search API and MCP settings
-        
+
     Returns:
         List of all configured and available tools for research operations
     """
     # Start with core research tools
     tools = [tool(ResearchComplete), think_tool]
-    
+
     # Add configured search tools
     configurable = Configuration.from_runnable_config(config)
     search_api = SearchAPI(get_config_value(configurable.search_api))
     search_tools = await get_search_tool(search_api)
     tools.extend(search_tools)
-    
+
     # Track existing tool names to prevent conflicts
     existing_tool_names = {
-        tool.name if hasattr(tool, "name") else tool.get("name", "web_search") 
+        tool.name if hasattr(tool, "name") else tool.get("name", "web_search")
         for tool in tools
     }
-    
+
     # Add MCP tools if configured
     mcp_tools = await load_mcp_tools(config, existing_tool_names)
     tools.extend(mcp_tools)
-    
+
     return tools
 
 def get_notes_from_tool_calls(messages: list[MessageLikeRepresentation]):
@@ -606,10 +630,10 @@ def get_notes_from_tool_calls(messages: list[MessageLikeRepresentation]):
 
 def anthropic_websearch_called(response):
     """Detect if Anthropic's native web search was used in the response.
-    
+
     Args:
         response: The response object from Anthropic's API
-        
+
     Returns:
         True if web search was called, False otherwise
     """
@@ -618,30 +642,30 @@ def anthropic_websearch_called(response):
         usage = response.response_metadata.get("usage")
         if not usage:
             return False
-        
+
         # Check for server-side tool usage information
         server_tool_use = usage.get("server_tool_use")
         if not server_tool_use:
             return False
-        
+
         # Look for web search request count
         web_search_requests = server_tool_use.get("web_search_requests")
         if web_search_requests is None:
             return False
-        
+
         # Return True if any web search requests were made
         return web_search_requests > 0
-        
+
     except (AttributeError, TypeError):
         # Handle cases where response structure is unexpected
         return False
 
 def openai_websearch_called(response):
     """Detect if OpenAI's web search functionality was used in the response.
-    
+
     Args:
         response: The response object from OpenAI's API
-        
+
     Returns:
         True if web search was called, False otherwise
     """
@@ -649,12 +673,12 @@ def openai_websearch_called(response):
     tool_outputs = response.additional_kwargs.get("tool_outputs")
     if not tool_outputs:
         return False
-    
+
     # Look for web search calls in the tool outputs
     for tool_output in tool_outputs:
         if tool_output.get("type") == "web_search_call":
             return True
-    
+
     return False
 
 
@@ -664,16 +688,16 @@ def openai_websearch_called(response):
 
 def is_token_limit_exceeded(exception: Exception, model_name: str = None) -> bool:
     """Determine if an exception indicates a token/context limit was exceeded.
-    
+
     Args:
         exception: The exception to analyze
         model_name: Optional model name to optimize provider detection
-        
+
     Returns:
         True if the exception indicates a token limit was exceeded, False otherwise
     """
     error_str = str(exception).lower()
-    
+
     # Step 1: Determine provider from model name if available
     provider = None
     if model_name:
@@ -684,7 +708,7 @@ def is_token_limit_exceeded(exception: Exception, model_name: str = None) -> boo
             provider = 'anthropic'
         elif model_str.startswith('gemini:') or model_str.startswith('google:'):
             provider = 'gemini'
-    
+
     # Step 2: Check provider-specific token limit patterns
     if provider == 'openai':
         return _check_openai_token_limit(exception, error_str)
@@ -692,7 +716,7 @@ def is_token_limit_exceeded(exception: Exception, model_name: str = None) -> boo
         return _check_anthropic_token_limit(exception, error_str)
     elif provider == 'gemini':
         return _check_gemini_token_limit(exception, error_str)
-    
+
     # Step 3: If provider unknown, check all providers
     return (
         _check_openai_token_limit(exception, error_str) or
@@ -706,31 +730,31 @@ def _check_openai_token_limit(exception: Exception, error_str: str) -> bool:
     exception_type = str(type(exception))
     class_name = exception.__class__.__name__
     module_name = getattr(exception.__class__, '__module__', '')
-    
+
     # Check if this is an OpenAI exception
     is_openai_exception = (
-        'openai' in exception_type.lower() or 
+        'openai' in exception_type.lower() or
         'openai' in module_name.lower()
     )
-    
+
     # Check for typical OpenAI token limit error types
     is_request_error = class_name in ['BadRequestError', 'InvalidRequestError']
-    
+
     if is_openai_exception and is_request_error:
         # Look for token-related keywords in error message
         token_keywords = ['token', 'context', 'length', 'maximum context', 'reduce']
         if any(keyword in error_str for keyword in token_keywords):
             return True
-    
+
     # Check for specific OpenAI error codes
     if hasattr(exception, 'code') and hasattr(exception, 'type'):
         error_code = getattr(exception, 'code', '')
         error_type = getattr(exception, 'type', '')
-        
+
         if (error_code == 'context_length_exceeded' or
             error_type == 'invalid_request_error'):
             return True
-    
+
     return False
 
 def _check_anthropic_token_limit(exception: Exception, error_str: str) -> bool:
@@ -739,21 +763,21 @@ def _check_anthropic_token_limit(exception: Exception, error_str: str) -> bool:
     exception_type = str(type(exception))
     class_name = exception.__class__.__name__
     module_name = getattr(exception.__class__, '__module__', '')
-    
+
     # Check if this is an Anthropic exception
     is_anthropic_exception = (
-        'anthropic' in exception_type.lower() or 
+        'anthropic' in exception_type.lower() or
         'anthropic' in module_name.lower()
     )
-    
+
     # Check for Anthropic-specific error patterns
     is_bad_request = class_name == 'BadRequestError'
-    
+
     if is_anthropic_exception and is_bad_request:
         # Anthropic uses specific error messages for token limits
         if 'prompt is too long' in error_str:
             return True
-    
+
     return False
 
 def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
@@ -762,26 +786,26 @@ def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
     exception_type = str(type(exception))
     class_name = exception.__class__.__name__
     module_name = getattr(exception.__class__, '__module__', '')
-    
+
     # Check if this is a Google/Gemini exception
     is_google_exception = (
-        'google' in exception_type.lower() or 
+        'google' in exception_type.lower() or
         'google' in module_name.lower()
     )
-    
+
     # Check for Google-specific resource exhaustion errors
     is_resource_exhausted = class_name in [
-        'ResourceExhausted', 
+        'ResourceExhausted',
         'GoogleGenerativeAIFetchError'
     ]
-    
+
     if is_google_exception and is_resource_exhausted:
         return True
-    
+
     # Check for specific Google API resource exhaustion patterns
     if 'google.api_core.exceptions.resourceexhausted' in exception_type.lower():
         return True
-    
+
     return False
 
 # NOTE: This may be out of date or not applicable to your models. Please update this as needed.
@@ -822,10 +846,10 @@ MODEL_TOKEN_LIMITS = {
 
 def get_model_token_limit(model_string):
     """Look up the token limit for a specific model.
-    
+
     Args:
         model_string: The model identifier string to look up
-        
+
     Returns:
         Token limit as integer if found, None if model not in lookup table
     """
@@ -833,18 +857,18 @@ def get_model_token_limit(model_string):
     for model_key, token_limit in MODEL_TOKEN_LIMITS.items():
         if model_key in model_string:
             return token_limit
-    
+
     # Model not found in lookup table
     return None
 
 def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> list[MessageLikeRepresentation]:
     """Truncate message history by removing up to the last AI message.
-    
+
     This is useful for handling token limit exceeded errors by removing recent context.
-    
+
     Args:
         messages: List of message objects to truncate
-        
+
     Returns:
         Truncated message list up to (but not including) the last AI message
     """
@@ -853,7 +877,7 @@ def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> l
         if isinstance(messages[i], AIMessage):
             # Return everything up to (but not including) the last AI message
             return messages[:i]
-    
+
     # No AI messages found, return original list
     return messages
 
@@ -863,7 +887,7 @@ def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> l
 
 def get_today_str() -> str:
     """Get current date formatted for display in prompts and outputs.
-    
+
     Returns:
         Human-readable date string in format like 'Mon Jan 15, 2024'
     """
@@ -896,7 +920,7 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return api_keys.get("GOOGLE_API_KEY")
         return None
     else:
-        if model_name.startswith("openai:"): 
+        if model_name.startswith("openai:"):
             return os.getenv("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
@@ -914,3 +938,235 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+PERPLEXITY_SEARCH_DESCRIPTION = (
+    "Search for real-time information using Perplexity Sonar. "
+    "This tool provides accurate, up-to-date information with source citations."
+)
+
+@tool(description=PERPLEXITY_SEARCH_DESCRIPTION)
+async def perplexity_search(
+    queries: List[str],
+    model: Annotated[Literal["sonar", "sonar-pro", "sonar-reasoning"], InjectedToolArg] = "sonar",
+    max_results: Annotated[int, InjectedToolArg] = 5,
+    config: RunnableConfig = None
+) -> str:
+    """Search for information using Perplexity Sonar API with real-time web search.
+
+    Args:
+        queries: List of search queries to execute
+        model: Perplexity model to use (sonar, sonar-pro, or sonar-reasoning)
+        max_results: Maximum number of results to return per query
+        config: Runtime configuration for API keys and model settings
+
+    Returns:
+        Formatted string containing search results with citations
+    """
+    # Get API key
+    api_key = get_perplexity_api_key(config)
+    if not api_key:
+        return "Error: Perplexity API key not found. Please set PERPLEXITY_API_KEY environment variable."
+
+    # Initialize Perplexity client
+    client = AsyncOpenAI(
+        api_key=api_key,
+        base_url="https://api.perplexity.ai"
+    )
+
+    all_results = []
+
+    for query in queries:
+        try:
+            # Create search query
+            messages = [
+                {
+                    "role": "system",
+                    "content": f"You are a helpful research assistant. Provide accurate, detailed information with proper citations. Return up to {max_results} key points with sources."
+                },
+                {
+                    "role": "user",
+                    "content": query
+                }
+            ]
+
+            # Make API call
+            response = await client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0.1,  # Low temperature for factual accuracy
+                max_tokens=2000
+            )
+
+            result = {
+                "query": query,
+                "content": response.choices[0].message.content,
+                "citations": getattr(response.choices[0].message, 'citations', [])
+            }
+
+            all_results.append(result)
+
+        except Exception as e:
+            all_results.append({
+                "query": query,
+                "content": f"Error searching for '{query}': {str(e)}",
+                "citations": []
+            })
+
+    # Format results
+    formatted_output = ""
+    for result in all_results:
+        formatted_output += f"\n--- Search Query: {result['query']} ---\n"
+        formatted_output += f"{result['content']}\n"
+
+        if result.get('citations'):
+            formatted_output += "\nSources:\n"
+            for i, citation in enumerate(result['citations'][:max_results], 1):
+                formatted_output += f"{i}. {citation}\n"
+        formatted_output += "\n"
+
+    return formatted_output.strip()
+
+def get_perplexity_api_key(config: RunnableConfig):
+    """Get Perplexity API key from environment or config."""
+    if not config:
+        return os.getenv("PERPLEXITY_API_KEY")
+
+    # Try to get from configurable section first
+    api_keys = config.get("configurable", {}).get("api_keys", {})
+    if isinstance(api_keys, dict):
+        return api_keys.get("PERPLEXITY_API_KEY")
+
+    return os.getenv("PERPLEXITY_API_KEY")
+
+
+# DuckDuckGo Search Tool Utils
+
+DUCKDUCKGO_SEARCH_DESCRIPTION = (
+    "Search for information using DuckDuckGo search engine. "
+    "This tool provides free web search with good coverage of general topics."
+)
+
+@tool(description=DUCKDUCKGO_SEARCH_DESCRIPTION)
+async def duckduckgo_search(
+    queries: List[str],
+    max_results: Annotated[int, InjectedToolArg] = 5,
+    config: RunnableConfig = None
+) -> str:
+    """Search for information using DuckDuckGo with retry logic and rate limiting.
+
+    Args:
+        queries: List of search queries to execute
+        max_results: Maximum number of results to return per query
+        config: Runtime configuration for settings
+
+    Returns:
+        Formatted string containing search results
+    """
+    async def process_single_query(query):
+        """Process a single search query with retry logic."""
+        loop = asyncio.get_event_loop()
+
+        def perform_search():
+            """Synchronous search function with retry logic."""
+            max_retries = 3
+            retry_count = 0
+            backoff_factor = 2.0
+            last_exception = None
+
+            while retry_count <= max_retries:
+                try:
+                    results = []
+                    with DDGS() as ddgs:
+                        # Change query slightly and add delay between retries
+                        if retry_count > 0:
+                            # Random delay with exponential backoff
+                            delay = backoff_factor ** retry_count + random.random()
+                            print(f"Retry {retry_count}/{max_retries} for query '{query}' after {delay:.2f}s delay")
+                            time.sleep(delay)
+
+                            # Add a random element to the query to bypass caching/rate limits
+                            modifiers = ['about', 'info', 'guide', 'overview', 'details', 'explained']
+                            modified_query = f"{query} {random.choice(modifiers)}"
+                        else:
+                            modified_query = query
+
+                        # Execute search
+                        ddg_results = list(ddgs.text(modified_query, max_results=max_results))
+
+                        # Format results
+                        for i, result in enumerate(ddg_results):
+                            results.append({
+                                'title': result.get('title', ''),
+                                'url': result.get('href', ''),
+                                'content': result.get('body', ''),
+                                'score': 1.0 - (i * 0.1),  # Simple scoring mechanism
+                                'raw_content': result.get('body', '')
+                            })
+
+                        # Return successful results
+                        return {
+                            'query': query,
+                            'follow_up_questions': None,
+                            'answer': None,
+                            'images': [],
+                            'results': results
+                        }
+
+                except Exception as e:
+                    # Store the exception and retry
+                    last_exception = e
+                    retry_count += 1
+                    print(f"DuckDuckGo search error: {str(e)}. Retrying {retry_count}/{max_retries}")
+
+                    # If not a rate limit error, don't retry
+                    if "Ratelimit" not in str(e) and retry_count >= 1:
+                        print(f"Non-rate limit error, stopping retries: {str(e)}")
+                        break
+
+            # If we reach here, all retries failed
+            print(f"All retries failed for query '{query}': {str(last_exception)}")
+            # Return empty results but with query info preserved
+            return {
+                'query': query,
+                'follow_up_questions': None,
+                'answer': None,
+                'images': [],
+                'results': [],
+                'error': str(last_exception)
+            }
+
+        return await loop.run_in_executor(None, perform_search)
+
+    # Process queries with delay between them to reduce rate limiting
+    all_results = []
+    for i, query in enumerate(queries):
+        # Add delay between queries (except first one)
+        if i > 0:
+            delay = 2.0 + random.random() * 2.0  # Random delay 2-4 seconds
+            await asyncio.sleep(delay)
+
+        # Process the query
+        result = await process_single_query(query)
+        all_results.append(result)
+
+    # Format the output
+    formatted_output = ""
+    for result in all_results:
+        formatted_output += f"\n--- Search Query: {result['query']} ---\n"
+
+        if result.get('error'):
+            formatted_output += f"Error: {result['error']}\n"
+        elif result.get('results'):
+            for i, res in enumerate(result['results'], 1):
+                formatted_output += f"\n{i}. {res.get('title', 'No title')}\n"
+                formatted_output += f"URL: {res.get('url', 'No URL')}\n"
+                formatted_output += f"Content: {res.get('content', 'No content')}\n"
+        else:
+            formatted_output += "No results found.\n"
+
+        formatted_output += "\n"
+
+    if not formatted_output.strip():
+        return "No valid search results found. Please try different search queries or use a different search API."
+
+    return formatted_output.strip()

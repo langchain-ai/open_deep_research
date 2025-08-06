@@ -2,7 +2,7 @@
 
 import os
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Annotated, Literal
 
 from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel, Field
@@ -10,15 +10,17 @@ from pydantic import BaseModel, Field
 
 class SearchAPI(Enum):
     """Enumeration of available search API providers."""
-    
+
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     TAVILY = "tavily"
+    PERPLEXITY = "perplexity"
+    DUCKDUCKGO = "duckduckgo"
     NONE = "none"
 
 class MCPConfig(BaseModel):
     """Configuration for Model Context Protocol (MCP) servers."""
-    
+
     url: Optional[str] = Field(
         default=None,
         optional=True,
@@ -37,7 +39,7 @@ class MCPConfig(BaseModel):
 
 class Configuration(BaseModel):
     """Main configuration class for the Deep Research agent."""
-    
+
     # General Configuration
     max_structured_output_retries: int = Field(
         default=3,
@@ -86,6 +88,8 @@ class Configuration(BaseModel):
                     {"label": "Tavily", "value": SearchAPI.TAVILY.value},
                     {"label": "OpenAI Native Web Search", "value": SearchAPI.OPENAI.value},
                     {"label": "Anthropic Native Web Search", "value": SearchAPI.ANTHROPIC.value},
+                    {"label": "Perplexity Sonar", "value": SearchAPI.PERPLEXITY.value},
+                    {"label": "DuckDuckGo", "value": SearchAPI.DUCKDUCKGO.value},
                     {"label": "None", "value": SearchAPI.NONE.value}
                 ]
             }
@@ -248,5 +252,5 @@ class Configuration(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-        
+
         arbitrary_types_allowed = True
