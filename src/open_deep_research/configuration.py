@@ -1,16 +1,24 @@
-from pydantic import BaseModel, Field
-from typing import Any, List, Optional
-from langchain_core.runnables import RunnableConfig
+"""Configuration management for the Open Deep Research system."""
+
 import os
 from enum import Enum
+from typing import Any, List, Optional
+
+from langchain_core.runnables import RunnableConfig
+from pydantic import BaseModel, Field
+
 
 class SearchAPI(Enum):
+    """Enumeration of available search API providers."""
+    
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     TAVILY = "tavily"
     NONE = "none"
 
 class MCPConfig(BaseModel):
+    """Configuration for Model Context Protocol (MCP) servers."""
+    
     url: Optional[str] = Field(
         default=None,
         optional=True,
@@ -28,6 +36,8 @@ class MCPConfig(BaseModel):
     """Whether the MCP server requires authentication"""
 
 class Configuration(BaseModel):
+    """Main configuration class for the Deep Research agent."""
+    
     # General Configuration
     max_structured_output_retries: int = Field(
         default=3,
@@ -82,11 +92,11 @@ class Configuration(BaseModel):
         }
     )
     max_researcher_iterations: int = Field(
-        default=3,
+        default=6,
         metadata={
             "x_oap_ui_config": {
                 "type": "slider",
-                "default": 3,
+                "default": 6,
                 "min": 1,
                 "max": 10,
                 "step": 1,
@@ -95,11 +105,11 @@ class Configuration(BaseModel):
         }
     )
     max_react_tool_calls: int = Field(
-        default=5,
+        default=10,
         metadata={
             "x_oap_ui_config": {
                 "type": "slider",
-                "default": 5,
+                "default": 10,
                 "min": 1,
                 "max": 30,
                 "step": 1,
@@ -109,11 +119,11 @@ class Configuration(BaseModel):
     )
     # Model Configuration
     summarization_model: str = Field(
-        default="openai:gpt-4.1-nano",
+        default="openai:gpt-4.1-mini",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1-nano",
+                "default": "openai:gpt-4.1-mini",
                 "description": "Model for summarizing research results from Tavily search results"
             }
         }
@@ -125,6 +135,18 @@ class Configuration(BaseModel):
                 "type": "number",
                 "default": 8192,
                 "description": "Maximum output tokens for summarization model"
+            }
+        }
+    )
+    max_content_length: int = Field(
+        default=50000,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "number",
+                "default": 50000,
+                "min": 1000,
+                "max": 200000,
+                "description": "Maximum character length for webpage content before summarization"
             }
         }
     )
@@ -149,11 +171,11 @@ class Configuration(BaseModel):
         }
     )
     compression_model: str = Field(
-        default="openai:gpt-4.1-mini",
+        default="openai:gpt-4.1",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1-mini",
+                "default": "openai:gpt-4.1",
                 "description": "Model for compressing research findings from sub-agents. NOTE: Make sure your Compression Model supports the selected search API."
             }
         }
@@ -225,4 +247,6 @@ class Configuration(BaseModel):
         return cls(**{k: v for k, v in values.items() if v is not None})
 
     class Config:
+        """Pydantic configuration."""
+        
         arbitrary_types_allowed = True

@@ -1,4 +1,4 @@
-# Open Deep Research
+# 🔬 Open Deep Research
 
 <img width="1388" height="298" alt="full_diagram" src="https://github.com/user-attachments/assets/12a2371b-8be2-4219-9b48-90503eb43c69" />
 
@@ -6,6 +6,10 @@ Deep research has broken out as one of the most popular agent applications. This
 
 * Read more in our [blog](https://blog.langchain.com/open-deep-research/) 
 * See our [video](https://www.youtube.com/watch?v=agGiWUpxkhg) for a quick overview
+
+### 🔥 Recent Updates
+
+**August 2, 2025**: Achieved #6 ranking on the [Deep Research Bench Leaderboard](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard) with an overall score of 0.4344. 
 
 ### 🚀 Quickstart
 
@@ -19,6 +23,8 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 2. Install dependencies:
 ```bash
+uv sync
+# or
 uv pip install -r pyproject.toml
 ```
 
@@ -44,9 +50,9 @@ Use this to open the Studio UI:
 
 Ask a question in the `messages` input field and click `Submit`.
 
-### Configurations
+### ⚙️ Configurations
 
-Open Deep Research offers extensive configuration options to customize the research process and model behavior. All configurations can be set via the web UI, environment variables, or by modifying the configuration directly.
+Extensive configuration options to customize research behavior. Configure via web UI, environment variables, or direct modification.
 
 #### General Settings
 
@@ -64,9 +70,9 @@ Open Deep Research offers extensive configuration options to customize the resea
 
 Open Deep Research uses multiple specialized models for different research tasks:
 
-- **Summarization Model** (default: `openai:gpt-4.1-nano`): Summarizes research results from search APIs
+- **Summarization Model** (default: `openai:gpt-4.1-mini`): Summarizes research results from search APIs
 - **Research Model** (default: `openai:gpt-4.1`): Conducts research and analysis 
-- **Compression Model** (default: `openai:gpt-4.1-mini`): Compresses research findings from sub-agents
+- **Compression Model** (default: `openai:gpt-4.1`): Compresses research findings from sub-agents
 - **Final Report Model** (default: `openai:gpt-4.1`): Writes the final comprehensive report
 
 All models are configured using [init_chat_model() API](https://python.langchain.com/docs/how_to/chat_models_universal_init/) which supports providers like OpenAI, Anthropic, Google Vertex AI, and others.
@@ -117,9 +123,9 @@ mcp-server-filesystem /path/to/allowed/dir1 /path/to/allowed/dir2
 
 Remote servers can be configured as authenticated or unauthenticated and support JWT-based authentication through OAuth endpoints.
 
-### Evaluation
+### 📊 Evaluation
 
-A comprehensive batch evaluation system designed for detailed analysis and comparative studies.
+Comprehensive batch evaluation system for detailed analysis and comparative studies.
 
 #### **Features:**
 - **Multi-dimensional Scoring**: Specialized evaluators with 0-1 scale ratings
@@ -130,12 +136,37 @@ A comprehensive batch evaluation system designed for detailed analysis and compa
 # Run comprehensive evaluation on LangSmith datasets
 python tests/run_evaluate.py
 ```
-#### **Key Files:**
-- `tests/run_evaluate.py`: Main evaluation script
-- `tests/evaluators.py`: Specialized evaluator functions
-- `tests/prompts.py`: Evaluation prompts for each dimension
 
-### Deployments and Usages
+#### **Deep Research Bench Submission:**
+The evaluation runs against the [Deep Research Bench](https://github.com/Ayanami0730/deep_research_bench), a comprehensive benchmark with 100 PhD-level research tasks across 22 fields.
+
+To submit results to the benchmark:
+
+1. **Run Evaluation**: Execute `python tests/run_evaluate.py` to evaluate against the Deep Research Bench dataset
+2. **Extract Results**: Use the extraction script to generate JSONL output:
+   ```bash
+   python tests/extract_langsmith_data.py --project-name "YOUR_PROJECT_NAME" --model-name "gpt-4.1" --dataset-name "deep_research_bench"
+   ```
+   This creates `tests/expt_results/deep_research_bench_gpt-4.1.jsonl` with the required format.
+3. **Submit to Benchmark**: Move the generated JSONL file to the Deep Research Bench repository and follow their [Quick Start guide](https://github.com/Ayanami0730/deep_research_bench?tab=readme-ov-file#quick-start) for evaluation submission
+
+> **Note:** We submitted results from [this commit](https://github.com/langchain-ai/open_deep_research/commit/c0a160b57a9b5ecd4b8217c3811a14d8eff97f72) to the Deep Research Bench, resulting in an overall score of 0.4344 (#6 on the leaderboard).
+
+Results for current `main` branch utilize more constrained prompting to reduce token spend ~4x while still achieving a score of 0.4268. 
+
+#### **Current Results (Main Branch)**
+
+| Metric | Score |
+|--------|-------|
+| Comprehensiveness | 0.4145 |
+| Insight | 0.3854 |
+| Instruction Following | 0.4780 |
+| Readability | 0.4495 |
+| **Overall Score** | **0.4268** |
+
+### 🚀 Deployments and Usage
+
+Multiple deployment options for different use cases.
 
 #### LangGraph Studio
 
@@ -155,9 +186,9 @@ You can also deploy your own instance of OAP, and make your own custom agents (l
 1. [Deploy Open Agent Platform](https://docs.oap.langchain.com/quickstart)
 2. [Add Deep Researcher to OAP](https://docs.oap.langchain.com/setup/agents)
 
-### Updates 🔥
-
 ### Legacy Implementations 🏛️
+
+Read about the evolution from our original implementations to the current version in our [blog post](https://rlancemartin.github.io/2025/07/30/bitter_lesson/).
 
 The `src/legacy/` folder contains two earlier implementations that provide alternative approaches to automated research:
 
@@ -172,5 +203,3 @@ The `src/legacy/` folder contains two earlier implementations that provide alter
 - **Parallel Processing**: Multiple researchers work simultaneously
 - **Speed Optimized**: Faster report generation through concurrency
 - **MCP Support**: Extensive Model Context Protocol integration
-
-See `src/legacy/legacy.md` for detailed documentation, configuration options, and usage examples for both legacy implementations.
