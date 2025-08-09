@@ -1,73 +1,96 @@
-from typing import Annotated, List, TypedDict, Literal
-from pydantic import BaseModel, Field
+"""Graph state definitions and data structures for the Deep Research agent."""
+
 import operator
+from typing import Annotated, Optional
 
-class Section(BaseModel):
-    name: str = Field(
-        description="Name for this section of the report.",
-    )
-    description: str = Field(
-        description="Brief overview of the main topics and concepts to be covered in this section.",
-    )
-    research: bool = Field(
-        description="Whether to perform web research for this section of the report."
-    )
-    content: str = Field(
-        description="The content of the section."
-    )   
+from langchain_core.messages import MessageLikeRepresentation
+from langgraph.graph import MessagesState
+from pydantic import BaseModel, Field
+from typing_extensions import TypedDict
 
-class Sections(BaseModel):
-    sections: List[Section] = Field(
-        description="Sections of the report.",
+
+###################
+# Structured Outputs
+###################
+class ConductResearch(BaseModel):
+    """Call this tool to conduct research on a specific topic."""
+    research_topic: str = Field(
+        description="The topic to research. Should be a single topic, and should be described in high detail (at least a paragraph).",
     )
 
-class SearchQuery(BaseModel):
-    search_query: str = Field(None, description="Query for web search.")
+class ResearchComplete(BaseModel):
+    """Call this tool to indicate that the research is complete."""
 
-class Queries(BaseModel):
-    queries: List[SearchQuery] = Field(
-        description="List of search queries.",
-    )
-
-class Feedback(BaseModel):
-    grade: Literal["pass","fail"] = Field(
-        description="Evaluation result indicating whether the response meets requirements ('pass') or needs revision ('fail')."
-    )
-    follow_up_queries: List[SearchQuery] = Field(
-        description="List of follow-up search queries.",
-    )
-
-class ReportStateInput(TypedDict):
-    topic: str # Report topic
+class Summary(BaseModel):
+    """Research summary with key findings."""
     
-class ReportStateOutput(TypedDict):
-    final_report: str # Final report
-    # for evaluation purposes only
-    # this is included only if configurable.include_source_str is True
-    source_str: str # String of formatted source content from web search
+    summary: str
+    key_excerpts: str
 
-class ReportState(TypedDict):
-    topic: str # Report topic    
-    feedback_on_report_plan: Annotated[list[str], operator.add] # List of feedback on the report plan
-    sections: list[Section] # List of report sections 
-    completed_sections: Annotated[list, operator.add] # Send() API key
-    report_sections_from_research: str # String of any completed sections from research to write final sections
-    final_report: str # Final report
-    # for evaluation purposes only
-    # this is included only if configurable.include_source_str is True
-    source_str: Annotated[str, operator.add] # String of formatted source content from web search
+class ClarifyWithUser(BaseModel):
+    """Model for user clarification requests."""
+    
+    need_clarification: bool = Field(
+        description="Whether the user needs to be asked a clarifying question.",
+    )
+    question: str = Field(
+        description="A question to ask the user to clarify the report scope",
+    )
+    verification: str = Field(
+        description="Verify message that we will start research after the user has provided the necessary information.",
+    )
 
-class SectionState(TypedDict):
-    topic: str # Report topic
-    section: Section # Report section  
-    search_iterations: int # Number of search iterations done
-    search_queries: list[SearchQuery] # List of search queries
-    source_str: str # String of formatted source content from web search
-    report_sections_from_research: str # String of any completed sections from research to write final sections
-    completed_sections: list[Section] # Final key we duplicate in outer state for Send() API
+class ResearchQuestion(BaseModel):
+    """Research question and brief for guiding research."""
+    
+    research_brief: str = Field(
+        description="A research question that will be used to guide the research.",
+    )
 
-class SectionOutputState(TypedDict):
-    completed_sections: list[Section] # Final key we duplicate in outer state for Send() API
-    # for evaluation purposes only
-    # this is included only if configurable.include_source_str is True
-    source_str: str # String of formatted source content from web search
+
+###################
+# State Definitions
+###################
+
+def override_reducer(current_value, new_value):
+    """Reducer function that allows overriding values in state."""
+    if isinstance(new_value, dict) and new_value.get("type") == "override":
+        return new_value.get("value", new_value)
+    else:
+        return operator.add(current_value, new_value)
+    
+class AgentInputState(MessagesState):
+    """InputState is only 'messages'."""
+
+class AgentState(MessagesState):
+    """Main agent state containing messages and research data."""
+    
+    supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
+    research_brief: Optional[str]
+    raw_notes: Annotated[list[str], override_reducer] = []
+    notes: Annotated[list[str], override_reducer] = []
+    final_report: str
+
+class SupervisorState(TypedDict):
+    """State for the supervisor that manages research tasks."""
+    
+    supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
+    research_brief: str
+    notes: Annotated[list[str], override_reducer] = []
+    research_iterations: int = 0
+    raw_notes: Annotated[list[str], override_reducer] = []
+
+class ResearcherState(TypedDict):
+    """State for individual researchers conducting research."""
+    
+    researcher_messages: Annotated[list[MessageLikeRepresentation], operator.add]
+    tool_call_iterations: int = 0
+    research_topic: str
+    compressed_research: str
+    raw_notes: Annotated[list[str], override_reducer] = []
+
+class ResearcherOutputState(BaseModel):
+    """Output state from individual researchers."""
+    
+    compressed_research: str
+    raw_notes: Annotated[list[str], override_reducer] = []

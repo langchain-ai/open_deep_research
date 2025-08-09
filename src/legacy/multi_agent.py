@@ -12,15 +12,15 @@ from langgraph.graph import MessagesState
 from langgraph.types import Command, Send
 from langgraph.graph import START, END, StateGraph
 
-from open_deep_research.configuration import MultiAgentConfiguration
-from open_deep_research.utils import (
+from legacy.configuration import MultiAgentConfiguration
+from legacy.utils import (
     get_config_value,
     tavily_search,
     duckduckgo_search,
     get_today_str,
 )
 
-from open_deep_research.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
+from legacy.prompts import SUPERVISOR_INSTRUCTIONS, RESEARCH_INSTRUCTIONS
 
 ## Tools factory - will be initialized based on configuration
 def get_search_tool(config: RunnableConfig):
@@ -278,6 +278,9 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
             question_obj = cast(Question, observation)
             result.append({"role": "assistant", "content": question_obj.question})
             return Command(goto=END, update={"messages": result})
+        elif tool_call["name"] == "FinishReport":
+            result.append({"role": "user", "content": "Report is Finish"})
+            return Command(goto=END, update={"messages": result})
         elif tool_call["name"] == "Sections":
             sections_list = cast(Sections, observation).sections
         elif tool_call["name"] == "Introduction":
@@ -340,7 +343,7 @@ async def supervisor_should_continue(state: ReportState) -> str:
     messages = state["messages"]
     last_message = messages[-1]
     # End because the supervisor asked a question or is finished
-    if not last_message.tool_calls or (len(last_message.tool_calls) == 1 and last_message.tool_calls[0]["name"] == "FinishReport"):
+    if not last_message.tool_calls:
         # Exit the graph
         return END
 

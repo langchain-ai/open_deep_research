@@ -1,94 +1,66 @@
-# Open Deep Research
+# Open Deep Research Repository Overview
 
-## About Open Deep Research
+## Project Description
+Open Deep Research is a configurable, fully open-source deep research agent that works across multiple model providers, search tools, and MCP (Model Context Protocol) servers. It enables automated research with parallel processing and comprehensive report generation.
 
-Open Deep Research is an experimental, fully open-source research assistant that automates deep research and produces comprehensive reports on any topic. It's designed to help researchers, analysts, and curious individuals generate detailed, well-sourced reports without manual research overhead.
+## Repository Structure
 
-### Key Features
-- **Automated Research**: Searches multiple sources (web, academic papers, specialized databases)
-- **Comprehensive Reports**: Generates structured markdown reports with proper citations
-- **Multiple Search APIs**: Supports Tavily, Perplexity, Exa, ArXiv, PubMed, DuckDuckGo, and more
-- **Flexible Models**: Compatible with any LLM that supports the `init_chat_model()` API
-- **Quality Evaluation**: Built-in evaluation systems to assess report quality
+### Root Directory
+- `README.md` - Comprehensive project documentation with quickstart guide
+- `pyproject.toml` - Python project configuration and dependencies
+- `langgraph.json` - LangGraph configuration defining the main graph entry point
+- `uv.lock` - UV package manager lock file
+- `LICENSE` - MIT license
+- `.env.example` - Environment variables template (not tracked)
 
-## Two Research Implementations
+### Core Implementation (`src/open_deep_research/`)
+- `deep_researcher.py` - Main LangGraph implementation (entry point: `deep_researcher`)
+- `configuration.py` - Configuration management and settings
+- `state.py` - Graph state definitions and data structures  
+- `prompts.py` - System prompts and prompt templates
+- `utils.py` - Utility functions and helpers
+- `files/` - Research output and example files
 
-Open Deep Research offers two distinct approaches to automated research, each with unique advantages:
+### Legacy Implementations (`src/legacy/`)
+Contains two earlier research implementations:
+- `graph.py` - Plan-and-execute workflow with human-in-the-loop
+- `multi_agent.py` - Supervisor-researcher multi-agent architecture
+- `legacy.md` - Documentation for legacy implementations
+- `CLAUDE.md` - Legacy-specific Claude instructions
+- `tests/` - Legacy-specific tests
 
-### 1. Graph-based Workflow Implementation
+### Security (`src/security/`)
+- `auth.py` - Authentication handler for LangGraph deployment
 
-The **graph-based implementation** (`src/open_deep_research/graph.py`) follows a structured plan-and-execute workflow:
+### Testing (`tests/`)
+- `run_evaluate.py` - Main evaluation script configured to run on deep research bench
+- `evaluators.py` - Specialized evaluation functions  
+- `prompts.py` - Evaluation prompts and criteria
+- `pairwise_evaluation.py` - Comparative evaluation tools
+- `supervisor_parallel_evaluation.py` - Multi-threaded evaluation
 
-**Characteristics:**
-- **Interactive Planning**: Uses a planner model to generate a structured report outline
-- **Human-in-the-Loop**: Allows review and feedback on the report plan before execution
-- **Sequential Process**: Creates sections one by one with reflection between iterations
-- **Quality Focus**: Emphasizes report accuracy and structure through iterative refinement
+### Examples (`examples/`)
+- `arxiv.md` - ArXiv research example
+- `pubmed.md` - PubMed research example
+- `inference-market.md` - Inference market analysis examples
 
-**Best for:**
-- High-stakes research where accuracy is critical
-- Reports requiring specific structure or customization
-- Situations where you want control over the research process
-- Academic or professional research contexts
+## Key Technologies
+- **LangGraph** - Workflow orchestration and graph execution
+- **LangChain** - LLM integration and tool calling
+- **Multiple LLM Providers** - OpenAI, Anthropic, Google, Groq, DeepSeek support
+- **Search APIs** - Tavily, OpenAI/Anthropic native search, DuckDuckGo, Exa
+- **MCP Servers** - Model Context Protocol for extended capabilities
 
-### 2. Multi-Agent Implementation
+## Development Commands
+- `uvx langgraph dev` - Start development server with LangGraph Studio
+- `python tests/run_evaluate.py` - Run comprehensive evaluations
+- `ruff check` - Code linting
+- `mypy` - Type checking
 
-The **multi-agent implementation** (`src/open_deep_research/multi_agent.py`) uses a supervisor-researcher architecture:
+## Configuration
+All settings configurable via:
+- Environment variables (`.env` file)
+- Web UI in LangGraph Studio
+- Direct configuration modification
 
-**Characteristics:**
-- **Supervisor Agent**: Manages overall research process and assembles final report
-- **Parallel Research**: Multiple researcher agents work simultaneously on different sections
-- **Speed Optimized**: Significantly faster due to parallel processing
-- **Tool Specialization**: Each agent has specific tools for their role
-
-**Best for:**
-- Quick research and rapid report generation
-- Exploratory research where speed matters
-- Situations with less need for human oversight
-- Business intelligence and market research
-
-## Quality Evaluation
-
-This guide explains how to quickly test and evaluate the quality of reports generated by Open Deep Research using the pytest evaluation system. The pytest evaluation system provides an easy way to:
-- Test both research agent implementations (multi-agent and graph-based)
-- Get immediate visual feedback with rich console output
-- Verify report quality against 9 comprehensive criteria
-- Compare different model configurations
-- Track results in LangSmith for analysis
-
-### Test Specific Agent
-```bash
-# Test only the multi-agent implementation
-python tests/run_test.py --agent multi_agent
-
-# Test only the graph-based implementation  
-python tests/run_test.py --agent graph
-```
-
-## Understanding the Output
-
-### Console Output
-The evaluation provides rich visual feedback including:
-
-1. **Test Configuration Panel**: Shows which agent and search API are being tested
-2. **Model Configuration Table**: Displays all model settings in a formatted table
-3. **Report Generation Status**: Real-time feedback during report creation
-4. **Generated Report Display**: Full report rendered in markdown format
-5. **Evaluation Results**: 
-   - **PASSED/FAILED** status in color-coded panel
-   - **Report Structure Analysis**: Table showing section headers
-   - **Evaluation Justification**: Detailed explanation from the evaluator
-
-### What Gets Evaluated
-
-The system checks reports against 9 quality criteria:
-
-1. **Topic Relevance (Overall)**: Does the report address the input topic thoroughly?
-2. **Section Relevance (Critical)**: Are all sections directly relevant to the main topic?
-3. **Structure and Flow**: Do sections flow logically and create a cohesive narrative?
-4. **Introduction Quality**: Does the introduction provide context and scope?
-5. **Conclusion Quality**: Does the conclusion summarize key findings?
-6. **Structural Elements**: Proper use of tables, lists, etc.
-7. **Section Headers**: Correct Markdown formatting (# for title, ## for sections)
-8. **Citations**: Proper source citation in each main body section
-9. **Overall Quality**: Well-researched, accurate, and professionally written
+Key settings include model selection, search API choice, concurrency limits, and MCP server configurations.
