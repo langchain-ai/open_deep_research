@@ -62,21 +62,12 @@ async def tavily_search(
     configurable = Configuration.from_runnable_config(config)
     max_char_to_include = 50_000   # NOTE: This can be tuned by the developer. This character count keeps us safely under input token limits for the latest models.
     model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model_args = {
-        "model": configurable.summarization_model,
-        "max_tokens": configurable.summarization_model_max_tokens,
-        "tags": ["langsmith:nostream"]
-    }
-
-    if model_api_key is not None:
-        summarization_model_args["api_key"] = model_api_key
-
-    summarization_model = (
-        init_chat_model(**summarization_model_args)
-        .with_structured_output(Summary)
-        .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
-    )
-
+    summarization_model = init_chat_model(
+        model=configurable.summarization_model,
+        max_tokens=configurable.summarization_model_max_tokens,
+        api_key=model_api_key,
+        tags=["langsmith:nostream"]
+    ).with_structured_output(Summary).with_retry(stop_after_attempt=configurable.max_structured_output_retries)
     async def noop():
         return None
     summarization_tasks = [
