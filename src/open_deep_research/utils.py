@@ -867,7 +867,8 @@ def get_today_str() -> str:
     Returns:
         Human-readable date string in format like 'Mon Jan 15, 2024'
     """
-    return datetime.now().strftime("%a %b %-d, %Y")
+    now = datetime.datetime.now()
+    return f"{now:%a} {now:%b} {now.day}, {now:%Y}"
 
 def get_config_value(value):
     """Extract value from configuration, handling enums and None values."""
