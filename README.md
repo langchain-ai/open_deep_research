@@ -1,11 +1,20 @@
-# Open Deep Research
+# 🔬 Open Deep Research
 
 <img width="1388" height="298" alt="full_diagram" src="https://github.com/user-attachments/assets/12a2371b-8be2-4219-9b48-90503eb43c69" />
 
-Deep research has broken out as one of the most popular agent applications. This is a simple, configurable, fully open source deep research agent that works across many model providers, search tools, and MCP servers. 
+Deep research has broken out as one of the most popular agent applications. This is a simple, configurable, fully open source deep research agent that works across many model providers, search tools, and MCP servers. It's performance is on par with many popular deep research agents ([see Deep Research Bench leaderboard](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard)).
 
-* Read more in our [blog](https://blog.langchain.com/open-deep-research/) 
-* See our [video](https://www.youtube.com/watch?v=agGiWUpxkhg) for a quick overview
+<img width="817" height="666" alt="Screenshot 2025-07-13 at 11 21 12 PM" src="https://github.com/user-attachments/assets/052f2ed3-c664-4a4f-8ec2-074349dcaa3f" />
+
+### 🔥 Recent Updates
+
+**August 7, 2025**: Added GPT-5 and updated the Deep Research Bench evaluation w/ GPT-5 results.
+
+**August 2, 2025**: Achieved #6 ranking on the [Deep Research Bench Leaderboard](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard) with an overall score of 0.4344. 
+
+**July 30, 2025**: Read about the evolution from our original implementations to the current version in our [blog post](https://rlancemartin.github.io/2025/07/30/bitter_lesson/).
+
+**July 16, 2025**: Read more in our [blog](https://blog.langchain.com/open-deep-research/) and watch our [video](https://www.youtube.com/watch?v=agGiWUpxkhg) for a quick overview.
 
 ### 🚀 Quickstart
 
@@ -19,6 +28,8 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 2. Install dependencies:
 ```bash
+uv sync
+# or
 uv pip install -r pyproject.toml
 ```
 
@@ -27,115 +38,79 @@ uv pip install -r pyproject.toml
 cp .env.example .env
 ```
 
-4. Launch the assistant with the LangGraph server locally to open LangGraph Studio in your browser:
+4. Launch agent with the LangGraph server locally:
 
 ```bash
 # Install dependencies and start the LangGraph server
 uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --allow-blocking
 ```
 
-Use this to open the Studio UI:
+This will open the LangGraph Studio UI in your browser.
+
 ```
 - 🚀 API: http://127.0.0.1:2024
 - 🎨 Studio UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 - 📚 API Docs: http://127.0.0.1:2024/docs
 ```
-<img width="817" height="666" alt="Screenshot 2025-07-13 at 11 21 12 PM" src="https://github.com/user-attachments/assets/052f2ed3-c664-4a4f-8ec2-074349dcaa3f" />
 
-Ask a question in the `messages` input field and click `Submit`.
+Ask a question in the `messages` input field and click `Submit`. Select different configuration in the "Manage Assistants" tab.
 
-### Configurations
+### ⚙️ Configurations
 
-Open Deep Research offers extensive configuration options to customize the research process and model behavior. All configurations can be set via the web UI, environment variables, or by modifying the configuration directly.
+#### LLM :brain:
 
-#### General Settings
+Open Deep Research supports a wide range of LLM providers via the [init_chat_model() API](https://python.langchain.com/docs/how_to/chat_models_universal_init/). It uses LLMs for a few different tasks. See the below model fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) file for more details. This can be accessed via the LangGraph Studio UI. 
 
-- **Max Structured Output Retries** (default: 3): Maximum number of retries for structured output calls from models when parsing fails
-- **Allow Clarification** (default: true): Whether to allow the researcher to ask clarifying questions before starting research
-- **Max Concurrent Research Units** (default: 5): Maximum number of research units to run concurrently using sub-agents. Higher values enable faster research but may hit rate limits
+- **Summarization** (default: `openai:gpt-4.1-mini`): Summarizes search API results
+- **Research** (default: `openai:gpt-4.1`): Power the search agent
+- **Compression** (default: `openai:gpt-4.1`): Compresses research findings
+- **Final Report Model** (default: `openai:gpt-4.1`): Write the final report
 
-#### Research Configuration
+> Note: the selected model will need to support [structured outputs](https://python.langchain.com/docs/integrations/chat/) and [tool calling](https://python.langchain.com/docs/how_to/tool_calling/).
 
-- **Search API** (default: Tavily): Choose from Tavily (works with all models), OpenAI Native Web Search, Anthropic Native Web Search, or None
-- **Max Researcher Iterations** (default: 3): Number of times the Research Supervisor will reflect on research and ask follow-up questions
-- **Max React Tool Calls** (default: 5): Maximum number of tool calling iterations in a single researcher step
+> Note: For OpenRouter: Follow [this guide](https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408) and for local models via Ollama  see [setup instructions](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318).
 
-#### Models
+#### Search API :mag:
 
-Open Deep Research uses multiple specialized models for different research tasks:
+Open Deep Research supports a wide range of search tools. By default it uses the [Tavily](https://www.tavily.com/) search API. Has full MCP compatibility and work native web search for Anthropic and OpenAI. See the `search_api` and `mcp_config` fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) file for more details. This can be accessed via the LangGraph Studio UI. 
 
-- **Summarization Model** (default: `openai:gpt-4.1-nano`): Summarizes research results from search APIs
-- **Research Model** (default: `openai:gpt-4.1`): Conducts research and analysis 
-- **Compression Model** (default: `openai:gpt-4.1-mini`): Compresses research findings from sub-agents
-- **Final Report Model** (default: `openai:gpt-4.1`): Writes the final comprehensive report
+#### Other 
 
-All models are configured using [init_chat_model() API](https://python.langchain.com/docs/how_to/chat_models_universal_init/) which supports providers like OpenAI, Anthropic, Google Vertex AI, Amazon Bedrock and others.
+See the fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) for various other settings to customize the behavior of Open Deep Research. 
 
-**Important Model Requirements:**
+### 📊 Evaluation
 
-1. **Structured Outputs**: All models must support structured outputs. Check support [here](https://python.langchain.com/docs/integrations/chat/).
+Open Deep Research is configured for evaluation with [Deep Research Bench](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard). This benchmark has 100 PhD-level research tasks (50 English, 50 Chinese), crafted by domain experts across 22 fields (e.g., Science & Tech, Business & Finance) to mirror real-world deep-research needs. It has 2 evaluation metrics, but the leaderboard is based on the RACE score. This uses LLM-as-a-judge (Gemini) to evaluate research reports against a golden set of reports compiled by experts across a set of metrics.
 
-2. **Search API Compatibility**: Research and Compression models must support your selected search API:
-   - Anthropic search requires Anthropic models with web search capability
-   - OpenAI search requires OpenAI models with web search capability  
-   - Tavily works with all models
+#### Usage
 
-3. **Tool Calling**: All models must support tool calling functionality
+> Warning: Running across the 100 examples can cost ~$20-$100 depending on the model selection.
 
-4. **Special Configurations**:
-   - For OpenRouter: Follow [this guide](https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408)
-   - For local models via Ollama: See [setup instructions](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318)
+The dataset is available on [LangSmith via this link](https://smith.langchain.com/public/c5e7a6ad-fdba-478c-88e6-3a388459ce8b/d). To kick off evaluation, run the following command:
 
-#### Example MCP (Model Context Protocol) Servers
-
-Open Deep Research supports MCP servers to extend research capabilities. 
-
-#### Local MCP Servers
-
-**Filesystem MCP Server** provides secure file system operations with robust access control:
-- Read, write, and manage files and directories
-- Perform operations like reading file contents, creating directories, moving files, and searching
-- Restrict operations to predefined directories for security
-- Support for both command-line configuration and dynamic MCP roots
-
-Example usage:
-```bash
-mcp-server-filesystem /path/to/allowed/dir1 /path/to/allowed/dir2
-```
-
-#### Remote MCP Servers  
-
-**Remote MCP servers** enable distributed agent coordination and support streamable HTTP requests. Unlike local servers, they can be multi-tenant and require more complex authentication.
-
-**Arcade MCP Server Example**:
-```json
-{
-  "url": "https://api.arcade.dev/v1/mcps/ms_0ujssxh0cECutqzMgbtXSGnjorm",
-  "tools": ["Search_SearchHotels", "Search_SearchOneWayFlights", "Search_SearchRoundtripFlights"]
-}
-```
-
-Remote servers can be configured as authenticated or unauthenticated and support JWT-based authentication through OAuth endpoints.
-
-### Evaluation
-
-A comprehensive batch evaluation system designed for detailed analysis and comparative studies.
-
-#### **Features:**
-- **Multi-dimensional Scoring**: Specialized evaluators with 0-1 scale ratings
-- **Dataset-driven Evaluation**: Batch processing across multiple test cases
-
-#### **Usage:**
 ```bash
 # Run comprehensive evaluation on LangSmith datasets
 python tests/run_evaluate.py
 ```
-#### **Key Files:**
-- `tests/run_evaluate.py`: Main evaluation script
-- `tests/evaluators.py`: Specialized evaluator functions
-- `tests/prompts.py`: Evaluation prompts for each dimension
 
-### Deployments and Usages
+This will provide a link to a LangSmith experiment, which will have a name `YOUR_EXPERIMENT_NAME`. Once this is done, extract the results to a JSONL file that can be submitted to the Deep Research Bench.
+
+```bash
+python tests/extract_langsmith_data.py --project-name "YOUR_EXPERIMENT_NAME" --model-name "you-model-name" --dataset-name "deep_research_bench"
+```
+
+This creates `tests/expt_results/deep_research_bench_model-name.jsonl` with the required format. Move the generated JSONL file to a local clone of the Deep Research Bench repository and follow their [Quick Start guide](https://github.com/Ayanami0730/deep_research_bench?tab=readme-ov-file#quick-start) for evaluation submission.
+
+#### Results 
+
+| Name | Commit | Summarization | Research | Compression | Total Cost | Total Tokens | RACE Score | Experiment |
+|------|--------|---------------|----------|-------------|------------|--------------|------------|------------|
+| GPT-5 | [ca3951d](https://github.com/langchain-ai/open_deep_research/pull/168/commits) | openai:gpt-4.1-mini | openai:gpt-5 | openai:gpt-4.1 |  | 204,640,896 | 0.4943 | [Link](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/6e4766ca-613c-4bda-8bde-f64f0422bbf3/compare?selectedSessions=4d5941c8-69ce-4f3d-8b3e-e3c99dfbd4cc&baseline=undefined) |
+| Defaults | [6532a41](https://github.com/langchain-ai/open_deep_research/commit/6532a4176a93cc9bb2102b3d825dcefa560c85d9) | openai:gpt-4.1-mini | openai:gpt-4.1 | openai:gpt-4.1 | $45.98 | 58,015,332 | 0.4309 | [Link](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/6e4766ca-6[…]ons=cf4355d7-6347-47e2-a774-484f290e79bc&baseline=undefined) |
+| Claude Sonnet 4 | [f877ea9](https://github.com/langchain-ai/open_deep_research/pull/163/commits/f877ea93641680879c420ea991e998b47aab9bcc) | openai:gpt-4.1-mini | anthropic:claude-sonnet-4-20250514 | openai:gpt-4.1 | $187.09 | 138,917,050 | 0.4401 | [Link](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/6e4766ca-6[…]ons=04f6002d-6080-4759-bcf5-9a52e57449ea&baseline=undefined) |
+| Deep Research Bench Submission | [c0a160b](https://github.com/langchain-ai/open_deep_research/commit/c0a160b57a9b5ecd4b8217c3811a14d8eff97f72) | openai:gpt-4.1-nano | openai:gpt-4.1 | openai:gpt-4.1 | $87.83 | 207,005,549 | 0.4344 | [Link](https://smith.langchain.com/o/ebbaf2eb-769b-4505-aca2-d11de10372a4/datasets/6e4766ca-6[…]ons=e6647f74-ad2f-4cb9-887e-acb38b5f73c0&baseline=undefined) |
+
+### 🚀 Deployments and Usage
 
 #### LangGraph Studio
 
@@ -155,11 +130,9 @@ You can also deploy your own instance of OAP, and make your own custom agents (l
 1. [Deploy Open Agent Platform](https://docs.oap.langchain.com/quickstart)
 2. [Add Deep Researcher to OAP](https://docs.oap.langchain.com/setup/agents)
 
-### Updates 🔥
-
 ### Legacy Implementations 🏛️
 
-The `src/legacy/` folder contains two earlier implementations that provide alternative approaches to automated research:
+The `src/legacy/` folder contains two earlier implementations that provide alternative approaches to automated research. They are less performant than the current implementation, but provide alternative ideas understanding the different approaches to deep research.
 
 #### 1. Workflow Implementation (`legacy/graph.py`)
 - **Plan-and-Execute**: Structured workflow with human-in-the-loop planning
@@ -172,5 +145,3 @@ The `src/legacy/` folder contains two earlier implementations that provide alter
 - **Parallel Processing**: Multiple researchers work simultaneously
 - **Speed Optimized**: Faster report generation through concurrency
 - **MCP Support**: Extensive Model Context Protocol integration
-
-See `src/legacy/legacy.md` for detailed documentation, configuration options, and usage examples for both legacy implementations.
