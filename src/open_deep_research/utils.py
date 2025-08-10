@@ -818,6 +818,14 @@ MODEL_TOKEN_LIMITS = {
     "ollama:llama2:13b": 4096,
     "ollama:llama2": 4096,
     "ollama:mistral": 32768,
+    "bedrock:us.amazon.nova-premier-v1:0": 1000000,
+    "bedrock:us.amazon.nova-pro-v1:0": 300000,
+    "bedrock:us.amazon.nova-lite-v1:0": 300000,
+    "bedrock:us.amazon.nova-micro-v1:0": 128000,
+    "bedrock:us.anthropic.claude-3-7-sonnet-20250219-v1:0": 200000,
+    "bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0": 200000,
+    "bedrock:us.anthropic.claude-opus-4-20250514-v1:0": 200000,
+    "anthropic.claude-opus-4-1-20250805-v1:0": 200000,
 }
 
 def get_model_token_limit(model_string):
