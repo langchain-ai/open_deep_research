@@ -875,7 +875,7 @@ def get_today_str() -> str:
     Returns:
         Human-readable date string in format like 'Mon Jan 15, 2024'
     """
-    now = datetime.datetime.now()
+    now = datetime.now()
     return f"{now:%a} {now:%b} {now.day}, {now:%Y}"
 
 def get_config_value(value):
