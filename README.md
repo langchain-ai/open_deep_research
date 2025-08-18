@@ -8,6 +8,8 @@ Deep research has broken out as one of the most popular agent applications. This
 
 ### 🔥 Recent Updates
 
+**August 14, 2025**: See our free course [here](https://academy.langchain.com/courses/deep-research-with-langgraph) outlining how open deep research works and how to build your own (course repo [here](https://github.com/langchain-ai/deep_research_from_scratch) with notebooks).
+
 **August 7, 2025**: Added GPT-5 and updated the Deep Research Bench evaluation w/ GPT-5 results.
 
 **August 2, 2025**: Achieved #6 ranking on the [Deep Research Bench Leaderboard](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard) with an overall score of 0.4344. 
