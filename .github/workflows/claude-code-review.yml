@@ -36,10 +36,10 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          
-          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
-          # model: "claude-opus-4-20250514"
-          
+
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4.1)
+          # model: "claude-opus-4-1-20250805"
+
           # Direct prompt for automated review (no @claude mention needed)
           direct_prompt: |
             Please review this pull request and provide feedback on:
@@ -50,6 +50,9 @@ jobs:
             - Test coverage
             
             Be constructive and helpful in your feedback.
+
+          # Optional: Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
+          # use_sticky_comment: true
           
           # Optional: Customize review based on file types
           # direct_prompt: |

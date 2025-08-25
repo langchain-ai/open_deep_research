@@ -23,6 +23,7 @@ jobs:
       pull-requests: read
       issues: read
       id-token: write
+      actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,9 +35,13 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # This is an optional setting that allows Claude to read CI results on PRs
+          additional_permissions: |
+            actions: read
           
-          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
-          # model: "claude-opus-4-20250514"
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4.1)
+          # model: "claude-opus-4-1-20250805"
           
           # Optional: Customize the trigger phrase (default: @claude)
           # trigger_phrase: "/claude"
