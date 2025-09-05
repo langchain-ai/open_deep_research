@@ -446,6 +446,38 @@ def wrap_mcp_authenticate_tool(tool: StructuredTool) -> StructuredTool:
     tool.coroutine = authentication_wrapper
     return tool
 
+def load_custom_tools(config: RunnableConfig, existing_tool_names: set[str]) -> List[BaseTool]:
+    """Load custom Python functions as tools"""
+    configurable = Configuration.from_runnable_config(config)
+    if not configurable.custom_tools:
+        return []
+    
+    tools = []
+    for tool_func in configurable.custom_tools:
+        # Check if tool already exists
+        tool_name = getattr(tool_func, 'name', str(tool_func))
+        if tool_name in existing_tool_names:
+            warnings.warn(f"Tool {tool_name} already exists, skipping")
+            continue
+        
+        # Ensure it's a proper LangChain tool
+        if isinstance(tool_func, BaseTool):
+            tools.append(tool_func)
+        elif callable(tool_func):
+            # If it's a callable but not a BaseTool, wrap it
+            try:
+                # If it's already decorated with @tool, it should be a BaseTool
+                if hasattr(tool_func, 'name') and hasattr(tool_func, 'description'):
+                    tools.append(tool_func)
+                else:
+                    warnings.warn(f"Tool {tool_name} is not properly decorated with @tool decorator, skipping")
+            except Exception as e:
+                warnings.warn(f"Error processing custom tool {tool_name}: {e}")
+        else:
+            warnings.warn(f"Invalid tool type for {tool_name}, must be callable or BaseTool")
+    
+    return tools
+
 async def load_mcp_tools(
     config: RunnableConfig,
     existing_tool_names: set[str],
@@ -589,6 +621,11 @@ async def get_all_tools(config: RunnableConfig):
         tool.name if hasattr(tool, "name") else tool.get("name", "web_search") 
         for tool in tools
     }
+    
+    # Add custom tools
+    custom_tools = load_custom_tools(config, existing_tool_names)
+    tools.extend(custom_tools)
+    existing_tool_names.update({tool.name for tool in custom_tools if hasattr(tool, "name")})
     
     # Add MCP tools if configured
     mcp_tools = await load_mcp_tools(config, existing_tool_names)
