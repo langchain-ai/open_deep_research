@@ -398,6 +398,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     
     # Prepare system prompt with MCP context if available
     researcher_prompt = research_system_prompt.format(
+        custom_tools_prompt=configurable.custom_tools_prompt or "",
         mcp_prompt=configurable.mcp_prompt or "", 
         date=get_today_str()
     )

@@ -231,12 +231,19 @@ class Configuration(BaseModel):
             }
         }
     )
-    
-    # Custom tools configuration
     custom_tools: Optional[List[Any]] = Field(
         default=None
     )
-
+    custom_tools_prompt: Optional[str] = Field(
+        default=None,
+        optional=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "description": "Any additional instructions to pass along to the Agent regarding the custom tools that are available to it."
+            }
+        }
+    )
 
     @classmethod
     def from_runnable_config(
