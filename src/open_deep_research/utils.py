@@ -678,7 +678,10 @@ def is_token_limit_exceeded(exception: Exception, model_name: str = None) -> boo
     provider = None
     if model_name:
         model_str = str(model_name).lower()
-        if model_str.startswith('openai:'):
+        # Handle OpenRouter models using OpenAI provider format (openai:deepseek/model)
+        if (model_str.startswith('openai:') or 
+            model_str.startswith('openrouter:') or 
+            ('/' in model_str and not model_str.startswith(('anthropic:', 'google:')))):
             provider = 'openai'
         elif model_str.startswith('anthropic:'):
             provider = 'anthropic'
@@ -707,7 +710,7 @@ def _check_openai_token_limit(exception: Exception, error_str: str) -> bool:
     class_name = exception.__class__.__name__
     module_name = getattr(exception.__class__, '__module__', '')
     
-    # Check if this is an OpenAI exception
+    # Check if this is an OpenAI exception (including OpenRouter using OpenAI API)
     is_openai_exception = (
         'openai' in exception_type.lower() or 
         'openai' in module_name.lower()
@@ -826,6 +829,17 @@ MODEL_TOKEN_LIMITS = {
     "bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0": 200000,
     "bedrock:us.anthropic.claude-opus-4-20250514-v1:0": 200000,
     "anthropic.claude-opus-4-1-20250805-v1:0": 200000,
+    # OpenRouter models using OpenAI provider format
+    "openai:deepseek/deepseek-chat": 256000,
+    "openai:deepseek/deepseek-chat-v3": 256000,
+    "openai:deepseek/deepseek-chat-v3.1": 256000,
+    # Legacy OpenRouter models
+    "openrouter:deepseek/deepseek-chat": 256000,
+    "openrouter:deepseek/deepseek-chat-v3": 256000,
+    "openrouter:deepseek/deepseek-chat-v3.1": 256000,
+    "openrouter:openai/gpt-4o": 128000,
+    "openrouter:openai/gpt-4o-mini": 128000,
+    "openrouter:anthropic/claude-3.5-sonnet": 200000,
 }
 
 def get_model_token_limit(model_string):
@@ -889,29 +903,72 @@ def get_config_value(value):
     else:
         return value.value
 
+def get_model_config_for_openrouter(model_name: str, api_key: str) -> dict:
+    """Get model configuration for OpenRouter models.
+    
+    Args:
+        model_name: The OpenRouter model name (e.g., "openrouter:deepseek/deepseek-chat")
+        api_key: The OpenRouter API key
+        
+    Returns:
+        Dictionary with model configuration including base_url
+    """
+    # Extract the actual model name from the OpenRouter format
+    if model_name.startswith("openrouter:"):
+        actual_model = model_name[len("openrouter:"):]
+    else:
+        actual_model = model_name
+    
+    return {
+        "model": "openai",  # Use OpenAI provider for OpenRouter compatibility
+        "openai_api_base": "https://openrouter.ai/api/v1",
+        "openai_api_key": api_key,
+        "model_name": actual_model,
+    }
+
 def get_api_key_for_model(model_name: str, config: RunnableConfig):
     """Get API key for a specific model from environment or config."""
     should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
     model_name = model_name.lower()
+    
     if should_get_from_config.lower() == "true":
         api_keys = config.get("configurable", {}).get("apiKeys", {})
         if not api_keys:
             return None
-        if model_name.startswith("openai:"):
+        
+        # Check for OpenRouter models using OpenAI provider (openai:deepseek/model)
+        if model_name.startswith("openai:") and "/" in model_name:
+            # This is likely an OpenRouter model using OpenAI provider
+            return api_keys.get("OPENAI_API_KEY")
+        elif model_name.startswith("openai:"):
             return api_keys.get("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return api_keys.get("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return api_keys.get("GOOGLE_API_KEY")
-        return None
+        elif model_name.startswith("deepseek"):
+            return api_keys.get("DEEPSEEK_API_KEY")
+        elif model_name.startswith("openrouter:"):
+            return api_keys.get("OPENROUTER_API_KEY")
+        # For models that don't match any prefix, use OpenAI key (for OpenRouter compatibility)
+        return api_keys.get("OPENAI_API_KEY")
     else:
-        if model_name.startswith("openai:"): 
+        # Check for OpenRouter models using OpenAI provider (openai:deepseek/model)
+        if model_name.startswith("openai:") and "/" in model_name:
+            # This is likely an OpenRouter model using OpenAI provider
+            return os.getenv("OPENAI_API_KEY")
+        elif model_name.startswith("openai:"): 
             return os.getenv("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return os.getenv("GOOGLE_API_KEY")
-        return None
+        elif model_name.startswith("deepseek"):
+            return os.getenv("DEEPSEEK_API_KEY")
+        elif model_name.startswith("openrouter:"):
+            return os.getenv("OPENROUTER_API_KEY")
+        # For models that don't match any prefix, use OpenAI key (for OpenRouter compatibility)
+        return os.getenv("OPENAI_API_KEY")
 
 def get_tavily_api_key(config: RunnableConfig):
     """Get Tavily API key from environment or config."""
