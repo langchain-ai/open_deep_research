@@ -231,6 +231,20 @@ class Configuration(BaseModel):
             }
         }
     )
+    research_mode: str = Field(
+        default="general",
+        metadata={
+            "x_oap_ui_config": {
+                "type": "select",
+                "default": "general",
+                "description": "Research mode: 'general' for general research or 'equity' for equity research with specialized agents",
+                "options": [
+                    {"label": "General Research", "value": "general"},
+                    {"label": "Equity Research", "value": "equity"}
+                ]
+            }
+        }
+    )
 
 
     @classmethod

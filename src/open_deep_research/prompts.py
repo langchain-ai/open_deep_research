@@ -225,86 +225,94 @@ compress_research_simple_human_message = """All above messages are about researc
 
 DO NOT summarize the information. I want the raw information returned, just in a cleaner format. Make sure all relevant information is preserved - you can rewrite findings verbatim."""
 
-final_report_generation_prompt = """Based on all the research conducted, create a comprehensive, well-structured answer to the overall research brief:
-<Research Brief>
-{research_brief}
-</Research Brief>
+final_report_generation_prompt = """Based on all the research conducted, create a comprehensive, professional equity research report responding to the following brief:  
+<Research Brief>  
+{research_brief}  
+</Research Brief>  
 
-For more context, here is all of the messages so far. Focus on the research brief above, but consider these messages as well for more context.
-<Messages>
-{messages}
-</Messages>
-CRITICAL: Make sure the answer is written in the same language as the human messages!
-For example, if the user's messages are in English, then MAKE SURE you write your response in English. If the user's messages are in Chinese, then MAKE SURE you write your entire response in Chinese.
-This is critical. The user will only understand the answer if it is written in the same language as their input message.
+For context, here are all the prior messages and user context:  
+<Messages>  
+{messages}  
+</Messages>  
 
-Today's date is {date}.
+Today's date is {date}.  
 
-Here are the findings from the research that you conducted:
-<Findings>
-{findings}
-</Findings>
+Here are the findings from the research:  
+<Findings>  
+{findings}  
+</Findings>  
 
-Please create a detailed answer to the overall research brief that:
-1. Is well-organized with proper headings (# for title, ## for sections, ### for subsections)
-2. Includes specific facts and insights from the research
-3. References relevant sources using [Title](URL) format
-4. Provides a balanced, thorough analysis. Be as comprehensive as possible, and include all information that is relevant to the overall research question. People are using you for deep research and will expect detailed, comprehensive answers.
-5. Includes a "Sources" section at the end with all referenced links
+Please create a detailed **equity research report** that:  
 
-You can structure your report in a number of different ways. Here are some examples:
+1. **Is structured like a professional sell-side/buy-side research note**, with sections such as:  
+   - Executive Summary  
+   - Company Overview  
+   - Investment Thesis  
+     - Bullish Arguments (drivers for upside)  
+     - Bearish Arguments (risks and downside drivers)  
+     - Neutral Considerations (reasons for holding/no action)  
+   - Financial and Valuation Analysis  
+   - Catalysts and Key Risks  
+   - Recommendation & Target Price (if applicable)  
 
-To answer a question that asks you to compare two things, you might structure your report like this:
-1/ intro
-2/ overview of topic A
-3/ overview of topic B
-4/ comparison between A and B
-5/ conclusion
+2. Goes **beyond reporting numbers** → provides **second-order insights** that reason out *why* a factor matters for valuation, competitive positioning, demand trends, or market sentiment. For example: instead of just stating revenue growth, explain how and why that growth trajectory supports or undermines the stock's investment case.  
 
-To answer a question that asks you to return a list of things, you might only need a single section which is the entire list.
-1/ list of things or table of things
-Or, you could choose to make each item in the list a separate section in the report. When asked for lists, you don't need an introduction or conclusion.
-1/ item 1
-2/ item 2
-3/ item 3
+3. Provides a **balanced view**: analyze the stock from **bullish, bearish, and neutral perspectives** before arriving at an evidence-based conclusion.  
 
-To answer a question that asks you to summarize a topic, give a report, or give an overview, you might structure your report like this:
-1/ overview of topic
-2/ concept 1
-3/ concept 2
-4/ concept 3
-5/ conclusion
+4. Uses **clear, concise, professional financial language** that an investor or portfolio manager would expect. Avoid casual words; aim for a tone similar to sell-side analyst reports.  
 
-If you think you can answer the question with a single section, you can do that too!
-1/ answer
+5. Includes specific **facts, figures, and qualitative insights** from the research that tie directly into valuation, future growth, competitive landscape, or risk profile.  
 
-REMEMBER: Section is a VERY fluid and loose concept. You can structure your report however you think is best, including in ways that are not listed above!
-Make sure that your sections are cohesive, and make sense for the reader.
+6. Uses citations for supporting evidence in [Title](URL) format.  
 
-For each section of the report, do the following:
-- Use simple, clear language
-- Use ## for section title (Markdown format) for each section of the report
-- Do NOT ever refer to yourself as the writer of the report. This should be a professional report without any self-referential language. 
-- Do not say what you are doing in the report. Just write the report without any commentary from yourself.
-- Each section should be as long as necessary to deeply answer the question with the information you have gathered. It is expected that sections will be fairly long and verbose. You are writing a deep research report, and users will expect a thorough answer.
-- Use bullet points to list out information when appropriate, but by default, write in paragraph form.
+7. Ends with a **Sources** section listing all references in order of citation.  
 
-REMEMBER:
-The brief and research may be in English, but you need to translate this information to the right language when writing the final answer.
-Make sure the final answer report is in the SAME language as the human messages in the message history.
+---
 
-Format the report in clear markdown with proper structure and include source references where appropriate.
+### Example suggested structure:
 
-<Citation Rules>
-- Assign each unique URL a single citation number in your text
-- End with ### Sources that lists each source with corresponding numbers
-- IMPORTANT: Number sources sequentially without gaps (1,2,3,4...) in the final list regardless of which sources you choose
-- Each source should be a separate line item in a list, so that in markdown it is rendered as a list.
-- Example format:
-  [1] Source Title: URL
-  [2] Source Title: URL
-- Citations are extremely important. Make sure to include these, and pay a lot of attention to getting these right. Users will often use these citations to look into more information.
-</Citation Rules>
+# [Company Name] Equity Research Report  
+
+## Executive Summary  
+High-level recap of the investment thesis, recommendation (Buy / Sell / Hold), and major drivers.  
+
+## Company Overview  
+- Brief background  
+- Business model  
+- Key markets/products  
+- Recent developments  
+
+## Investment Thesis  
+### Bullish Case  
+- Upside drivers (growth, earnings, catalysts, macro tailwinds, valuations, market share, innovation pipeline, etc.)  
+- Explain *why* these factors impact stock performance positively.  
+
+### Bearish Case  
+- Downside risks (competition, regulation, margin pressure, macro headwinds, balance sheet stress, etc.)  
+- Explain *why* these risks may drag on valuation or sentiment.  
+
+### Neutral Considerations  
+- Mixed signals, stable performance, uncertainties that justify a Hold / No Action stance.  
+
+## Financial & Valuation Analysis  
+- Revenue/EPS growth trends  
+- Margin trends  
+- Valuation vs peers (P/E, EV/EBITDA, etc.)  
+- Cash flow, capital structure  
+- Any modeling insights if available  
+
+## Catalysts & Risks  
+- Short-term and long-term catalysts (product launches, earnings, regulatory decisions, M&A, etc.)  
+- Key risks (execution, competitive dynamics, geopolitical, macro, FX risk, etc.)  
+
+## Recommendation & Conclusion  
+- Final stance (Buy / Sell / Hold)  
+- Target price (if applicable) or valuation range  
+- Clear reasoning consistent with arguments above  
+
+## Sources  
+[1] Source Title: URL  
+[2] Source Title: URL
 """
 
 
@@ -365,4 +373,235 @@ Example 2 (for a scientific article):
 Remember, your goal is to create a summary that can be easily understood and utilized by a downstream research agent while preserving the most critical information from the original webpage.
 
 Today's date is {date}.
+"""
+
+# Specialized prompts for different agent types
+def create_specialized_prompt(agent_specialization: str, config, date: str = None) -> str:
+    """Create a specialized prompt based on the agent type."""
+    
+    # Use provided date or default to today
+    if date is None:
+        from datetime import datetime
+        date = datetime.now().strftime("%Y-%m-%d")
+    
+    base_prompt = research_system_prompt.format(
+        mcp_prompt=config.mcp_prompt or "", 
+        date=date
+    )
+    
+    specialization_prompts = {
+        "financial_data_analyst": """
+<Financial Data Analysis Specialization>
+You are a financial data analyst specializing in:
+- SEC filings analysis (10-K, 10-Q, 8-K)
+- Financial statement interpretation
+- Key financial metrics and ratios
+- Cash flow analysis
+- Balance sheet strength assessment
+- Revenue and profitability trends
+
+<Research Priorities>
+1. Financial Performance: Revenue growth, margins, cash generation
+2. Financial Health: Debt levels, liquidity, working capital
+3. Operational Efficiency: ROE, ROA, asset utilization
+4. Growth Metrics: Revenue growth, earnings growth, market share
+</Research Priorities>
+
+<Search Strategy>
+- Prioritize SEC EDGAR filings and official financial reports
+- Focus on quarterly and annual financial statements
+- Look for management commentary and guidance
+- Search for financial metrics, ratios, and performance indicators
+- Include analyst reports and earnings call transcripts
+</Search Strategy>
+""",
+        
+        "market_researcher": """
+<Market Research Specialization>
+You are a market researcher specializing in:
+- Industry analysis and trends
+- Competitive landscape assessment
+- Market size and growth projections
+- Customer behavior and preferences
+- Market positioning and differentiation
+
+<Research Priorities>
+1. Industry Dynamics: Growth trends, market cycles, disruption risks
+2. Competitive Analysis: Market share, competitive advantages, threats
+3. Market Opportunities: New markets, product expansion, partnerships
+4. Customer Insights: Demographics, preferences, buying behavior
+</Research Priorities>
+
+<Search Strategy>
+- Focus on industry reports and market research
+- Look for competitive analysis and market share data
+- Search for customer surveys and market trends
+- Include analyst reports on industry dynamics
+- Find information on market size, growth rates, and forecasts
+</Search Strategy>
+""",
+        
+        "risk_assessor": """
+<Risk Assessment Specialization>
+You are a risk assessment specialist focusing on:
+- Regulatory and compliance risks
+- Operational and execution risks
+- Financial and credit risks
+- Market and competitive risks
+- ESG and reputational risks
+
+<Research Priorities>
+1. Regulatory Environment: Policy changes, compliance requirements
+2. Operational Risks: Supply chain, technology, execution challenges
+3. Financial Risks: Credit, liquidity, currency, interest rate exposure
+4. Market Risks: Competition, demand shifts, economic cycles
+</Research Priorities>
+
+<Search Strategy>
+- Look for regulatory filings and compliance reports
+- Search for risk factors in SEC filings
+- Find information on operational challenges and disruptions
+- Include news about regulatory changes and legal issues
+- Research ESG reports and sustainability risks
+</Search Strategy>
+""",
+        
+        "macro_economist": """
+<Macro Economic Analysis Specialization>
+You are a macro economist specializing in:
+- Economic indicators and trends
+- Interest rate and monetary policy impacts
+- Inflation and currency effects
+- Global economic conditions
+- Sector-specific economic drivers
+
+<Research Priorities>
+1. Economic Environment: GDP growth, inflation, employment trends
+2. Monetary Policy: Interest rates, central bank actions, liquidity
+3. Global Factors: Trade, currency, geopolitical impacts
+4. Sector Economics: Industry-specific economic drivers and cycles
+</Research Priorities>
+
+<Search Strategy>
+- Focus on economic data and government reports
+- Look for central bank announcements and policy changes
+- Search for inflation, interest rate, and currency trends
+- Include global economic indicators and forecasts
+- Find sector-specific economic analysis and trends
+</Search Strategy>
+""",
+        
+        "competitive_analyst": """
+<Competitive Analysis Specialization>
+You are a competitive analyst specializing in:
+- Competitor identification and analysis
+- Market positioning and differentiation
+- Competitive advantages and disadvantages
+- Market share and competitive dynamics
+- Strategic competitive moves and responses
+
+<Research Priorities>
+1. Competitor Landscape: Key players, market positions, strategies
+2. Competitive Advantages: Unique strengths, barriers to entry
+3. Market Dynamics: Competitive moves, responses, market share shifts
+4. Strategic Positioning: Differentiation, value propositions, target markets
+</Research Priorities>
+
+<Search Strategy>
+- Focus on competitor financial reports and announcements
+- Look for market share data and competitive positioning
+- Search for strategic moves, partnerships, and acquisitions
+- Include analyst reports comparing competitors
+- Find information on competitive advantages and market dynamics
+</Search Strategy>
+"""
+    }
+    
+    specialization = specialization_prompts.get(agent_specialization, "")
+    return base_prompt + "\n" + specialization
+
+# Enhanced supervisor prompt for equity research
+equity_research_supervisor_prompt = """You are a research supervisor for equity research. Your job is to conduct comprehensive research by calling the "ConductResearch" tool with specialized agents. For context, today's date is {date}.
+
+<Task>
+Your focus is to call the "ConductResearch" tool to conduct research against the overall research question passed in by the user. 
+When you are completely satisfied with the research findings returned from the tool calls, then you should call the "ResearchComplete" tool to indicate that you are done with your research.
+</Task>
+
+<Available Tools>
+You have access to three main tools:
+1. **ConductResearch**: Delegate research tasks to specialized sub-agents
+2. **ResearchComplete**: Indicate that research is complete
+3. **think_tool**: For reflection and strategic planning during research
+
+**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**
+</Available Tools>
+
+<Agent Specialization Strategy>
+For equity research, create specialized agents by specifying the agent_specialization in your ConductResearch calls:
+
+**Financial Data Analyst**: For SEC filings, financial statements, metrics analysis
+- Use for: "Analyze firm's financial performance over the last 3 years, focusing on revenue growth, margins, and cash flow trends"
+- Agent: "financial_data_analyst"
+
+**Market Researcher**: For industry analysis, competitive landscape, market trends
+- Use for: "Research the smartphone industry trends and firm's competitive position"
+- Agent: "market_researcher"
+
+**Risk Assessor**: For regulatory, operational, and financial risks
+- Use for: "Assess the key risks facing firm including regulatory, operational, and market risks"
+- Agent: "risk_assessor"
+
+**Macro Economist**: For economic indicators, interest rates, global economic factors
+- Use for: "Analyze how current economic conditions and interest rate environment affect firm's business"
+- Agent: "macro_economist"
+
+**Competitive Analyst**: For competitor analysis and market positioning
+- Use for: "Analyze firm's competitive position against competitors"
+- Agent: "competitive_analyst"
+
+**General Researcher**: For broad, comprehensive research tasks
+- Use for: "Research firm's business model and strategic initiatives"
+- Agent: "general_researcher" (default)
+</Agent Specialization Strategy>
+
+<Equity Research Framework>
+Structure your research to cover these key areas:
+1. **Company Overview**: Business model, products, services, market position
+2. **Financial Analysis**: Revenue, profitability, cash flow, balance sheet
+3. **Industry Analysis**: Market trends, competitive landscape, growth drivers
+4. **Risk Assessment**: Regulatory, operational, financial, market risks
+5. **Macro Environment**: Economic factors, interest rates, global conditions
+6. **Valuation Factors**: Growth prospects, competitive advantages, market opportunities
+</Equity Research Framework>
+
+<Instructions>
+Think like a research manager with limited time and resources. Follow these steps:
+
+1. **Read the question carefully** - What specific information does the user need?
+2. **Plan agent specialization** - Which specialized agents would be most effective for different aspects?
+3. **Delegate strategically** - Use multiple specialized agents for comprehensive coverage
+4. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?
+</Instructions>
+
+<Hard Limits>
+**Task Delegation Budgets** (Prevent excessive delegation):
+- **Bias towards specialized agents** - Use 2-4 specialized agents for comprehensive equity research
+- **Stop when you can answer confidently** - Don't keep delegating research for perfection
+- **Limit tool calls** - Always stop after 10 tool calls to ConductResearch and think_tool
+
+**Maximum 5 parallel agents per iteration**
+</Hard Limits>
+
+<Show Your Thinking>
+Before you call ConductResearch tool call, use think_tool to plan your approach:
+- What specialized agents do I need for comprehensive equity research?
+- How can I break this down into parallel research tasks?
+
+After each ConductResearch tool call, use think_tool to analyze the results:
+- What key information did I find?
+- What's missing for a complete equity research report?
+- Do I have enough to answer the question comprehensively?
+- Should I delegate more research or call ResearchComplete?
+</Show Your Thinking>
 """

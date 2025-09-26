@@ -600,6 +600,75 @@ def get_notes_from_tool_calls(messages: list[MessageLikeRepresentation]):
     """Extract notes from tool call messages."""
     return [tool_msg.content for tool_msg in filter_messages(messages, include_types="tool")]
 
+def extract_agent_specialization(research_topic: str) -> str:
+    """Extract agent specialization from research topic or tool call arguments."""
+    # Check if the research topic contains specialization hints
+    topic_lower = research_topic.lower()
+    
+    # Risk assessment keywords (check first to avoid conflicts with "market risk")
+    if any(keyword in topic_lower for keyword in [
+        'risk', 'regulatory', 'compliance', 'operational risk', 'financial risk',
+        'esg', 'sustainability', 'legal', 'litigation', 'assess the key risks'
+    ]):
+        return "risk_assessor"
+    
+    # Financial analysis keywords
+    elif any(keyword in topic_lower for keyword in [
+        'financial', 'sec filing', 'earnings', 'revenue', 'profit', 'cash flow', 
+        'balance sheet', 'financial statement', 'financial performance', 'financial metrics'
+    ]):
+        return "financial_data_analyst"
+    
+    # Macro economic keywords
+    elif any(keyword in topic_lower for keyword in [
+        'economic', 'interest rate', 'inflation', 'gdp', 'monetary policy',
+        'central bank', 'economic indicator', 'macro', 'global economic'
+    ]):
+        return "macro_economist"
+    
+    # Competitive analysis keywords (more specific to avoid conflicts)
+    elif any(keyword in topic_lower for keyword in [
+        'competitor', 'vs', 'versus', 'compared to', 'competitive advantage', 
+        'competitive landscape', 'against', 'versus'
+    ]):
+        return "competitive_analyst"
+    
+    # Market research keywords (check last to avoid conflicts)
+    elif any(keyword in topic_lower for keyword in [
+        'market', 'industry', 'market size', 'market share', 'market trend', 
+        'customer', 'demand', 'market growth', 'industry analysis', 'competitive position'
+    ]):
+        return "market_researcher"
+    
+    # Default to general researcher
+    else:
+        return "general_researcher"
+
+async def get_specialized_tools(config: RunnableConfig, agent_specialization: str) -> list:
+    """Get tools specialized for the agent type."""
+    
+    # Base tools available to all agents
+    base_tools = [tool(ResearchComplete), think_tool]
+    
+    # Get search tools
+    configurable = Configuration.from_runnable_config(config)
+    search_api = SearchAPI(get_config_value(configurable.search_api))
+    search_tools = await get_search_tool(search_api)
+    base_tools.extend(search_tools)
+    
+    # Add MCP tools
+    mcp_tools = await load_mcp_tools(config, set())
+    base_tools.extend(mcp_tools)
+    
+    # For now, we'll use the same tools for all specializations
+    # In the future, we can add specialized tools like:
+    # - SEC filing search tools
+    # - Financial data APIs
+    # - Risk assessment tools
+    # - Economic data tools
+    
+    return base_tools
+
 ##########################
 # Model Provider Native Websearch Utils
 ##########################

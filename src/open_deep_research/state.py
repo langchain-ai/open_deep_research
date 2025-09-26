@@ -13,9 +13,17 @@ from typing_extensions import TypedDict
 # Structured Outputs
 ###################
 class ConductResearch(BaseModel):
-    """Call this tool to conduct research on a specific topic."""
+    """Call this tool to conduct research on a specific topic with a specialized agent."""
     research_topic: str = Field(
         description="The topic to research. Should be a single topic, and should be described in high detail (at least a paragraph).",
+    )
+    agent_specialization: str = Field(
+        description="The type of specialized agent to create for this research task. Examples: 'financial_data_analyst', 'market_researcher', 'risk_assessor', 'competitive_analyst', 'macro_economist', 'general_researcher'",
+        default="general_researcher"
+    )
+    research_focus: str = Field(
+        description="Specific focus areas for this research task. Examples: 'SEC filings and financial statements', 'industry trends and competitive landscape', 'regulatory and operational risks'",
+        default="comprehensive_research"
     )
 
 class ResearchComplete(BaseModel):
@@ -86,6 +94,8 @@ class ResearcherState(TypedDict):
     researcher_messages: Annotated[list[MessageLikeRepresentation], operator.add]
     tool_call_iterations: int = 0
     research_topic: str
+    agent_specialization: str
+    research_focus: str
     compressed_research: str
     raw_notes: Annotated[list[str], override_reducer] = []
 

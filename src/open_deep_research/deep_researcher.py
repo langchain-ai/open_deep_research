@@ -23,6 +23,7 @@ from open_deep_research.prompts import (
     clarify_with_user_instructions,
     compress_research_simple_human_message,
     compress_research_system_prompt,
+    equity_research_supervisor_prompt,
     final_report_generation_prompt,
     lead_researcher_prompt,
     research_system_prompt,
@@ -41,10 +42,12 @@ from open_deep_research.state import (
 )
 from open_deep_research.utils import (
     anthropic_websearch_called,
+    extract_agent_specialization,
     get_all_tools,
     get_api_key_for_model,
     get_model_token_limit,
     get_notes_from_tool_calls,
+    get_specialized_tools,
     get_today_str,
     is_token_limit_exceeded,
     openai_websearch_called,
@@ -154,11 +157,19 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     response = await research_model.ainvoke([HumanMessage(content=prompt_content)])
     
     # Step 3: Initialize supervisor with research brief and instructions
-    supervisor_system_prompt = lead_researcher_prompt.format(
-        date=get_today_str(),
-        max_concurrent_research_units=configurable.max_concurrent_research_units,
-        max_researcher_iterations=configurable.max_researcher_iterations
-    )
+    # Choose supervisor prompt based on research mode
+    if configurable.research_mode == "equity":
+        supervisor_system_prompt = equity_research_supervisor_prompt.format(
+            date=get_today_str(),
+            max_concurrent_research_units=configurable.max_concurrent_research_units,
+            max_researcher_iterations=configurable.max_researcher_iterations
+        )
+    else:
+        supervisor_system_prompt = lead_researcher_prompt.format(
+            date=get_today_str(),
+            max_concurrent_research_units=configurable.max_concurrent_research_units,
+            max_researcher_iterations=configurable.max_researcher_iterations
+        )
     
     return Command(
         goto="research_supervisor", 
@@ -297,7 +308,9 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
                     "researcher_messages": [
                         HumanMessage(content=tool_call["args"]["research_topic"])
                     ],
-                    "research_topic": tool_call["args"]["research_topic"]
+                    "research_topic": tool_call["args"]["research_topic"],
+                    "agent_specialization": tool_call["args"].get("agent_specialization", "general_researcher"),
+                    "research_focus": tool_call["args"].get("research_focus", "comprehensive_research")
                 }, config) 
                 for tool_call in allowed_conduct_research_calls
             ]
@@ -365,9 +378,8 @@ supervisor_subgraph = supervisor_builder.compile()
 async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[Literal["researcher_tools"]]:
     """Individual researcher that conducts focused research on specific topics.
     
-    This researcher is given a specific research topic by the supervisor and uses
-    available tools (search, think_tool, MCP tools) to gather comprehensive information.
-    It can use think_tool for strategic planning between searches.
+    This researcher can be dynamically specialized based on the research topic
+    and agent_specialization provided by the supervisor.
     
     Args:
         state: Current researcher state with messages and topic context
@@ -376,19 +388,22 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     Returns:
         Command to proceed to researcher_tools for tool execution
     """
-    # Step 1: Load configuration and validate tool availability
+    # Step 1: Load configuration and extract specialization
     configurable = Configuration.from_runnable_config(config)
     researcher_messages = state.get("researcher_messages", [])
+    research_topic = state.get("research_topic", "")
+    agent_specialization = state.get("agent_specialization", "general_researcher")
+    research_focus = state.get("research_focus", "comprehensive_research")
     
-    # Get all available research tools (search, MCP, think_tool)
-    tools = await get_all_tools(config)
+    # Step 2: Get specialized tools based on agent type
+    tools = await get_specialized_tools(config, agent_specialization)
     if len(tools) == 0:
         raise ValueError(
             "No tools found to conduct research: Please configure either your "
             "search API or add MCP tools to your configuration."
         )
     
-    # Step 2: Configure the researcher model with tools
+    # Step 3: Configure the researcher model with tools
     research_model_config = {
         "model": configurable.research_model,
         "max_tokens": configurable.research_model_max_tokens,
@@ -396,11 +411,9 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
         "tags": ["langsmith:nostream"]
     }
     
-    # Prepare system prompt with MCP context if available
-    researcher_prompt = research_system_prompt.format(
-        mcp_prompt=configurable.mcp_prompt or "", 
-        date=get_today_str()
-    )
+    # Step 4: Create specialized system prompt
+    from open_deep_research.prompts import create_specialized_prompt
+    specialized_prompt = create_specialized_prompt(agent_specialization, configurable, get_today_str())
     
     # Configure model with tools, retry logic, and settings
     research_model = (
@@ -410,11 +423,11 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
         .with_config(research_model_config)
     )
     
-    # Step 3: Generate researcher response with system context
-    messages = [SystemMessage(content=researcher_prompt)] + researcher_messages
+    # Step 5: Generate researcher response with specialized context
+    messages = [SystemMessage(content=specialized_prompt)] + researcher_messages
     response = await research_model.ainvoke(messages)
     
-    # Step 4: Update state and proceed to tool execution
+    # Step 6: Update state and proceed to tool execution
     return Command(
         goto="researcher_tools",
         update={
