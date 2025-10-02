@@ -29,6 +29,12 @@ class ConductResearch(BaseModel):
 class ResearchComplete(BaseModel):
     """Call this tool to indicate that the research is complete."""
 
+class QualityCheck(BaseModel):
+    """Call this tool to assess the quality of research findings and provide improvement recommendations."""
+    research_findings: str = Field(
+        description="The research findings to assess for quality. This should include the research brief and all collected findings.",
+    )
+
 class Summary(BaseModel):
     """Research summary with key findings."""
     
@@ -55,6 +61,19 @@ class ResearchQuestion(BaseModel):
         description="A research question that will be used to guide the research.",
     )
 
+class QualityAssessment(BaseModel):
+    """Quality assessment results for equity research."""
+    
+    research_depth_score: int = Field(description="Score 1-5 for research depth and thoroughness")
+    source_quality_score: int = Field(description="Score 1-5 for quality and credibility of sources")
+    analytical_rigor_score: int = Field(description="Score 1-5 for analytical depth and reasoning")
+    practical_value_score: int = Field(description="Score 1-5 for practical investment value")
+    balance_objectivity_score: int = Field(description="Score 1-5 for balance and objectivity")
+    writing_quality_score: int = Field(description="Score 1-5 for writing clarity and structure")
+    missing_topics: str = Field(description="Specific research topics that would improve the report")
+    writing_improvements: str = Field(description="Specific suggestions for improving writing style and structure")
+    overall_assessment: str = Field(description="Overall assessment and summary of findings")
+
 
 ###################
 # State Definitions
@@ -78,6 +97,9 @@ class AgentState(MessagesState):
     raw_notes: Annotated[list[str], override_reducer] = []
     notes: Annotated[list[str], override_reducer] = []
     final_report: str
+    quality_assessment: str
+    iteration_count: int = 0
+    quality_scores: dict = {}
 
 class SupervisorState(TypedDict):
     """State for the supervisor that manages research tasks."""

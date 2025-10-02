@@ -135,10 +135,10 @@ You can customize the research assistant workflow through several parameters:
 - `number_of_queries`: Number of search queries to generate per section (default: 2)
 - `max_search_depth`: Maximum number of reflection and search iterations (default: 2)
 - `planner_provider`: Model provider for planning phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
-- `planner_model`: Specific model for planning (default: "claude-3-7-sonnet-latest")
+- `planner_model`: Specific model for planning (default: "gpt-4.1")
 - `planner_model_kwargs`: Additional parameter for planner_model
 - `writer_provider`: Model provider for writing phase (default: "anthropic", but can be any provider from supported integrations with `init_chat_model` as listed [here](https://python.langchain.com/api_reference/langchain/chat_models/langchain.chat_models.base.init_chat_model.html))
-- `writer_model`: Model for writing the report (default: "claude-3-5-sonnet-latest")
+- `writer_model`: Model for writing the report (default: "gpt-4o" - OpenAI's strongest model)
 - `writer_model_kwargs`: Additional parameter for writer_model
 - `search_api`: API to use for web searches (default: "tavily", options include "perplexity", "exa", "arxiv", "pubmed", "linkup")
 
@@ -156,8 +156,8 @@ This implementation focuses on efficiency and parallelization, making it ideal f
 
 You can customize the multi-agent implementation through several parameters:
 
-- `supervisor_model`: Model for the supervisor agent (default: "anthropic:claude-3-5-sonnet-latest")
-- `researcher_model`: Model for researcher agents (default: "anthropic:claude-3-5-sonnet-latest") 
+- `supervisor_model`: Model for the supervisor agent (default: "openai:gpt-4.1")
+- `researcher_model`: Model for researcher agents (default: "openai:gpt-4.1") 
 - `number_of_queries`: Number of search queries to generate per section (default: 2)
 - `search_api`: API to use for web searches (default: "tavily", options include "duckduckgo", "none")
 - `ask_for_clarification`: Whether the supervisor should ask clarifying questions before research (default: false) - **Important**: Set to `true` to enable the Question tool for the supervisor agent
@@ -302,7 +302,7 @@ thread = {"configurable": {"thread_id": str(uuid.uuid4()),
 
 (2) ***The workflow planner and writer models need to support structured outputs***: Check whether structured outputs are supported by the model you are using [here](https://python.langchain.com/docs/integrations/chat/).
 
-(3) ***The agent models need to support tool calling:*** Ensure tool calling is well supoorted; tests have been done with Claude 3.7, o3, o3-mini, and gpt4.1. See [here](https://smith.langchain.com/public/adc5d60c-97ee-4aa0-8b2c-c776fb0d7bd6/d).
+(3) ***The agent models need to support tool calling:*** Ensure tool calling is well supoorted; tests have been done with Claude 3.7, gpt-4o (OpenAI's strongest model), gpt-4o-mini, and gpt4.1. See [here](https://smith.langchain.com/public/adc5d60c-97ee-4aa0-8b2c-c776fb0d7bd6/d).
 
 (4) With Groq, there are token per minute (TPM) limits if you are on the `on_demand` service tier:
 - The `on_demand` service tier has a limit of `6000 TPM`
@@ -351,18 +351,18 @@ python tests/run_test.py --all
 
 # Test specific agent with custom models
 python tests/run_test.py --agent multi_agent \
-  --supervisor-model "anthropic:claude-3-7-sonnet-latest" \
+  --supervisor-model "openai:gpt-4o" \
   --search-api tavily
 
-# Test with OpenAI o3 models
+# Test with optimized model configuration
 python tests/run_test.py --all \
-  --supervisor-model "openai:o3" \
-  --researcher-model "openai:o3" \
+  --supervisor-model "openai:gpt-4.1" \
+  --researcher-model "openai:gpt-4.1" \
   --planner-provider "openai" \
-  --planner-model "o3" \
+  --planner-model "gpt-4.1" \
   --writer-provider "openai" \
-  --writer-model "o3" \
-  --eval-model "openai:o3" \
+  --writer-model "gpt-4o" \
+  --eval-model "openai:gpt-4.1" \
   --search-api "tavily"
 ```
 

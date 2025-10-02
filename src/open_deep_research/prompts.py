@@ -1,27 +1,35 @@
 """System prompts and prompt templates for the Deep Research agent."""
 
 clarify_with_user_instructions="""
-These are the messages that have been exchanged so far from the user asking for the report:
+These are the messages that have been exchanged so far from the user asking for an equity research report:
 <Messages>
 {messages}
 </Messages>
 
 Today's date is {date}.
 
-Assess whether you need to ask a clarifying question, or if the user has already provided enough information for you to start research.
+You are preparing to conduct comprehensive equity research on a company. Assess whether you need to ask a clarifying question, or if the user has already provided enough information for you to start the equity research analysis.
 IMPORTANT: If you can see in the messages history that you have already asked a clarifying question, you almost always do not need to ask another one. Only ask another question if ABSOLUTELY NECESSARY.
+
+For equity research, you should clarify if the following key information is missing:
+- Company name and ticker symbol (if available)
+- Specific research focus areas (financial analysis, competitive positioning, industry trends, risk assessment, etc.)
+- Time horizon for analysis (e.g., "last 3 years", "current year", "forward-looking")
+- Geographic focus (if relevant for global companies)
+- Specific metrics or KPIs of interest
+- Comparison companies or benchmarks (if applicable)
 
 If there are acronyms, abbreviations, or unknown terms, ask the user to clarify.
 If you need to ask a question, follow these guidelines:
-- Be concise while gathering all necessary information
-- Make sure to gather all the information needed to carry out the research task in a concise, well-structured manner.
+- Be concise while gathering all necessary information for comprehensive equity research
+- Focus on gathering information needed for a professional equity research report
 - Use bullet points or numbered lists if appropriate for clarity. Make sure that this uses markdown formatting and will be rendered correctly if the string output is passed to a markdown renderer.
 - Don't ask for unnecessary information, or information that the user has already provided. If you can see that the user has already provided the information, do not ask for it again.
 
 Respond in valid JSON format with these exact keys:
 "need_clarification": boolean,
-"question": "<question to ask the user to clarify the report scope>",
-"verification": "<verification message that we will start research>"
+"question": "<question to ask the user to clarify the equity research scope>",
+"verification": "<verification message that we will start equity research>"
 
 If you need to ask a clarifying question, return:
 "need_clarification": true,
@@ -31,18 +39,18 @@ If you need to ask a clarifying question, return:
 If you do not need to ask a clarifying question, return:
 "need_clarification": false,
 "question": "",
-"verification": "<acknowledgement message that you will now start research based on the provided information>"
+"verification": "<acknowledgement message that you will now start comprehensive equity research based on the provided information>"
 
 For the verification message when no clarification is needed:
-- Acknowledge that you have sufficient information to proceed
-- Briefly summarize the key aspects of what you understand from their request
-- Confirm that you will now begin the research process
+- Acknowledge that you have sufficient information to proceed with equity research
+- Briefly summarize the key aspects of the company and research focus you understand from their request
+- Confirm that you will now begin the comprehensive equity research process
 - Keep the message concise and professional
 """
 
 
 transform_messages_into_research_topic_prompt = """You will be given a set of messages that have been exchanged so far between yourself and the user. 
-Your job is to translate these messages into a more detailed and concrete research question that will be used to guide the research.
+Your job is to translate these messages into a more detailed and concrete equity research brief that will be used to guide comprehensive equity research on the specified company.
 
 The messages that have been exchanged so far between yourself and the user are:
 <Messages>
@@ -51,89 +59,32 @@ The messages that have been exchanged so far between yourself and the user are:
 
 Today's date is {date}.
 
-You will return a single research question that will be used to guide the research.
+You will return a single comprehensive equity research brief that will guide the research process.
 
-Guidelines:
-1. Maximize Specificity and Detail
-- Include all known user preferences and explicitly list key attributes or dimensions to consider.
-- It is important that all details from the user are included in the instructions.
+Guidelines for Equity Research Brief:
+1. Maximize Specificity and Detail for Equity Analysis
+- Include all known user preferences and explicitly list key equity research dimensions to consider (financial performance, competitive positioning, industry trends, risk factors, etc.).
+- Specify the company name, ticker symbol (if available), and any specific focus areas mentioned by the user.
+- It is important that all details from the user are included in the research brief.
 
-2. Fill in Unstated But Necessary Dimensions as Open-Ended
-- If certain attributes are essential for a meaningful output but the user has not provided them, explicitly state that they are open-ended or default to no specific constraint.
+2. Fill in Unstated But Essential Equity Research Dimensions
+- If certain attributes are essential for comprehensive equity research but the user has not provided them, explicitly state that they are open-ended or default to comprehensive coverage.
+- Standard equity research should cover: company overview, financial analysis, industry analysis, competitive positioning, risk assessment, and investment thesis.
 
 3. Avoid Unwarranted Assumptions
-- If the user has not provided a particular detail, do not invent one.
-- Instead, state the lack of specification and guide the researcher to treat it as flexible or accept all possible options.
+- If the user has not provided a particular detail (time horizon, geographic focus, specific metrics), do not invent one.
+- Instead, state the lack of specification and guide the researcher to treat it as flexible or provide comprehensive coverage.
 
 4. Use the First Person
-- Phrase the request from the perspective of the user.
+- Phrase the request from the perspective of the user requesting equity research.
 
-5. Sources
-- If specific sources should be prioritized, specify them in the research question.
-- For product and travel research, prefer linking directly to official or primary websites (e.g., official brand sites, manufacturer pages, or reputable e-commerce platforms like Amazon for user reviews) rather than aggregator sites or SEO-heavy blogs.
-- For academic or scientific queries, prefer linking directly to the original paper or official journal publication rather than survey papers or secondary summaries.
-- For people, try linking directly to their LinkedIn profile, or their personal website if they have one.
-- If the query is in a specific language, prioritize sources published in that language.
+5. Equity Research Sources
+- Prioritize authoritative financial and business sources in the research brief.
+- For equity research, prioritize: SEC filings (10-K, 10-Q, 8-K), earnings call transcripts, analyst reports, industry reports, company investor relations materials, financial news, and regulatory filings.
+- Avoid general news sites or blogs unless they contain specific financial analysis or industry insights.
+- If the company operates internationally, specify relevant geographic sources and regulatory bodies.
 """
 
-lead_researcher_prompt = """You are a research supervisor. Your job is to conduct research by calling the "ConductResearch" tool. For context, today's date is {date}.
-
-<Task>
-Your focus is to call the "ConductResearch" tool to conduct research against the overall research question passed in by the user. 
-When you are completely satisfied with the research findings returned from the tool calls, then you should call the "ResearchComplete" tool to indicate that you are done with your research.
-</Task>
-
-<Available Tools>
-You have access to three main tools:
-1. **ConductResearch**: Delegate research tasks to specialized sub-agents
-2. **ResearchComplete**: Indicate that research is complete
-3. **think_tool**: For reflection and strategic planning during research
-
-**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**
-</Available Tools>
-
-<Instructions>
-Think like a research manager with limited time and resources. Follow these steps:
-
-1. **Read the question carefully** - What specific information does the user need?
-2. **Decide how to delegate the research** - Carefully consider the question and decide how to delegate the research. Are there multiple independent directions that can be explored simultaneously?
-3. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?
-</Instructions>
-
-<Hard Limits>
-**Task Delegation Budgets** (Prevent excessive delegation):
-- **Bias towards single agent** - Use single agent for simplicity unless the user request has clear opportunity for parallelization
-- **Stop when you can answer confidently** - Don't keep delegating research for perfection
-- **Limit tool calls** - Always stop after {max_researcher_iterations} tool calls to ConductResearch and think_tool if you cannot find the right sources
-
-**Maximum {max_concurrent_research_units} parallel agents per iteration**
-</Hard Limits>
-
-<Show Your Thinking>
-Before you call ConductResearch tool call, use think_tool to plan your approach:
-- Can the task be broken down into smaller sub-tasks?
-
-After each ConductResearch tool call, use think_tool to analyze the results:
-- What key information did I find?
-- What's missing?
-- Do I have enough to answer the question comprehensively?
-- Should I delegate more research or call ResearchComplete?
-</Show Your Thinking>
-
-<Scaling Rules>
-**Simple fact-finding, lists, and rankings** can use a single sub-agent:
-- *Example*: List the top 10 coffee shops in San Francisco → Use 1 sub-agent
-
-**Comparisons presented in the user request** can use a sub-agent for each element of the comparison:
-- *Example*: Compare OpenAI vs. Anthropic vs. DeepMind approaches to AI safety → Use 3 sub-agents
-- Delegate clear, distinct, non-overlapping subtopics
-
-**Important Reminders:**
-- Each ConductResearch call spawns a dedicated research agent for that specific topic
-- A separate agent will write the final report - you just need to gather information
-- When calling ConductResearch, provide complete standalone instructions - sub-agents can't see other agents' work
-- Do NOT use acronyms or abbreviations in your research questions, be very clear and specific
-</Scaling Rules>"""
 
 research_system_prompt = """You are a research assistant conducting research on the user's input topic. For context, today's date is {date}.
 
@@ -226,34 +177,36 @@ compress_research_simple_human_message = """All above messages are about researc
 DO NOT summarize the information. I want the raw information returned, just in a cleaner format. Make sure all relevant information is preserved - you can rewrite findings verbatim."""
 
 final_report_generation_prompt = """Based on all the research conducted, create a comprehensive, professional equity research report responding to the following brief:  
-<Research Brief>  
-{research_brief}  
-</Research Brief>  
+<Research Brief>
+{research_brief}
+</Research Brief>
 
 For context, here are all the prior messages and user context:  
-<Messages>  
-{messages}  
-</Messages>  
+<Messages>
+{messages}
+</Messages>
 
-Today's date is {date}.  
+Today's date is {date}.
 
 Here are the findings from the research:  
-<Findings>  
-{findings}  
-</Findings>  
+<Findings>
+{findings}
+</Findings>
 
 Please create a detailed **equity research report** that:  
 
 1. **Is structured like a professional sell-side/buy-side research note**, with sections such as:  
-   - Executive Summary  
-   - Company Overview  
-   - Investment Thesis  
-     - Bullish Arguments (drivers for upside)  
-     - Bearish Arguments (risks and downside drivers)  
-     - Neutral Considerations (reasons for holding/no action)  
-   - Financial and Valuation Analysis  
-   - Catalysts and Key Risks  
-   - Recommendation & Target Price (if applicable)  
+-Executive Summary
+-Bullish Thesis
+-Bearish Thesis
+-Company Overview
+-Business Segments (with table)
+-Investment Thesis
+-Risks & Challenges
+-Competitive Advantage & Long-term Growth
+-Industry Overview
+-Business Cycle Performance
+-Management Assessment
 
 2. Goes **beyond reporting numbers** → provides **second-order insights** that reason out *why* a factor matters for valuation, competitive positioning, demand trends, or market sentiment. For example: instead of just stating revenue growth, explain how and why that growth trajectory supports or undermines the stock's investment case.  
 
@@ -263,56 +216,11 @@ Please create a detailed **equity research report** that:
 
 5. Includes specific **facts, figures, and qualitative insights** from the research that tie directly into valuation, future growth, competitive landscape, or risk profile.  
 
-6. Uses citations for supporting evidence in [Title](URL) format.  
+6. Uses citations for supporting evidence in [Title](URL) format, upto 15 citations.
 
-7. Ends with a **Sources** section listing all references in order of citation.  
+7. Ends with a **Sources** section listing all references in order of citation. 
 
----
-
-### Example suggested structure:
-
-# [Company Name] Equity Research Report  
-
-## Executive Summary  
-High-level recap of the investment thesis, recommendation (Buy / Sell / Hold), and major drivers.  
-
-## Company Overview  
-- Brief background  
-- Business model  
-- Key markets/products  
-- Recent developments  
-
-## Investment Thesis  
-### Bullish Case  
-- Upside drivers (growth, earnings, catalysts, macro tailwinds, valuations, market share, innovation pipeline, etc.)  
-- Explain *why* these factors impact stock performance positively.  
-
-### Bearish Case  
-- Downside risks (competition, regulation, margin pressure, macro headwinds, balance sheet stress, etc.)  
-- Explain *why* these risks may drag on valuation or sentiment.  
-
-### Neutral Considerations  
-- Mixed signals, stable performance, uncertainties that justify a Hold / No Action stance.  
-
-## Financial & Valuation Analysis  
-- Revenue/EPS growth trends  
-- Margin trends  
-- Valuation vs peers (P/E, EV/EBITDA, etc.)  
-- Cash flow, capital structure  
-- Any modeling insights if available  
-
-## Catalysts & Risks  
-- Short-term and long-term catalysts (product launches, earnings, regulatory decisions, M&A, etc.)  
-- Key risks (execution, competitive dynamics, geopolitical, macro, FX risk, etc.)  
-
-## Recommendation & Conclusion  
-- Final stance (Buy / Sell / Hold)  
-- Target price (if applicable) or valuation range  
-- Clear reasoning consistent with arguments above  
-
-## Sources  
-[1] Source Title: URL  
-[2] Source Title: URL
+8. Uses non-quantitative metrics and qualitative insights where appropriate.
 """
 
 
@@ -578,10 +486,12 @@ Structure your research to cover these key areas:
 <Instructions>
 Think like a research manager with limited time and resources. Follow these steps:
 
-1. **Read the question carefully** - What specific information does the user need?
+1. **Read the research brief carefully** - What specific information does the research brief require?
 2. **Plan agent specialization** - Which specialized agents would be most effective for different aspects?
 3. **Delegate strategically** - Use multiple specialized agents for comprehensive coverage
 4. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?
+
+**Research Brief Guidance**: The research brief has been tailored to address specific research areas. Focus on conducting research that fulfills the brief's requirements comprehensively.
 </Instructions>
 
 <Hard Limits>
@@ -604,4 +514,82 @@ After each ConductResearch tool call, use think_tool to analyze the results:
 - Do I have enough to answer the question comprehensively?
 - Should I delegate more research or call ResearchComplete?
 </Show Your Thinking>
+"""
+
+# Quality Assessment Prompt for Equity Research
+quality_assessment_prompt = """You are a senior equity research analyst tasked with assessing the quality of a completed equity research report. Your job is to evaluate the final report against professional standards and provide actionable improvement recommendations.
+
+Today's date is {date}.
+
+<Research Brief>
+{research_brief}
+</Research Brief>
+
+<Final Report>
+{final_report}
+</Final Report>
+
+Please assess the completed equity research report across the following dimensions and provide specific recommendations for improvement:
+
+## Assessment Criteria
+
+### 1. Research Depth (Score 1-5)
+- **Excellent (5)**: Comprehensive coverage of all key equity research areas (financial analysis, competitive positioning, industry trends, risk assessment, management evaluation)
+- **Good (4)**: Covers most key areas with good detail
+- **Adequate (3)**: Covers basic areas but may lack depth in some areas
+- **Poor (2)**: Limited coverage with significant gaps
+- **Very Poor (1)**: Superficial coverage with major omissions
+
+### 2. Source Quality (Score 1-5)
+- **Excellent (5)**: Primarily authoritative sources (SEC filings, earnings calls, analyst reports, industry reports, company materials)
+- **Good (4)**: Mostly authoritative sources with some general sources
+- **Adequate (3)**: Mix of authoritative and general sources
+- **Poor (2)**: Primarily general sources with limited authoritative content
+- **Very Poor (1)**: Mostly unreliable or inappropriate sources
+
+### 3. Analytical Rigor (Score 1-5)
+- **Excellent (5)**: Deep analysis with second-order insights, clear reasoning chains, and quantitative support
+- **Good (4)**: Solid analysis with some insights and reasoning
+- **Adequate (3)**: Basic analysis with limited insights
+- **Poor (2)**: Surface-level analysis with minimal reasoning
+- **Very Poor (1)**: Lacks analytical depth or reasoning
+
+### 4. Practical Value (Score 1-5)
+- **Excellent (5)**: Provides clear investment insights, actionable recommendations, and practical implications
+- **Good (4)**: Provides useful insights with some actionable elements
+- **Adequate (3)**: Provides basic insights with limited practical value
+- **Poor (2)**: Limited practical insights or recommendations
+- **Very Poor (1)**: Lacks practical investment value
+
+### 5. Balance and Objectivity (Score 1-5)
+- **Excellent (5)**: Balanced presentation of bullish and bearish factors, objective analysis
+- **Good (4)**: Mostly balanced with minor bias
+- **Adequate (3)**: Somewhat balanced but may show slight bias
+- **Poor (2)**: Clear bias or unbalanced presentation
+- **Very Poor (1)**: Heavily biased or one-sided analysis
+
+### 6. Writing Quality (Score 1-5)
+- **Excellent (5)**: Clear, professional, well-structured, and engaging writing
+- **Good (4)**: Clear and professional with minor issues
+- **Adequate (3)**: Generally clear but may have some structural issues
+- **Poor (2)**: Unclear or poorly structured writing
+- **Very Poor (1)**: Difficult to follow or unprofessional writing
+### 7. Ease of reading (Score 1-5)
+- **Excellent (5)**: Clear, concise, and well-organized writing with logical insights and non-quantitative metrics
+- **Good (4)**: Clear and concise with minor issues and non-quantitative metrics
+- **Adequate (3)**: Generally clear but may have some structural issues
+- **Poor (2)**: Unclear or poorly structured writing
+- **Very Poor (1)**: Difficult to follow or unprofessional writing
+
+## Required Output
+
+Provide specific, actionable recommendations for:
+
+1. **Missing Research Topics**: List specific research areas that would strengthen the report (e.g., "Analyze the company's ESG performance and regulatory risks in key markets")
+
+2. **Writing Improvements**: Suggest specific improvements to writing style, structure, or presentation (e.g., "Add more quantitative analysis to support qualitative claims", "Restructure the competitive analysis section for better flow")
+
+3. **Overall Assessment**: Provide a comprehensive summary of the research quality and key areas for improvement
+
+Focus on providing constructive, specific feedback that would help create a professional-grade equity research report suitable for institutional investors.
 """

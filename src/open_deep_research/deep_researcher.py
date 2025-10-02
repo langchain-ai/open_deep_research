@@ -25,7 +25,7 @@ from open_deep_research.prompts import (
     compress_research_system_prompt,
     equity_research_supervisor_prompt,
     final_report_generation_prompt,
-    lead_researcher_prompt,
+    quality_assessment_prompt,
     research_system_prompt,
     transform_messages_into_research_topic_prompt,
 )
@@ -34,6 +34,8 @@ from open_deep_research.state import (
     AgentState,
     ClarifyWithUser,
     ConductResearch,
+    QualityAssessment,
+    QualityCheck,
     ResearchComplete,
     ResearcherOutputState,
     ResearcherState,
@@ -125,8 +127,11 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     that will guide the research supervisor. It also sets up the initial supervisor
     context with appropriate prompts and instructions.
     
+    If quality assessment feedback is available, it incorporates the feedback to create
+    a more targeted research brief that addresses specific improvement areas.
+    
     Args:
-        state: Current agent state containing user messages
+        state: Current agent state containing user messages and quality feedback
         config: Runtime configuration with model settings
         
     Returns:
@@ -150,26 +155,47 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     )
     
     # Step 2: Generate structured research brief from user messages
-    prompt_content = transform_messages_into_research_topic_prompt.format(
-        messages=get_buffer_string(state.get("messages", [])),
-        date=get_today_str()
-    )
+    # Check if this is an improvement iteration with quality feedback
+    quality_assessment = state.get("quality_assessment", "")
+    iteration_count = state.get("iteration_count", 0)
+    
+    if iteration_count > 0 and quality_assessment and "🔄 QUALITY IMPROVEMENT REQUIRED" in quality_assessment:
+        # This is an improvement iteration - incorporate quality feedback
+        improvement_prompt = f"""
+Based on the quality assessment feedback, please create an improved research brief that addresses the specific areas identified for improvement.
+
+**Original Research Request:**
+{get_buffer_string(state.get("messages", []))}
+
+**Quality Assessment Feedback:**
+{quality_assessment}
+
+**Instructions:**
+1. Create a research brief that specifically addresses the missing research topics identified
+2. Focus on the priority research areas mentioned in the quality assessment
+3. Ensure the brief guides the research supervisor to conduct targeted research on the identified gaps
+4. Maintain the original research scope while adding the specific improvement areas
+
+Please generate a comprehensive research brief that incorporates both the original request and the quality improvement feedback.
+"""
+        
+        prompt_content = improvement_prompt
+    else:
+        # Initial research brief generation
+        prompt_content = transform_messages_into_research_topic_prompt.format(
+            messages=get_buffer_string(state.get("messages", [])),
+            date=get_today_str()
+        )
+    
     response = await research_model.ainvoke([HumanMessage(content=prompt_content)])
     
     # Step 3: Initialize supervisor with research brief and instructions
-    # Choose supervisor prompt based on research mode
-    if configurable.research_mode == "equity":
-        supervisor_system_prompt = equity_research_supervisor_prompt.format(
-            date=get_today_str(),
-            max_concurrent_research_units=configurable.max_concurrent_research_units,
-            max_researcher_iterations=configurable.max_researcher_iterations
-        )
-    else:
-        supervisor_system_prompt = lead_researcher_prompt.format(
-            date=get_today_str(),
-            max_concurrent_research_units=configurable.max_concurrent_research_units,
-            max_researcher_iterations=configurable.max_researcher_iterations
-        )
+    # Use equity research supervisor prompt (equity research mode only)
+    supervisor_system_prompt = equity_research_supervisor_prompt.format(
+        date=get_today_str(),
+        max_concurrent_research_units=configurable.max_concurrent_research_units,
+        max_researcher_iterations=configurable.max_researcher_iterations
+    )
     
     return Command(
         goto="research_supervisor", 
@@ -381,7 +407,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     This researcher can be dynamically specialized based on the research topic
     and agent_specialization provided by the supervisor.
     
-    Args:
+    Args:=
         state: Current researcher state with messages and topic context
         config: Runtime configuration with model settings and tool availability
         
@@ -709,6 +735,188 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
         **cleared_state
     }
 
+async def quality_assessment(state: AgentState, config: RunnableConfig):
+    """Assess the quality of the final equity research report and provide improvement recommendations.
+    
+    This function evaluates the completed equity research report against professional standards
+    and provides specific recommendations for improvement. It also determines if the report
+    meets quality thresholds or needs further research iterations.
+    
+    Args:
+        state: Agent state containing the final report and research context
+        config: Runtime configuration with model settings and API keys
+        
+    Returns:
+        Dictionary containing quality assessment results and updated state
+    """
+    # Step 1: Extract final report and research brief
+    final_report = state.get("final_report", "")
+    research_brief = state.get("research_brief", "")
+    iteration_count = state.get("iteration_count", 0)
+    
+    if not final_report or final_report.startswith("Error"):
+        # Skip quality assessment if report generation failed
+        return {
+            "quality_assessment": "Quality assessment skipped due to report generation error",
+            "messages": [AIMessage(content="Quality assessment skipped - report generation failed")]
+        }
+    
+    # Step 2: Configure the quality assessment model
+    configurable = Configuration.from_runnable_config(config)
+    quality_model_config = {
+        "model": configurable.research_model,
+        "max_tokens": configurable.research_model_max_tokens,
+        "api_key": get_api_key_for_model(configurable.research_model, config),
+        "tags": ["langsmith:nostream"]
+    }
+    
+    # Step 3: Create quality assessment prompt
+    quality_prompt_content = quality_assessment_prompt.format(
+        research_brief=research_brief,
+        final_report=final_report,
+        date=get_today_str()
+    )
+    
+    try:
+        # Configure model for structured quality assessment
+        quality_model = (
+            configurable_model
+            .with_structured_output(QualityAssessment)
+            .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
+            .with_config(quality_model_config)
+        )
+        
+        # Execute quality assessment
+        quality_result = await quality_model.ainvoke([HumanMessage(content=quality_prompt_content)])
+        
+        # Store quality scores for reference
+        quality_scores = {
+            "research_depth": quality_result.research_depth_score,
+            "source_quality": quality_result.source_quality_score,
+            "analytical_rigor": quality_result.analytical_rigor_score,
+            "practical_value": quality_result.practical_value_score,
+            "balance_objectivity": quality_result.balance_objectivity_score,
+            "writing_quality": quality_result.writing_quality_score
+        }
+        
+        # Check if there are specific missing research topics
+        has_missing_topics = quality_result.missing_topics and quality_result.missing_topics.strip() and "No missing research topics" not in quality_result.missing_topics
+        
+        # Format quality assessment result
+        quality_report = f"""## Quality Assessment Report (Iteration {iteration_count + 1})
+
+**Overall Scores (1-5 scale):**
+- Research Depth: {quality_result.research_depth_score}/5
+- Source Quality: {quality_result.source_quality_score}/5
+- Analytical Rigor: {quality_result.analytical_rigor_score}/5
+- Practical Value: {quality_result.practical_value_score}/5
+- Balance & Objectivity: {quality_result.balance_objectivity_score}/5
+- Writing Quality: {quality_result.writing_quality_score}/5
+
+**Missing Research Topics:**
+{quality_result.missing_topics}
+
+**Writing Improvements:**
+{quality_result.writing_improvements}
+
+**Overall Assessment:**
+{quality_result.overall_assessment}"""
+        
+        # Add improvement instruction if there are missing research topics
+        if has_missing_topics:
+            improvement_instruction = f"""
+
+## 🔄 QUALITY IMPROVEMENT REQUIRED
+
+Based on the quality assessment, the report needs improvement. Please conduct additional research to address the following areas:
+
+**Priority Research Areas:**
+{quality_result.missing_topics}
+
+**Writing Improvements Needed:**
+{quality_result.writing_improvements}
+
+Please conduct additional research and regenerate the report with these improvements in mind."""
+            
+            return {
+                "quality_assessment": quality_report + improvement_instruction,
+                "quality_scores": quality_scores,
+                "iteration_count": iteration_count + 1,
+                "messages": [AIMessage(content=quality_report + improvement_instruction)]
+            }
+        else:
+            # No missing research topics - report is satisfactory
+            satisfactory_report = quality_report + f"""
+
+**Quality Status:** ✅ SATISFACTORY - No missing research topics identified."""
+            
+            return {
+                "quality_assessment": satisfactory_report,
+                "quality_scores": quality_scores,
+                "iteration_count": iteration_count + 1,
+                "messages": [AIMessage(content=satisfactory_report)]
+            }
+        
+    except Exception as e:
+        error_report = f"Error performing quality assessment: {str(e)}"
+        return {
+            "quality_assessment": error_report,
+            "messages": [AIMessage(content=error_report)]
+        }
+
+def should_continue_improvement(state: AgentState) -> str:
+    """Determine whether to continue with quality improvement or end the process.
+    
+    This function checks the quality assessment feedback to decide whether
+    there are specific missing research topics that need to be addressed.
+    
+    Args:
+        state: Agent state containing quality assessment and iteration count
+        
+    Returns:
+        Next node to execute: "research_supervisor" for improvement or "END" for completion
+    """
+    quality_assessment = state.get("quality_assessment", "")
+    iteration_count = state.get("iteration_count", 0)
+    max_iterations = 3
+    
+    # If no quality assessment yet, continue to quality assessment
+    if not quality_assessment or "Quality Assessment Report" not in quality_assessment:
+        return "quality_assessment"
+    
+    # Check if max iterations reached
+    if iteration_count >= max_iterations:
+        return "END"
+    
+    # Check if quality assessment indicates no missing research topics
+    # Look for indicators that no further research is needed
+    no_improvement_needed_indicators = [
+        "✅ SATISFACTORY",
+        "No missing research topics",
+        "No additional research needed",
+        "Quality assessment skipped"
+    ]
+    
+    # Check if any of these indicators are present
+    if any(indicator in quality_assessment for indicator in no_improvement_needed_indicators):
+        return "END"
+    
+    # Check if there are specific missing research topics mentioned
+    missing_topics_indicators = [
+        "Missing Research Topics:",
+        "Priority Research Areas:",
+        "Focus on improving",
+        "Additional research needed",
+        "Research gaps"
+    ]
+    
+    # If specific missing topics are mentioned, continue improvement via research brief
+    if any(indicator in quality_assessment for indicator in missing_topics_indicators):
+        return "write_research_brief"
+    
+    # Default to ending if no clear improvement areas identified
+    return "END"
+
 # Main Deep Researcher Graph Construction
 # Creates the complete deep research workflow from user input to final report
 deep_researcher_builder = StateGraph(
@@ -722,11 +930,24 @@ deep_researcher_builder.add_node("clarify_with_user", clarify_with_user)        
 deep_researcher_builder.add_node("write_research_brief", write_research_brief)     # Research planning phase
 deep_researcher_builder.add_node("research_supervisor", supervisor_subgraph)       # Research execution phase
 deep_researcher_builder.add_node("final_report_generation", final_report_generation)  # Report generation phase
+deep_researcher_builder.add_node("quality_assessment", quality_assessment)        # Quality assessment phase
 
 # Define main workflow edges for sequential execution
 deep_researcher_builder.add_edge(START, "clarify_with_user")                       # Entry point
+deep_researcher_builder.add_edge("clarify_with_user", "write_research_brief")      # Clarification to planning
+deep_researcher_builder.add_edge("write_research_brief", "research_supervisor")   # Planning to research
 deep_researcher_builder.add_edge("research_supervisor", "final_report_generation") # Research to report
-deep_researcher_builder.add_edge("final_report_generation", END)                   # Final exit point
+deep_researcher_builder.add_edge("final_report_generation", "quality_assessment")  # Report to quality assessment
+
+# Add conditional edge for iterative improvement
+deep_researcher_builder.add_conditional_edges(
+    "quality_assessment",
+    should_continue_improvement,
+    {
+        "write_research_brief": "write_research_brief",  # Continue improvement via research brief
+        "END": END                                        # End process
+    }
+)
 
 # Compile the complete deep researcher workflow
 deep_researcher = deep_researcher_builder.compile()

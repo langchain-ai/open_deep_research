@@ -41,7 +41,7 @@ def get_evaluation_llm(eval_model=None):
         Structured LLM for generating evaluation grades
     """
     # Use provided model, then environment variable, then default
-    model_to_use = eval_model or os.environ.get("EVAL_MODEL", "anthropic:claude-3-7-sonnet-latest")
+    model_to_use = eval_model or os.environ.get("EVAL_MODEL", "openai:gpt-4.1")
     
     criteria_eval_llm = init_chat_model(model_to_use)
     return criteria_eval_llm.with_structured_output(CriteriaGrade)
@@ -93,7 +93,7 @@ def search_api(request):
 @pytest.fixture
 def eval_model(request):
     """Get the evaluation model from command line or environment variable."""
-    return request.config.getoption("--eval-model") or os.environ.get("EVAL_MODEL", "anthropic:claude-3-7-sonnet-latest")
+    return request.config.getoption("--eval-model") or os.environ.get("EVAL_MODEL", "openai:gpt-4.1")
 
 @pytest.fixture
 def models(request, research_agent):
@@ -102,11 +102,11 @@ def models(request, research_agent):
         return {
             "supervisor_model": (
                 request.config.getoption("--supervisor-model") or 
-                os.environ.get("SUPERVISOR_MODEL", "anthropic:claude-3-7-sonnet-latest")
+                os.environ.get("SUPERVISOR_MODEL", "openai:gpt-4.1")
             ),
             "researcher_model": (
                 request.config.getoption("--researcher-model") or 
-                os.environ.get("RESEARCHER_MODEL", "anthropic:claude-3-5-sonnet-latest")
+                os.environ.get("RESEARCHER_MODEL", "openai:gpt-4.1")
             ),
         }
     else:  # graph agent
@@ -117,7 +117,7 @@ def models(request, research_agent):
             ),
             "planner_model": (
                 request.config.getoption("--planner-model") or 
-                os.environ.get("PLANNER_MODEL", "claude-3-7-sonnet-latest")
+                os.environ.get("PLANNER_MODEL", "gpt-4.1")
             ),
             "writer_provider": (
                 request.config.getoption("--writer-provider") or 
@@ -125,7 +125,7 @@ def models(request, research_agent):
             ),
             "writer_model": (
                 request.config.getoption("--writer-model") or 
-                os.environ.get("WRITER_MODEL", "claude-3-5-sonnet-latest")
+                os.environ.get("WRITER_MODEL", "gpt-4o")
             ),
             "max_search_depth": int(
                 request.config.getoption("--max-search-depth") or 
@@ -209,9 +209,9 @@ def test_response_criteria_evaluation(research_agent, search_api, models, eval_m
             "thread_id": str(uuid.uuid4()),
             "search_api": search_api,
             "planner_provider": models.get("planner_provider", "anthropic"),
-            "planner_model": models.get("planner_model", "claude-3-7-sonnet-latest"),
+            "planner_model": models.get("planner_model", "gpt-4.1"),
             "writer_provider": models.get("writer_provider", "anthropic"),
-            "writer_model": models.get("writer_model", "claude-3-5-sonnet-latest"),
+            "writer_model": models.get("writer_model", "gpt-4o"),
             "max_search_depth": models.get("max_search_depth", 2),
         }}
         

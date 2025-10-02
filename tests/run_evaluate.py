@@ -20,13 +20,13 @@ max_concurrent_research_units = 10
 search_api = "tavily" # NOTE: We use Tavily to stay consistent
 max_researcher_iterations = 6
 max_react_tool_calls = 10
-summarization_model = "openai:gpt-4.1-mini"
+summarization_model = "openai:o3-mini"
 summarization_model_max_tokens = 8192
 research_model = "openai:gpt-5" # "anthropic:claude-sonnet-4-20250514"
 research_model_max_tokens = 10000
-compression_model = "openai:gpt-4.1"
+compression_model = "openai:o3"
 compression_model_max_tokens = 10000
-final_report_model = "openai:gpt-4.1"
+final_report_model = "openai:o3"
 final_report_model_max_tokens = 10000
 
 async def target(

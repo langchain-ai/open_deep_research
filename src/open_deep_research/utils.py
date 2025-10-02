@@ -855,15 +855,15 @@ def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
 
 # NOTE: This may be out of date or not applicable to your models. Please update this as needed.
 MODEL_TOKEN_LIMITS = {
-    "openai:gpt-4.1-mini": 1047576,
-    "openai:gpt-4.1-nano": 1047576,
-    "openai:gpt-4.1": 1047576,
+    "openai:o3-mini": 1047576,
+    "openai:o3-nano": 1047576,
+    "openai:o3": 1047576,
     "openai:gpt-4o-mini": 128000,
     "openai:gpt-4o": 128000,
     "openai:o4-mini": 200000,
     "openai:o3-mini": 200000,
     "openai:o3": 200000,
-    "openai:o3-pro": 200000,
+    "openai:o3": 200000,
     "openai:o1": 200000,
     "openai:o1-pro": 200000,
     "anthropic:claude-opus-4": 200000,

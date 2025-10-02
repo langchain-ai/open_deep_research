@@ -14,7 +14,7 @@ Simplified test runner for Open Deep Research with rich console output.
 
 Example usage:
 python tests/run_test.py --all  # Run all agents with rich output
-python tests/run_test.py --agent multi_agent --supervisor-model "anthropic:claude-3-7-sonnet-latest"
+python tests/run_test.py --agent multi_agent --supervisor-model "openai:gpt-4.1"
 python tests/run_test.py --agent graph --search-api tavily
 """
 
@@ -27,13 +27,13 @@ def main():
     parser.add_argument("--all", action="store_true", help="Run tests for all agents")
     
     # Model configuration options
-    parser.add_argument("--supervisor-model", help="Model for supervisor agent (e.g., 'anthropic:claude-3-7-sonnet-latest')")
-    parser.add_argument("--researcher-model", help="Model for researcher agent (e.g., 'anthropic:claude-3-5-sonnet-latest')")
+    parser.add_argument("--supervisor-model", help="Model for supervisor agent (e.g., 'openai:gpt-4.1')")
+    parser.add_argument("--researcher-model", help="Model for researcher agent (e.g., 'openai:gpt-4.1')")
     parser.add_argument("--planner-provider", help="Provider for planner model (e.g., 'anthropic')")
-    parser.add_argument("--planner-model", help="Model for planner in graph-based agent (e.g., 'claude-3-7-sonnet-latest')")
+    parser.add_argument("--planner-model", help="Model for planner in graph-based agent (e.g., 'gpt-4.1')")
     parser.add_argument("--writer-provider", help="Provider for writer model (e.g., 'anthropic')")
-    parser.add_argument("--writer-model", help="Model for writer in graph-based agent (e.g., 'claude-3-5-sonnet-latest')")
-    parser.add_argument("--eval-model", help="Model for evaluating report quality (default: openai:claude-3-7-sonnet-latest)")
+    parser.add_argument("--writer-model", help="Model for writer in graph-based agent (e.g., 'gpt-4o')")
+    parser.add_argument("--eval-model", help="Model for evaluating report quality (default: openai:gpt-4.1)")
     parser.add_argument("--max-search-depth", help="Maximum search depth for graph agent")
     
     # Search API configuration

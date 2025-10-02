@@ -6,7 +6,7 @@ from open_deep_research.utils import get_today_str
 from tests.prompts import RELEVANCE_PROMPT, STRUCTURE_PROMPT, GROUNDEDNESS_PROMPT, OVERALL_QUALITY_PROMPT, CORRECTNESS_PROMPT, COMPLETENESS_PROMPT
 
 eval_model = ChatOpenAI(
-    model="gpt-4.1",
+    model="o3",
 )
 
 def _format_input_query(inputs: dict) -> str:

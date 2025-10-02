@@ -119,11 +119,11 @@ class Configuration(BaseModel):
     )
     # Model Configuration
     summarization_model: str = Field(
-        default="openai:gpt-4.1-mini",
+        default="openai:gpt-4o",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1-mini",
+                "default": "openai:gpt-4o",
                 "description": "Model for summarizing research results from Tavily search results"
             }
         }
@@ -191,11 +191,11 @@ class Configuration(BaseModel):
         }
     )
     final_report_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:gpt-4o",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
+                "default": "openai:gpt-4o",
                 "description": "Model for writing the final report from all research findings"
             }
         }
@@ -228,20 +228,6 @@ class Configuration(BaseModel):
             "x_oap_ui_config": {
                 "type": "text",
                 "description": "Any additional instructions to pass along to the Agent regarding the MCP tools that are available to it."
-            }
-        }
-    )
-    research_mode: str = Field(
-        default="general",
-        metadata={
-            "x_oap_ui_config": {
-                "type": "select",
-                "default": "general",
-                "description": "Research mode: 'general' for general research or 'equity' for equity research with specialized agents",
-                "options": [
-                    {"label": "General Research", "value": "general"},
-                    {"label": "Equity Research", "value": "equity"}
-                ]
             }
         }
     )

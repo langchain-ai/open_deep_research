@@ -116,8 +116,8 @@ async def generate_report_plan(state: ReportState, config: RunnableConfig):
                         Each section must have: name, description, research, and content fields."""
 
     # Run the planner
-    if planner_model == "claude-3-7-sonnet-latest":
-        # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
+    if planner_model == "gpt-4.1":
+        # Allocate a thinking budget for gpt-4.1 as the planner model
         planner_llm = init_chat_model(model=planner_model, 
                                       model_provider=planner_provider, 
                                       max_tokens=20_000, 
@@ -325,8 +325,8 @@ async def write_section(state: SectionState, config: RunnableConfig) -> Command[
     planner_model = get_config_value(configurable.planner_model)
     planner_model_kwargs = get_config_value(configurable.planner_model_kwargs or {})
 
-    if planner_model == "claude-3-7-sonnet-latest":
-        # Allocate a thinking budget for claude-3-7-sonnet-latest as the planner model
+    if planner_model == "gpt-4.1":
+        # Allocate a thinking budget for gpt-4.1 as the planner model
         reflection_model = init_chat_model(model=planner_model, 
                                            model_provider=planner_provider, 
                                            max_tokens=20_000, 
