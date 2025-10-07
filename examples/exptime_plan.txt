@@ -1,0 +1,8 @@
+set_plan
+plan_step_complete
+for_each_file *.py
+  for_each_file *.md
+    read_file {file1}
+    read_file {file2}
+run_in_bash_session python tooling/fdc_cli.py close --task-id "exptime-test"
+submit

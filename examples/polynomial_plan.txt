@@ -1,0 +1,6 @@
+set_plan
+plan_step_complete
+for_each_file src/**/*.py
+  replace_with_git_merge_diff {file1}
+run_in_bash_session python tooling/fdc_cli.py close --task-id "refactor-all-py"
+submit
