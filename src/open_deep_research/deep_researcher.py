@@ -45,6 +45,7 @@ from open_deep_research.utils import (
     get_api_key_for_model,
     get_model_token_limit,
     get_notes_from_tool_calls,
+    get_search_tool,
     get_today_str,
     is_token_limit_exceeded,
     openai_websearch_called,
@@ -388,6 +389,9 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
             "search API or add MCP tools to your configuration."
         )
     
+    search_tool = await get_search_tool(search_api=configurable.search_api)
+    search_tool_prompt = f"- **{search_tool[0].name}**: For conducting web searches to gather information" if search_tool else ""
+
     # Step 2: Configure the researcher model with tools
     research_model_config = {
         "model": configurable.research_model,
@@ -400,6 +404,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     researcher_prompt = research_system_prompt.format(
         custom_tools_prompt=configurable.custom_tools_prompt or "",
         mcp_prompt=configurable.mcp_prompt or "", 
+        search_tools_prompt=search_tool_prompt,
         date=get_today_str()
     )
     
