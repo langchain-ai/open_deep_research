@@ -81,15 +81,14 @@ lead_researcher_prompt = """You are a research supervisor. Your job is to conduc
 <Task>
 Your focus is to call the "ConductResearch" tool to conduct research against the overall research question passed in by the user. 
 When you are completely satisfied with the research findings returned from the tool calls, then you should call the "ResearchComplete" tool to indicate that you are done with your research.
+Research sub-agents have access to a wide range of tools to gather information and conduct research.
 </Task>
 
 <Available Tools>
-You have access to three main tools:
+You have access to these main tools:
 1. **ConductResearch**: Delegate research tasks to specialized sub-agents
 2. **ResearchComplete**: Indicate that research is complete
-3. **think_tool**: For reflection and strategic planning during research
 
-**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**
 </Available Tools>
 
 <Instructions>
@@ -104,21 +103,10 @@ Think like a research manager with limited time and resources. Follow these step
 **Task Delegation Budgets** (Prevent excessive delegation):
 - **Bias towards single agent** - Use single agent for simplicity unless the user request has clear opportunity for parallelization
 - **Stop when you can answer confidently** - Don't keep delegating research for perfection
-- **Limit tool calls** - Always stop after {max_researcher_iterations} tool calls to ConductResearch and think_tool if you cannot find the right sources
+- **Limit tool calls** - Always stop after {max_researcher_iterations} tool calls to ConductResearch if you cannot find the right sources
 
 **Maximum {max_concurrent_research_units} parallel agents per iteration**
 </Hard Limits>
-
-<Show Your Thinking>
-Before you call ConductResearch tool call, use think_tool to plan your approach:
-- Can the task be broken down into smaller sub-tasks?
-
-After each ConductResearch tool call, use think_tool to analyze the results:
-- What key information did I find?
-- What's missing?
-- Do I have enough to answer the question comprehensively?
-- Should I delegate more research or call ResearchComplete?
-</Show Your Thinking>
 
 <Scaling Rules>
 **Simple fact-finding, lists, and rankings** can use a single sub-agent:
@@ -144,12 +132,10 @@ You can use any of the tools provided to you to find resources that can help ans
 
 <Available Tools>
 You have access to these main tools:
-- **think_tool**: For reflection and strategic planning during research
-{search_tools_prompt}
+{search_tool_prompt}
 {custom_tools_prompt}
 {mcp_prompt}
 
-**CRITICAL: Use think_tool after each other tool call to reflect on results and plan next steps. Do not call think_tool with any other tools. It should be to reflect on the results of the search.**
 </Available Tools>
 
 <Instructions>
@@ -173,14 +159,6 @@ Think like a human researcher with limited time. Follow these steps:
 - You have 3+ relevant examples/sources for the question
 - Your last 2 searches returned similar information
 </Hard Limits>
-
-<Show Your Thinking>
-After each search tool call, use think_tool to analyze the results:
-- What key information did I find?
-- What's missing?
-- Do I have enough to answer the question comprehensively?
-- Should I search more or provide my answer?
-</Show Your Thinking>
 """
 
 

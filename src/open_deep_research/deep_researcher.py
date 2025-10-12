@@ -50,7 +50,6 @@ from open_deep_research.utils import (
     is_token_limit_exceeded,
     openai_websearch_called,
     remove_up_to_last_ai_message,
-    think_tool,
 )
 
 # Initialize a configurable model that we will use throughout the agent
@@ -180,8 +179,8 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
     """Lead research supervisor that plans research strategy and delegates to researchers.
     
     The supervisor analyzes the research brief and decides how to break down the research
-    into manageable tasks. It can use think_tool for strategic planning, ConductResearch
-    to delegate tasks to sub-researchers, or ResearchComplete when satisfied with findings.
+    into manageable tasks. It can use ConductResearch to delegate tasks to sub-researchers, 
+    or ResearchComplete when satisfied with findings.
     
     Args:
         state: Current supervisor state with messages and research context
@@ -200,7 +199,7 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
     }
     
     # Available tools: research delegation, completion signaling, and strategic thinking
-    lead_researcher_tools = [ConductResearch, ResearchComplete, think_tool]
+    lead_researcher_tools = [ConductResearch, ResearchComplete]
     
     # Configure model with tools, retry logic, and model settings
     research_model = (
@@ -224,12 +223,11 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
     )
 
 async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Command[Literal["supervisor", "__end__"]]:
-    """Execute tools called by the supervisor, including research delegation and strategic thinking.
+    """Execute tools called by the supervisor, including research delegation.
     
-    This function handles three types of supervisor tool calls:
-    1. think_tool - Strategic reflection that continues the conversation
-    2. ConductResearch - Delegates research tasks to sub-researchers
-    3. ResearchComplete - Signals completion of research phase
+    This function handles two types of supervisor tool calls:
+    1. ConductResearch - Delegates research tasks to sub-researchers
+    2. ResearchComplete - Signals completion of research phase
     
     Args:
         state: Current supervisor state with messages and iteration count
@@ -262,23 +260,9 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
             }
         )
     
-    # Step 2: Process all tool calls together (both think_tool and ConductResearch)
+    # Step 2: Process all tool calls together
     all_tool_messages = []
     update_payload = {"supervisor_messages": []}
-    
-    # Handle think_tool calls (strategic reflection)
-    think_tool_calls = [
-        tool_call for tool_call in most_recent_message.tool_calls 
-        if tool_call["name"] == "think_tool"
-    ]
-    
-    for tool_call in think_tool_calls:
-        reflection_content = tool_call["args"]["reflection"]
-        all_tool_messages.append(ToolMessage(
-            content=f"Reflection recorded: {reflection_content}",
-            name="think_tool",
-            tool_call_id=tool_call["id"]
-        ))
     
     # Handle ConductResearch calls (research delegation)
     conduct_research_calls = [
@@ -367,8 +351,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     """Individual researcher that conducts focused research on specific topics.
     
     This researcher is given a specific research topic by the supervisor and uses
-    available tools (search, think_tool, MCP tools) to gather comprehensive information.
-    It can use think_tool for strategic planning between searches.
+    available tools (search, MCP tools, custom tools) to gather comprehensive information.
     
     Args:
         state: Current researcher state with messages and topic context
@@ -381,7 +364,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     configurable = Configuration.from_runnable_config(config)
     researcher_messages = state.get("researcher_messages", [])
     
-    # Get all available research tools (search, MCP, think_tool)
+    # Get all available research tools (search, MCP, custom tools)
     tools = await get_all_tools(config)
     if len(tools) == 0:
         raise ValueError(
@@ -404,7 +387,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     researcher_prompt = research_system_prompt.format(
         custom_tools_prompt=configurable.custom_tools_prompt or "",
         mcp_prompt=configurable.mcp_prompt or "", 
-        search_tools_prompt=search_tool_prompt,
+        search_tool_prompt=search_tool_prompt,
         date=get_today_str()
     )
     
@@ -439,12 +422,12 @@ async def execute_tool_safely(tool, args, config):
 
 
 async def researcher_tools(state: ResearcherState, config: RunnableConfig) -> Command[Literal["researcher", "compress_research"]]:
-    """Execute tools called by the researcher, including search tools and strategic thinking.
+    """Execute tools called by the researcher, including search tools, MCP and custom tools.
     
     This function handles various types of researcher tool calls:
-    1. think_tool - Strategic reflection that continues the research conversation
-    2. Search tools (tavily_search, web_search) - Information gathering
-    3. MCP tools - External tool integrations
+    1. Search tools (tavily_search, web_search) - Information gathering
+    2. MCP tools - External tool integrations
+    3. Custom tools - Passed with the configuration
     4. ResearchComplete - Signals completion of individual research task
     
     Args:
