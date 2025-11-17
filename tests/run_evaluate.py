@@ -11,7 +11,7 @@ load_dotenv("../.env")
 client = Client()
 
 # NOTE: Configure the right dataset and evaluators
-dataset_name = "Deep Research Bench"
+dataset_name = "Deep Research Bench Test"
 evaluators = [eval_overall_quality, eval_relevance, eval_structure, eval_correctness, eval_groundedness, eval_completeness]
 # NOTE: Configure the right parameters for the experiment, these will be logged in the metadata
 max_structured_output_retries = 3
@@ -65,7 +65,7 @@ async def main():
         target,
         data=dataset_name,
         evaluators=evaluators,
-        experiment_prefix=f"ODR GPT-5, Tavily Search",
+        experiment_prefix=f"Polaris GPT-5, Tavily Search",
         max_concurrency=10,
         metadata={
             "max_structured_output_retries": max_structured_output_retries,
