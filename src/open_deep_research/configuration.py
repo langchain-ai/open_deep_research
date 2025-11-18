@@ -118,13 +118,35 @@ class Configuration(BaseModel):
         }
     )
     # Model Configuration
+    ### Adding endpoint URL
+    openai_api_base: str = Field(
+        default="https://api.openai.com/v1", # "https://openrouter.ai/api/v1" for Open Router
+        metadat={
+            "x_oap_ui_config" : {
+                "type": "text", 
+                "default" : "https://api.openai.com/v1", 
+                "description": "Endpoint for OpenAI API", 
+            }
+        }
+    )
+    ###
     summarization_model: str = Field(
-        default="openai:gpt-4.1-mini",
+        default="openai:gpt-4.1-mini", # "openai/gpt-4.1-mini" for Open Router
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
                 "default": "openai:gpt-4.1-mini",
                 "description": "Model for summarizing research results from Tavily search results"
+            }
+        }
+    )
+    summarization_model_provider: str = Field(
+        default="openai", 
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai", 
+                "description": "Model provider"
             }
         }
     )
@@ -151,12 +173,22 @@ class Configuration(BaseModel):
         }
     )
     research_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:gpt-4.1", # "openai/gpt-4.1" for Open Router
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
                 "default": "openai:gpt-4.1",
                 "description": "Model for conducting research. NOTE: Make sure your Researcher Model supports the selected search API."
+            }
+        }
+    )
+    research_model_provider: str = Field(
+        default="openai", 
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai", 
+                "description": "Model provider"
             }
         }
     )
@@ -171,12 +203,22 @@ class Configuration(BaseModel):
         }
     )
     compression_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:gpt-4.1", # "openai/gpt-4.1-mini" for Open Router
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
                 "default": "openai:gpt-4.1",
                 "description": "Model for compressing research findings from sub-agents. NOTE: Make sure your Compression Model supports the selected search API."
+            }
+        }
+    )
+    compression_model_provider: str = Field(
+        default="openai", 
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai", 
+                "description": "Model provider"
             }
         }
     )
@@ -191,12 +233,22 @@ class Configuration(BaseModel):
         }
     )
     final_report_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:gpt-4.1", # "openai/gpt-4.1" for Open Router
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
                 "default": "openai:gpt-4.1",
                 "description": "Model for writing the final report from all research findings"
+            }
+        }
+    )
+    final_report_model_provider: str = Field(
+        default="openai", 
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai", 
+                "description": "Model provider"
             }
         }
     )
