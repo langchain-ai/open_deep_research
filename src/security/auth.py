@@ -1,15 +1,24 @@
 import os
 import asyncio
+from typing import Optional, Any
+
+try:
+    from supabase import create_client, Client
+
+    HAS_SUPABASE = True
+except ImportError:
+    HAS_SUPABASE = False
+    Client = None
+    create_client = None
+
 from langgraph_sdk import Auth
 from langgraph_sdk.auth.types import StudioUser
-from supabase import create_client, Client
-from typing import Optional, Any
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase: Optional[Client] = None
 
-if supabase_url and supabase_key:
+if HAS_SUPABASE and supabase_url and supabase_key:
     supabase = create_client(supabase_url, supabase_key)
 
 # The "Auth" object is a container that LangGraph will use to mark our authentication function

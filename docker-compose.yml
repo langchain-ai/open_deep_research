@@ -1,0 +1,63 @@
+services:
+  open-deep-research:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODE: ${MODE:-development}
+    container_name: open-deep-research
+    ports:
+      - "${PORT:-2024}:2024"
+    environment:
+      # LLM API Keys
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      
+      # Search API Keys
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      EXA_API_KEY: ${EXA_API_KEY:-}
+      
+      # LangSmith Configuration
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      
+      # Supabase (Optional, for Open Agent Platform)
+      SUPABASE_KEY: ${SUPABASE_KEY:-}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      GET_API_KEYS_FROM_CONFIG: ${GET_API_KEYS_FROM_CONFIG:-false}
+      
+      # Container Configuration
+      MODE: ${MODE:-development}
+      HOST: 0.0.0.0
+      PORT: 2024
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      
+      # LangGraph Configuration
+      LANGGRAPH_API_KEY: ${LANGGRAPH_API_KEY:-}
+      LANGGRAPH_ENDPOINT: ${LANGGRAPH_ENDPOINT:-}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY:-}
+      
+    volumes:
+      - ./src:/app/src:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./langgraph.json:/app/langgraph.json:ro
+    
+    restart: unless-stopped
+    
+    networks:
+      - deep-research-network
+    
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://127.0.0.1:2024/docs', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  deep-research-network:
+    driver: bridge
