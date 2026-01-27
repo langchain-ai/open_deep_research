@@ -31,10 +31,6 @@ class Pipeline:
             default="http://open-deep-research:2024",
             description="URL of the LangGraph Deep Research server (use container name for Docker network)",
         )
-        ASSISTANT_ID: str = Field(
-            default="Deep Researcher",
-            description="The assistant/graph ID as defined in langgraph.json",
-        )
 
         # ================
         # Polling Settings
@@ -107,6 +103,9 @@ class Pipeline:
             description="Maximum character length for webpage content before summarization",
         )
 
+    # Static constant - must match the graph name in langgraph.json
+    ASSISTANT_ID = "Deep Researcher"
+
     def __init__(self):
         """Initialize the pipeline with default configuration."""
         # Pipeline identification - simple pipe type (single model endpoint)
@@ -146,7 +145,7 @@ class Pipeline:
         """Called when the server is started."""
         print(f"on_startup:{__name__}")
         print(f"LangGraph URL: {self.valves.LANGGRAPH_URL}")
-        print(f"Assistant ID: {self.valves.ASSISTANT_ID}")
+        print(f"Assistant ID: {self.ASSISTANT_ID}")
 
     async def on_shutdown(self):
         """Called when the server is stopped."""
@@ -190,22 +189,61 @@ class Pipeline:
             raise RuntimeError(f"Error creating thread: {e}")
 
     def get_configurable_params(self) -> Dict[str, Any]:
-        """Build the configurable parameters to pass to LangGraph."""
+        """Build the configurable parameters to pass to LangGraph.
+
+        Only include parameters that have non-default values to avoid
+        validation errors with the LangGraph API.
+        """
+        # Build config with all parameters - LangGraph will use defaults for any missing
+        config = {}
+
+        # Only add non-empty/non-default values
+        if self.valves.SEARCH_API:
+            config["search_api"] = self.valves.SEARCH_API
+        if self.valves.RESEARCH_MODEL:
+            config["research_model"] = self.valves.RESEARCH_MODEL
+        if self.valves.RESEARCH_MODEL_MAX_TOKENS:
+            config["research_model_max_tokens"] = self.valves.RESEARCH_MODEL_MAX_TOKENS
+        if self.valves.COMPRESSION_MODEL:
+            config["compression_model"] = self.valves.COMPRESSION_MODEL
+        if self.valves.COMPRESSION_MODEL_MAX_TOKENS:
+            config["compression_model_max_tokens"] = (
+                self.valves.COMPRESSION_MODEL_MAX_TOKENS
+            )
+        if self.valves.FINAL_REPORT_MODEL:
+            config["final_report_model"] = self.valves.FINAL_REPORT_MODEL
+        if self.valves.FINAL_REPORT_MODEL_MAX_TOKENS:
+            config["final_report_model_max_tokens"] = (
+                self.valves.FINAL_REPORT_MODEL_MAX_TOKENS
+            )
+        if self.valves.SUMMARIZATION_MODEL:
+            config["summarization_model"] = self.valves.SUMMARIZATION_MODEL
+        if self.valves.SUMMARIZATION_MODEL_MAX_TOKENS:
+            config["summarization_model_max_tokens"] = (
+                self.valves.SUMMARIZATION_MODEL_MAX_TOKENS
+            )
+
+        # Boolean and integer configs
+        config["allow_clarification"] = self.valves.ALLOW_CLARIFICATION
+        config["max_concurrent_research_units"] = (
+            self.valves.MAX_CONCURRENT_RESEARCH_UNITS
+        )
+        config["max_researcher_iterations"] = self.valves.MAX_RESEARCHER_ITERATIONS
+        config["max_react_tool_calls"] = self.valves.MAX_REACT_TOOL_CALLS
+        config["max_content_length"] = self.valves.MAX_CONTENT_LENGTH
+
+        return config
+
+    def emit_status(self, description: str, done: bool = False) -> Dict[str, Any]:
+        """Emit a status event for OpenWebUI to display."""
         return {
-            "search_api": self.valves.SEARCH_API,
-            "research_model": self.valves.RESEARCH_MODEL,
-            "research_model_max_tokens": self.valves.RESEARCH_MODEL_MAX_TOKENS,
-            "compression_model": self.valves.COMPRESSION_MODEL,
-            "compression_model_max_tokens": self.valves.COMPRESSION_MODEL_MAX_TOKENS,
-            "final_report_model": self.valves.FINAL_REPORT_MODEL,
-            "final_report_model_max_tokens": self.valves.FINAL_REPORT_MODEL_MAX_TOKENS,
-            "summarization_model": self.valves.SUMMARIZATION_MODEL,
-            "summarization_model_max_tokens": self.valves.SUMMARIZATION_MODEL_MAX_TOKENS,
-            "allow_clarification": self.valves.ALLOW_CLARIFICATION,
-            "max_concurrent_research_units": self.valves.MAX_CONCURRENT_RESEARCH_UNITS,
-            "max_researcher_iterations": self.valves.MAX_RESEARCHER_ITERATIONS,
-            "max_react_tool_calls": self.valves.MAX_REACT_TOOL_CALLS,
-            "max_content_length": self.valves.MAX_CONTENT_LENGTH,
+            "event": {
+                "type": "status",
+                "data": {
+                    "description": description,
+                    "done": done,
+                },
+            }
         }
 
     def pipe(
@@ -231,15 +269,15 @@ class Pipeline:
             print("Title Generation Request - returning simple response")
             return "Deep Research Report"
 
-        # Start with thinking indicator for long-running tasks
-        yield "<thinking>\n"
-        yield f"{self.get_random_status_message()}\n"
+        # Emit initial status
+        yield self.emit_status("Initializing deep research...")
 
         try:
             print(f"[Deep Research] Processing query: {user_message[:100]}...")
 
             if not messages:
-                yield "</thinking>\n\nError: No messages provided"
+                yield self.emit_status("Error: No messages provided", done=True)
+                yield "Error: No messages provided"
                 return
 
             # Get or create conversation context
@@ -251,16 +289,18 @@ class Pipeline:
             # Create new thread for new conversations
             if not conv_data["thread_id"]:
                 print("[Deep Research] Creating new thread...")
-                yield "Initializing research session...\n"
+                yield self.emit_status("Creating research session...")
                 try:
                     conv_data["thread_id"] = self.create_thread()
                     conv_data["message_count"] = 0
                     print(f"[Deep Research] Created thread: {conv_data['thread_id']}")
                 except ConnectionError as e:
-                    yield f"</thinking>\n\nConnection Error: {e}"
+                    yield self.emit_status(f"Connection Error", done=True)
+                    yield f"Connection Error: {e}"
                     return
                 except Exception as e:
-                    yield f"</thinking>\n\nError creating research session: {e}"
+                    yield self.emit_status("Error creating session", done=True)
+                    yield f"Error creating research session: {e}"
                     return
 
             # Store conversation data
@@ -275,44 +315,72 @@ class Pipeline:
             if "user" in body and isinstance(body["user"], dict):
                 username = body["user"].get("name", "unknown")
 
-            # Build the payload with configurable parameters
-            payload = json.dumps(
-                {
-                    "assistant_id": self.valves.ASSISTANT_ID,
-                    "input": {"messages": [{"content": user_message, "type": "human"}]},
-                    "config": {"configurable": self.get_configurable_params()},
-                    "metadata": {"openwebui_username": username},
-                }
-            )
+            # Build the payload for LangGraph API
+            # Note: LangGraph uses "role": "human" for user messages
+            request_payload = {
+                "assistant_id": self.ASSISTANT_ID,
+                "input": {"messages": [{"role": "human", "content": user_message}]},
+                "metadata": {"openwebui_username": username},
+            }
+
+            # Add configurable parameters if any are set
+            config_params = self.get_configurable_params()
+            if config_params:
+                request_payload["config"] = {"configurable": config_params}
+
+            payload = json.dumps(request_payload)
+
+            # Debug: Log the payload being sent
+            print(f"[Deep Research] Sending payload: {payload[:500]}...")
 
             # Start the research run
             print(f"[Deep Research] Starting run at: {run_url}")
-            yield "Starting deep research...\n"
+            yield self.emit_status("Starting deep research...")
 
             try:
                 run_response = requests.post(
                     run_url, headers=self.headers, data=payload, timeout=60
                 )
+                # Check for errors and get detailed error message
+                if run_response.status_code >= 400:
+                    error_detail = "Unknown error"
+                    try:
+                        error_json = run_response.json()
+                        error_detail = error_json.get("detail", str(error_json))
+                    except:
+                        error_detail = run_response.text[:500]
+                    print(
+                        f"[Deep Research] API Error {run_response.status_code}: {error_detail}"
+                    )
+                    yield self.emit_status(
+                        f"API Error ({run_response.status_code})", done=True
+                    )
+                    yield f"Error starting research ({run_response.status_code}): {error_detail}"
+                    return
                 run_response.raise_for_status()
             except requests.exceptions.ConnectionError as e:
-                yield f"</thinking>\n\nConnection Error: Cannot reach LangGraph server. {e}"
+                yield self.emit_status("Connection Error", done=True)
+                yield f"Connection Error: Cannot reach LangGraph server. {e}"
                 return
             except requests.exceptions.Timeout:
-                yield "</thinking>\n\nError: Request timed out while starting research"
+                yield self.emit_status("Request Timeout", done=True)
+                yield "Error: Request timed out while starting research"
                 return
             except requests.exceptions.HTTPError as e:
-                yield f"</thinking>\n\nError starting research: {e}"
+                yield self.emit_status("HTTP Error", done=True)
+                yield f"Error starting research: {e}"
                 return
 
             run_data = run_response.json()
             run_id = run_data.get("run_id")
 
             if not run_id:
-                yield "</thinking>\n\nError: Failed to start research - No run ID received"
+                yield self.emit_status("Failed to start research", done=True)
+                yield "Error: Failed to start research - No run ID received"
                 return
 
             print(f"[Deep Research] Started run: {run_id}")
-            yield f"Research initiated (ID: {run_id[:8]}...)\n"
+            yield self.emit_status(f"Research started (ID: {run_id[:8]}...)")
 
             # Poll for completion
             check_run_url = (
@@ -320,7 +388,7 @@ class Pipeline:
             )
             start_time = time.time()
             last_status_time = time.time()
-            status_interval = 10  # Show status message every 10 seconds
+            status_interval = 8  # Show status message every 8 seconds
 
             print("[Deep Research] Polling for completion...")
 
@@ -337,38 +405,46 @@ class Pipeline:
 
                     if current_status == "success":
                         print("[Deep Research] Research completed successfully")
-                        yield "Finalizing research report...\n"
+                        yield self.emit_status("Finalizing research report...")
                         break
                     elif current_status in ["error", "timeout", "interrupted"]:
                         error_detail = status_data.get("error", "Unknown error")
                         print(
                             f"[Deep Research] Run failed: {current_status} - {error_detail}"
                         )
-                        yield f"</thinking>\n\nResearch failed with status: {current_status}\nDetails: {error_detail}"
+                        yield self.emit_status(
+                            f"Research failed: {current_status}", done=True
+                        )
+                        yield f"Research failed with status: {current_status}\nDetails: {error_detail}"
                         return
 
-                    # Show periodic status updates
+                    # Show periodic status updates with elapsed time
                     current_time = time.time()
                     if current_time - last_status_time >= status_interval:
                         elapsed = int(current_time - start_time)
-                        yield f"[{elapsed}s] {self.get_random_status_message()}\n"
+                        status_msg = self.get_random_status_message()
+                        yield self.emit_status(f"[{elapsed}s] {status_msg}")
                         last_status_time = current_time
 
                     time.sleep(self.valves.POLL_INTERVAL)
 
                 except requests.exceptions.RequestException as e:
                     print(f"[Deep Research] Polling error: {e}")
-                    yield "Temporary connection issue, retrying...\n"
+                    yield self.emit_status("Temporary connection issue, retrying...")
                     time.sleep(self.valves.POLL_INTERVAL)
                     continue
             else:
                 elapsed = int(time.time() - start_time)
-                yield f"</thinking>\n\nResearch timed out after {elapsed} seconds. Try increasing MAX_WAIT_TIME in pipeline settings."
+                yield self.emit_status(
+                    f"Research timed out after {elapsed}s", done=True
+                )
+                yield f"Research timed out after {elapsed} seconds. Try increasing MAX_WAIT_TIME in pipeline settings."
                 return
 
             # Fetch the final result
             join_url = f"{check_run_url}/join"
             print(f"[Deep Research] Fetching results from: {join_url}")
+            yield self.emit_status("Retrieving research results...")
 
             try:
                 result_response = requests.get(
@@ -376,11 +452,12 @@ class Pipeline:
                 )
                 result_response.raise_for_status()
             except requests.exceptions.RequestException as e:
-                yield f"</thinking>\n\nError fetching research results: {e}"
+                yield self.emit_status("Error fetching results", done=True)
+                yield f"Error fetching research results: {e}"
                 return
 
-            # Close thinking tag before the answer
-            yield "</thinking>\n\n"
+            # Mark status as done before returning the report
+            yield self.emit_status("", done=True)
 
             # Extract and return the response
             result_data = result_response.json()
@@ -410,11 +487,13 @@ class Pipeline:
         except requests.exceptions.RequestException as e:
             error_msg = f"Network error: {e}"
             print(f"[Deep Research] {error_msg}")
-            yield f"</thinking>\n\n{error_msg}"
+            yield self.emit_status("Network Error", done=True)
+            yield error_msg
         except Exception as e:
             error_msg = f"Unexpected error: {e}"
             print(f"[Deep Research] {error_msg}")
             import traceback
 
             traceback.print_exc()
-            yield f"</thinking>\n\n{error_msg}"
+            yield self.emit_status("Unexpected Error", done=True)
+            yield error_msg

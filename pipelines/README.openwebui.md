@@ -122,7 +122,8 @@ After installation, you can customize the pipeline:
 | Valve | Default | Description |
 |-------|---------|-------------|
 | `LANGGRAPH_URL` | `http://open-deep-research:2024` | LangGraph server URL. Use container name for Docker network. |
-| `ASSISTANT_ID` | `Deep Researcher` | Graph ID from langgraph.json |
+
+> **Note:** The `ASSISTANT_ID` is set statically to `"Deep Researcher"` to match the graph name in `langgraph.json` and cannot be changed via Valves.
 
 ### Polling Settings
 
