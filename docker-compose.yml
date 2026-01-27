@@ -40,7 +40,7 @@ services:
       - external-network
     
     healthcheck:
-      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://127.0.0.1:2024/docs', timeout=5)"]
+      test: ["CMD", "python", "-c", "import http.client; c=http.client.HTTPConnection('127.0.0.1',2024,timeout=5);c.request('GET','/docs');r=c.getresponse();exit(0 if r.status==200 else 1)"]
       interval: 30s
       timeout: 10s
       retries: 3

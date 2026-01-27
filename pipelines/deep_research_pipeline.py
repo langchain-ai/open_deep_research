@@ -109,20 +109,10 @@ class Pipeline:
 
     def __init__(self):
         """Initialize the pipeline with default configuration."""
-        # Pipeline identification
-        self.type = "pipe"  # Explicitly declare as pipe type (not filter)
-        self.id = "deep_research"  # Explicit ID to avoid routing issues
+        # Pipeline identification - simple pipe type (single model endpoint)
+        # Note: Do NOT set self.id - let it be inferred from filename
+        # This avoids routing issues with OpenWebUI's pipeline. prefix
         self.name = "Deep Research"
-
-        # Declare this pipeline as a model endpoint
-        # This makes it appear as a selectable "model" in OpenWebUI
-        self.pipelines = [
-            {
-                "id": "deep-research",
-                "name": "Deep Research Agent",
-                "description": "Comprehensive AI-powered research using LangGraph with parallel processing",
-            }
-        ]
 
         # Initialize valves (configuration)
         self.valves = self.Valves()
