@@ -20,7 +20,7 @@ COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 COPY tests/ ./tests/
 
-RUN uv sync && uv pip install --no-cache-dir supabase>=2.15.3
+RUN uv sync
 
 COPY --chown=appuser:appuser langgraph.json ./
 RUN chown -R appuser:appuser /app
