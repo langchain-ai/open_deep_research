@@ -80,14 +80,23 @@ async def tavily_search(
     
     # Character limit to stay within model token limits (configurable)
     max_char_to_include = configurable.max_content_length
-    
+
     # Initialize summarization model with retry logic
     model_api_key = get_api_key_for_model(configurable.summarization_model, config)
+    summarization_model_config = {
+        "model": configurable.summarization_model,
+        "max_tokens": configurable.summarization_model_max_tokens,
+        "api_key": model_api_key,
+        "tags": ["langsmith:nostream"]
+    }
+
+    # Add base_url for Z.AI models
+    base_url = get_base_url_for_model(configurable.summarization_model)
+    if base_url:
+        summarization_model_config["base_url"] = base_url
+
     summarization_model = init_chat_model(
-        model=configurable.summarization_model,
-        max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
+        **summarization_model_config
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
@@ -786,6 +795,14 @@ def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
 
 # NOTE: This may be out of date or not applicable to your models. Please update this as needed.
 MODEL_TOKEN_LIMITS = {
+    # Z.AI / GLM Models (OpenAI-compatible API)
+    "zai:glm-4.7": 128000,
+    "zai:glm-4.6": 128000,
+    "zai:glm-4.5": 128000,
+    "zai:glm-4-flash": 128000,
+    "zai:glm-4-plus": 128000,
+    "zai:glm-4-air": 128000,
+    "zai:glm-4.6v": 128000,
     "openai:gpt-4.1-mini": 1047576,
     "openai:gpt-4.1-nano": 1047576,
     "openai:gpt-4.1": 1047576,
@@ -903,15 +920,64 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return api_keys.get("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return api_keys.get("GOOGLE_API_KEY")
+        elif model_name.startswith("zai:"):
+            return api_keys.get("ZAI_API_KEY")
         return None
     else:
-        if model_name.startswith("openai:"): 
+        if model_name.startswith("openai:"):
             return os.getenv("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return os.getenv("GOOGLE_API_KEY")
+        elif model_name.startswith("zai:"):
+            return os.getenv("ZAI_API_KEY")
         return None
+
+def get_base_url_for_model(model_name: str) -> Optional[str]:
+    """Get base URL for models that require custom endpoints.
+
+    Args:
+        model_name: The model identifier string
+
+    Returns:
+        Base URL if the model requires a custom endpoint, None otherwise
+    """
+    model_name = model_name.lower()
+    if model_name.startswith("zai:"):
+        return "https://api.z.ai/api/paas/v4/"
+    return None
+
+def build_model_config(
+    model_name: str,
+    max_tokens: int,
+    config: RunnableConfig,
+    extra_tags: Optional[List[str]] = None
+) -> dict[str, Any]:
+    """Build model configuration with API key and base URL.
+
+    Args:
+        model_name: The model identifier string
+        max_tokens: Maximum output tokens for the model
+        config: Runtime configuration for API key access
+        extra_tags: Optional additional tags to include
+
+    Returns:
+        Dictionary with model configuration parameters
+    """
+    model_config = {
+        "model": model_name,
+        "max_tokens": max_tokens,
+        "api_key": get_api_key_for_model(model_name, config),
+        "tags": (extra_tags or []) + ["langsmith:nostream"]
+    }
+
+    # Add base_url for models that require custom endpoints
+    base_url = get_base_url_for_model(model_name)
+    if base_url:
+        model_config["base_url"] = base_url
+
+    return model_config
 
 def get_tavily_api_key(config: RunnableConfig):
     """Get Tavily API key from environment or config."""
