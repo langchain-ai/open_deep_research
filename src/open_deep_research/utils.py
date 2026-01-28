@@ -77,23 +77,33 @@ async def tavily_search(
     
     # Step 3: Set up the summarization model with configuration
     configurable = Configuration.from_runnable_config(config)
-    
+
     # Character limit to stay within model token limits (configurable)
     max_char_to_include = configurable.max_content_length
 
     # Initialize summarization model with retry logic
-    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model_config = {
-        "model": configurable.summarization_model,
-        "max_tokens": configurable.summarization_model_max_tokens,
-        "api_key": model_api_key,
-        "tags": ["langsmith:nostream"]
-    }
+    # Check if this is a Z.AI model (OpenAI-compatible)
+    is_zai_model = configurable.summarization_model.lower().startswith("zai:")
 
-    # Add base_url for Z.AI models
-    base_url = get_base_url_for_model(configurable.summarization_model)
-    if base_url:
-        summarization_model_config["base_url"] = base_url
+    if is_zai_model:
+        # Extract the actual model name (e.g., "zai:glm-4.7" -> "glm-4.7")
+        actual_model_name = configurable.summarization_model.split(":", 1)[1] if ":" in configurable.summarization_model else configurable.summarization_model
+        summarization_model_config = {
+            "model": actual_model_name,
+            "model_provider": "openai",  # Use OpenAI provider for Z.AI compatibility
+            "max_tokens": configurable.summarization_model_max_tokens,
+            "api_key": get_api_key_for_model(configurable.summarization_model, config),
+            "base_url": "https://api.z.ai/api/paas/v4/",  # Z.AI endpoint
+            "tags": ["langsmith:nostream"]
+        }
+    else:
+        # Standard model configuration
+        summarization_model_config = {
+            "model": configurable.summarization_model,
+            "max_tokens": configurable.summarization_model_max_tokens,
+            "api_key": get_api_key_for_model(configurable.summarization_model, config),
+            "tags": ["langsmith:nostream"]
+        }
 
     summarization_model = init_chat_model(
         **summarization_model_config
@@ -934,20 +944,6 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return os.getenv("ZAI_API_KEY")
         return None
 
-def get_base_url_for_model(model_name: str) -> Optional[str]:
-    """Get base URL for models that require custom endpoints.
-
-    Args:
-        model_name: The model identifier string
-
-    Returns:
-        Base URL if the model requires a custom endpoint, None otherwise
-    """
-    model_name = model_name.lower()
-    if model_name.startswith("zai:"):
-        return "https://api.z.ai/api/paas/v4/"
-    return None
-
 def build_model_config(
     model_name: str,
     max_tokens: int,
@@ -965,17 +961,29 @@ def build_model_config(
     Returns:
         Dictionary with model configuration parameters
     """
-    model_config = {
-        "model": model_name,
-        "max_tokens": max_tokens,
-        "api_key": get_api_key_for_model(model_name, config),
-        "tags": (extra_tags or []) + ["langsmith:nostream"]
-    }
+    # Check if this is a Z.AI model (OpenAI-compatible)
+    is_zai_model = model_name.lower().startswith("zai:")
 
-    # Add base_url for models that require custom endpoints
-    base_url = get_base_url_for_model(model_name)
-    if base_url:
-        model_config["base_url"] = base_url
+    # For Z.AI models, strip the prefix and use OpenAI provider with custom base URL
+    if is_zai_model:
+        # Extract the actual model name (e.g., "zai:glm-4.7" -> "glm-4.7")
+        actual_model_name = model_name.split(":", 1)[1] if ":" in model_name else model_name
+        model_config = {
+            "model": actual_model_name,
+            "model_provider": "openai",  # Use OpenAI provider for Z.AI compatibility
+            "max_tokens": max_tokens,
+            "api_key": get_api_key_for_model(model_name, config),
+            "base_url": "https://api.z.ai/api/paas/v4/",  # Z.AI endpoint
+            "tags": (extra_tags or []) + ["langsmith:nostream"]
+        }
+    else:
+        # Standard model configuration
+        model_config = {
+            "model": model_name,
+            "max_tokens": max_tokens,
+            "api_key": get_api_key_for_model(model_name, config),
+            "tags": (extra_tags or []) + ["langsmith:nostream"]
+        }
 
     return model_config
 
