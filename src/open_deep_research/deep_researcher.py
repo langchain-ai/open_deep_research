@@ -55,7 +55,7 @@ from open_deep_research.utils import (
 
 # Initialize a configurable model that we will use throughout the agent
 configurable_model = init_chat_model(
-    configurable_fields=("model", "max_tokens", "api_key", "base_url"),
+    configurable_fields=("model", "max_tokens", "api_key", "base_url", "model_provider"),
 )
 
 async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["write_research_brief", "__end__"]]:
