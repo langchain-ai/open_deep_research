@@ -27,6 +27,7 @@ from open_deep_research.prompts import (
     lead_researcher_prompt,
     research_system_prompt,
     transform_messages_into_research_topic_prompt,
+    guardrail_prompt,
 )
 from open_deep_research.state import (
     AgentInputState,
@@ -38,6 +39,7 @@ from open_deep_research.state import (
     ResearcherState,
     ResearchQuestion,
     SupervisorState,
+    GuardrailVerdict,
 )
 from open_deep_research.utils import (
     anthropic_websearch_called,
@@ -57,7 +59,7 @@ configurable_model = init_chat_model(
     configurable_fields=("model", "max_tokens", "api_key"),
 )
 
-async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["write_research_brief", "__end__"]]:
+async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["guardrail_check", "__end__"]]:
     """Analyze user messages and ask clarifying questions if the research scope is unclear.
     
     This function determines whether the user's request needs clarification before proceeding
@@ -74,7 +76,7 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     configurable = Configuration.from_runnable_config(config)
     if not configurable.allow_clarification:
         # Skip clarification step and proceed directly to research
-        return Command(goto="write_research_brief")
+        return Command(goto="guardrail_check")
     
     # Step 2: Prepare the model for structured clarification analysis
     messages = state["messages"]
@@ -110,10 +112,53 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     else:
         # Proceed to research with verification message
         return Command(
-            goto="write_research_brief", 
+            goto="guardrail_check", 
             update={"messages": [AIMessage(content=response.verification)]}
         )
 
+async def guardrail_check(
+    state: AgentState,
+    config: RunnableConfig
+) -> Command[Literal["write_research_brief", "__end__"]]:
+
+    configurable = Configuration.from_runnable_config(config)
+
+    guardrail_model = (
+        configurable_model
+        .with_structured_output(GuardrailVerdict)
+        .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
+        .with_config({
+            "model": configurable.guardrail_model,
+            "max_tokens": configurable.guardrail_model_max_tokens,
+            "api_key": get_api_key_for_model(configurable.guardrail_model, config),
+            "tags": ["security:guardrail"]
+        })
+    )
+
+    prompt = guardrail_prompt.format(
+        messages=get_buffer_string(state.get("messages", []))
+    )
+
+    verdict = await guardrail_model.ainvoke([
+        HumanMessage(content=prompt)
+    ])
+
+    if not verdict.allowed:
+        if configurable.guardrail_fail_closed:
+            return Command(
+                goto=END,
+                update={
+                    "messages": [
+                        AIMessage(
+                            content="Your request cannot be processed due to security policy."
+                        )
+                    ]
+                }
+            )
+    else:
+        return Command(goto="write_research_brief")
+
+    return Command(goto="write_research_brief")
 
 async def write_research_brief(state: AgentState, config: RunnableConfig) -> Command[Literal["research_supervisor"]]:
     """Transform user messages into a structured research brief and initialize supervisor.
@@ -706,6 +751,7 @@ deep_researcher_builder = StateGraph(
 
 # Add main workflow nodes for the complete research process
 deep_researcher_builder.add_node("clarify_with_user", clarify_with_user)           # User clarification phase
+deep_researcher_builder.add_node("guardrail_check", guardrail_check)
 deep_researcher_builder.add_node("write_research_brief", write_research_brief)     # Research planning phase
 deep_researcher_builder.add_node("research_supervisor", supervisor_subgraph)       # Research execution phase
 deep_researcher_builder.add_node("final_report_generation", final_report_generation)  # Report generation phase

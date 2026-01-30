@@ -1,7 +1,7 @@
 """Graph state definitions and data structures for the Deep Research agent."""
 
 import operator
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 
 from langchain_core.messages import MessageLikeRepresentation
 from langgraph.graph import MessagesState
@@ -39,6 +39,10 @@ class ClarifyWithUser(BaseModel):
     verification: str = Field(
         description="Verify message that we will start research after the user has provided the necessary information.",
     )
+
+class GuardrailVerdict(BaseModel):
+    allowed: bool
+    reasons: List[str]
 
 class ResearchQuestion(BaseModel):
     """Research question and brief for guiding research."""

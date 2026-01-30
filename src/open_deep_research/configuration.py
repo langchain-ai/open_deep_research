@@ -210,6 +210,47 @@ class Configuration(BaseModel):
             }
         }
     )
+    guardrail_model: str = Field(
+        default="openai:gpt-4o-mini",
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai:gpt-4o-mini",
+                "description": (
+                    "Model used for security guardrails and semantic validation of user input. "
+                    "This model is responsible for detecting prompt injection attempts, "
+                    "output control requests, and other policy violations before research begins. "
+                    "NOTE: This model should be fast, deterministic, and cost-efficient."
+                )
+            }
+        }
+    )
+    guardrail_model_max_tokens: int = Field(
+        default=512,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "number",
+                "default": 512,
+                "description": (
+                    "Maximum output tokens for the guardrail model. "
+                    "Guardrail responses are structured and should not require large outputs."
+                )
+            }
+        }
+    )
+    guardrail_fail_closed: bool = Field(
+        default=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "boolean",
+                "default": True,
+                "description": (
+                    "If enabled, the system will block requests that fail the guardrail check. "
+                    "If disabled, the system will proceed despite guardrail violations (not recommended)."
+                )
+            }
+        }
+    )
     # MCP server configuration
     mcp_config: Optional[MCPConfig] = Field(
         default=None,
