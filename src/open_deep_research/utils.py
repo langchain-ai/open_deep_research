@@ -4,6 +4,8 @@ import asyncio
 import logging
 import os
 import warnings
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
@@ -32,6 +34,18 @@ from tavily import AsyncTavilyClient
 from open_deep_research.configuration import Configuration, SearchAPI
 from open_deep_research.prompts import summarize_webpage_prompt
 from open_deep_research.state import ResearchComplete, Summary
+
+from azure.identity import DefaultAzureCredential
+
+# In-process cache for Azure AD tokens to avoid repeated network calls
+# keyed by scope. Protect with a lock for thread-safety.
+_AZURE_TOKEN_CACHE: dict = {
+    "token": None,
+    "expires_on": 0,
+    "credential": None,
+}
+_AZURE_TOKEN_CACHE_LOCK = threading.Lock()
+
 
 ##########################
 # Tavily Search Tool Utils
@@ -871,12 +885,18 @@ def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> l
 
 def get_today_str() -> str:
     """Get current date formatted for display in prompts and outputs.
-    
+
     Returns:
-        Human-readable date string in format like 'Mon Jan 15, 2024'
+        Human-readable date string in format like 'Mon Jan 15, 2024'.
+        Uses a fixed English abbreviation mapping to be consistent across OSes.
     """
     now = datetime.now()
-    return f"{now:%a} {now:%b} {now.day}, {now:%Y}"
+    # Use fixed English abbreviations to avoid locale/strftime differences
+    weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    weekday = weekdays[now.weekday()]  # Monday == 0
+    month = months[now.month - 1]
+    return f"{weekday} {month} {now.day}, {now.year}"
 
 def get_config_value(value):
     """Extract value from configuration, handling enums and None values."""
@@ -891,8 +911,19 @@ def get_config_value(value):
 
 def get_api_key_for_model(model_name: str, config: RunnableConfig):
     """Get API key for a specific model from environment or config."""
+    # Normalize
     should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
-    model_name = model_name.lower()
+    model_name = (model_name or "").lower()
+
+    # New: support Azure-hosted OpenAI endpoints. When model string starts with
+    # "azure_openai:" we obtain an Azure AD access token using
+    # DefaultAzureCredential and return that token. To avoid excessive network
+    # I/O, cache the token in-process until shortly before expiration.
+    if model_name.startswith("azure_openai:"):
+        scope = "https://cognitiveservices.azure.com/.default"
+        return _get_cached_azure_token(scope, config)
+
+    # Existing behavior for other providers. Prefer config keys if configured.
     if should_get_from_config.lower() == "true":
         api_keys = config.get("configurable", {}).get("apiKeys", {})
         if not api_keys:
@@ -912,6 +943,55 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
         elif model_name.startswith("google"):
             return os.getenv("GOOGLE_API_KEY")
         return None
+
+
+def _get_cached_azure_token(scope: str, config: RunnableConfig, safety_margin: int = 60):
+    """Return an Azure AD access token for the given scope, using an
+    in-process cache to minimize network calls.
+
+    Args:
+        scope: The OAuth scope to request (e.g. https://cognitiveservices.azure.com/.default)
+        config: Runtime configuration (not currently used but kept for parity)
+        safety_margin: Seconds before token expiry to proactively refresh
+
+    Returns:
+        Access token string, or None if it cannot be obtained
+    """
+    now = int(time.time())
+
+    with _AZURE_TOKEN_CACHE_LOCK:
+        token = _AZURE_TOKEN_CACHE.get("token")
+        expires_on = _AZURE_TOKEN_CACHE.get("expires_on", 0)
+        credential = _AZURE_TOKEN_CACHE.get("credential")
+
+        # If token is still valid (with safety margin), return it
+        if token and (expires_on - safety_margin) > now:
+            return token
+
+        # Otherwise, obtain or reuse a DefaultAzureCredential and fetch a new token
+        if credential is None:
+            try:
+                credential = DefaultAzureCredential()
+                _AZURE_TOKEN_CACHE["credential"] = credential
+            except Exception:
+                # If credential creation fails, do not repeatedly attempt in tight loop
+                return None
+
+        try:
+            access_token = credential.get_token(scope)
+            if not access_token:
+                return None
+
+            _AZURE_TOKEN_CACHE["token"] = access_token.token
+            # access_token.expires_on is an int POSIX timestamp in many SDKs
+            expires_on_ts = int(getattr(access_token, "expires_on", int(time.time()) + 300))
+            _AZURE_TOKEN_CACHE["expires_on"] = expires_on_ts
+
+            return access_token.token
+        except Exception:
+            # On failure, clear cached credential to allow retry later
+            _AZURE_TOKEN_CACHE["credential"] = None
+            return None
 
 def get_tavily_api_key(config: RunnableConfig):
     """Get Tavily API key from environment or config."""
