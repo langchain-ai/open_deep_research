@@ -96,11 +96,25 @@ CORRECTNESS_PROMPT = """You are evaluating the correctness of a research report 
 
 You will be provided with the question, the report, and the answer from an independent authority.
 
-Score the report from 1-5 on how well it mirrors the answer from the authority. 
+Score the report from 1-5 on how well it mirrors the answer from the authority.
 We expect the report to contain more information that is not in the answer, that's perfectly okay.
 They likely won't be perfectly the same, but they should have the same themes and ideas to get a high score.
 
 Use your best judgement when comparing the answer to the report!
+
+<user_question>
+{user_question}
+</user_question>
+
+<report>
+{report}
+</report>
+
+<answer>
+{answer}
+</answer>
+
+Today is {today}
 """
 
 RELEVANCE_PROMPT = """You are evaluating the relevance of a response to a user's input question. Please assess the answer against the following criteria, being especially strict about section relevance.
