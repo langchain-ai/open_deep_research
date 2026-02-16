@@ -117,6 +117,18 @@ class Configuration(BaseModel):
             }
         }
     )
+    tavily_timeout: int = Field(
+        default=60,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "number",
+                "default": 60,
+                "min": 1,
+                "max": 300,
+                "description": "Timeout for Tavily search in seconds."
+            }
+        }
+    )
     # Model Configuration
     summarization_model: str = Field(
         default="openai:gpt-4.1-mini",
