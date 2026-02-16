@@ -39,6 +39,16 @@ class Configuration(BaseModel):
     """Main configuration class for the Deep Research agent."""
     
     # General Configuration
+    force_think_tool: bool = Field(
+        default=False,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "boolean",
+                "default": False,
+                "description": "Require agents to call think_tool before executing other tools"
+            }
+        }
+    )
     max_structured_output_retries: int = Field(
         default=3,
         metadata={
