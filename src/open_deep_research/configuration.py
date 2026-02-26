@@ -14,6 +14,7 @@ class SearchAPI(Enum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     TAVILY = "tavily"
+    SEARXNG = "searxng"
     NONE = "none"
 
 class MCPConfig(BaseModel):
@@ -85,6 +86,7 @@ class Configuration(BaseModel):
                 "options": [
                     {"label": "Tavily", "value": SearchAPI.TAVILY.value},
                     {"label": "OpenAI Native Web Search", "value": SearchAPI.OPENAI.value},
+                    {"label": "SearxNG (local)", "value": SearchAPI.SEARXNG.value},
                     {"label": "Anthropic Native Web Search", "value": SearchAPI.ANTHROPIC.value},
                     {"label": "None", "value": SearchAPI.NONE.value}
                 ]
