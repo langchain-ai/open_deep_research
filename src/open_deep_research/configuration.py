@@ -13,6 +13,7 @@ class SearchAPI(Enum):
     
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
+    AZURE_OPENAI = "azure_openai"
     TAVILY = "tavily"
     NONE = "none"
 
@@ -85,6 +86,7 @@ class Configuration(BaseModel):
                 "options": [
                     {"label": "Tavily", "value": SearchAPI.TAVILY.value},
                     {"label": "OpenAI Native Web Search", "value": SearchAPI.OPENAI.value},
+                    {"label": "Azure OpenAI Native Web Search", "value": SearchAPI.AZURE_OPENAI.value},
                     {"label": "Anthropic Native Web Search", "value": SearchAPI.ANTHROPIC.value},
                     {"label": "None", "value": SearchAPI.NONE.value}
                 ]
@@ -207,6 +209,37 @@ class Configuration(BaseModel):
                 "type": "number",
                 "default": 10000,
                 "description": "Maximum output tokens for final report model"
+            }
+        }
+    )
+    # Azure OpenAI Configuration
+    azure_endpoint: Optional[str] = Field(
+        default=None,
+        optional=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "description": "Azure OpenAI endpoint URL (e.g., https://your-resource.openai.azure.com/)"
+            }
+        }
+    )
+    deployment_name: Optional[str] = Field(
+        default=None,
+        optional=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "description": "Azure OpenAI deployment name"
+            }
+        }
+    )
+    api_version: Optional[str] = Field(
+        default="2024-02-15-preview",
+        optional=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "description": "Azure OpenAI API version"
             }
         }
     )
