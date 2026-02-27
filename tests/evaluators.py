@@ -1,13 +1,21 @@
+import os
 from typing import cast
+from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from open_deep_research.utils import get_today_str
 from tests.prompts import RELEVANCE_PROMPT, STRUCTURE_PROMPT, GROUNDEDNESS_PROMPT, OVERALL_QUALITY_PROMPT, CORRECTNESS_PROMPT, COMPLETENESS_PROMPT
 
-eval_model = ChatOpenAI(
-    model="gpt-4.1",
-)
+# eval_model = ChatOpenAI(
+#     model="gpt-4.1",
+# )
+
+eval_model = ChatGroq( 
+    model="openai/gpt-oss-120b", 
+    temperature=0, 
+    max_tokens=1000,
+    groq_api_key=os.getenv("GROQ_API_KEY"))
 
 def _format_input_query(inputs: dict) -> str:
     messages = inputs["messages"]
