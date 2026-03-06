@@ -366,3 +366,24 @@ Remember, your goal is to create a summary that can be easily understood and uti
 
 Today's date is {date}.
 """
+
+
+
+force_think_tool_supervisor_before_conduct_research_reminder = (
+    "Before delegating any research with ConductResearch you must first call think_tool to "
+    "plan your approach. Reflect with think_tool, then decide whether to delegate."
+)
+
+force_think_tool_supervisor_after_conduct_research_reminder = (
+    "After calling ConductResearch, you must call think_tool to reflect on the results. "
+    "Use think_tool now to analyze progress and plan the next action."
+)
+
+force_think_tool_researcher_after_call_search_tool_reminder = (
+    "You must call think_tool to reflect on the latest findings before using other tools. "
+    "Use think_tool now to analyze progress and plan the next action."
+)
+
+has_mixed_think_tool_calls_reminder = (
+    "You cannot call think_tool in parallel with other tools. Please call think_tool first, then call the other tools."
+)
