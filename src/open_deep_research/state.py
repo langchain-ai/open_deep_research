@@ -151,6 +151,9 @@ class AgentState(MessagesState):
     # `final_report` 保存最终生成的完整报告文本。
     final_report: str
 
+    # `api_response` 保存 API 友好的结构化返回体。
+    api_response: dict | None = None
+
 
 # 定义 supervisor 节点使用的状态结构。
 # 这里用 `TypedDict`，说明它本质上是一个受类型约束的字典。

@@ -45,6 +45,23 @@ class EvidencePriorityStrategy(Enum):
     LOCAL_FIRST = "local_first"
     FRESHNESS_FIRST = "freshness_first"
 
+
+class MemoryMode(Enum):
+    """Enumeration of memory modes exposed to API callers."""
+
+    OFF = "off"
+    SESSION_ONLY = "session_only"
+    LONG_TERM_ONLY = "long_term_only"
+    BOTH = "both"
+
+
+class RagScope(Enum):
+    """Enumeration of RAG scopes exposed to API callers."""
+
+    DISABLED = "disabled"
+    LOCAL_ONLY = "local_only"
+    HYBRID = "hybrid"
+
 class MCPConfig(BaseModel):
     """Configuration for Model Context Protocol (MCP) servers."""
     
@@ -352,6 +369,47 @@ class Configuration(BaseModel):
                     {"label": "Local first", "value": EvidencePriorityStrategy.LOCAL_FIRST.value},
                     {"label": "Freshness first", "value": EvidencePriorityStrategy.FRESHNESS_FIRST.value}
                 ]
+            }
+        }
+    )
+    memory_mode: MemoryMode = Field(
+        default=MemoryMode.BOTH,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "select",
+                "default": MemoryMode.BOTH.value,
+                "description": "Runtime memory mode for API calls.",
+                "options": [
+                    {"label": "Off", "value": MemoryMode.OFF.value},
+                    {"label": "Session only", "value": MemoryMode.SESSION_ONLY.value},
+                    {"label": "Long-term only", "value": MemoryMode.LONG_TERM_ONLY.value},
+                    {"label": "Both", "value": MemoryMode.BOTH.value}
+                ]
+            }
+        }
+    )
+    rag_scope: RagScope = Field(
+        default=RagScope.HYBRID,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "select",
+                "default": RagScope.HYBRID.value,
+                "description": "Runtime RAG scope for API calls.",
+                "options": [
+                    {"label": "Disabled", "value": RagScope.DISABLED.value},
+                    {"label": "Local only", "value": RagScope.LOCAL_ONLY.value},
+                    {"label": "Hybrid", "value": RagScope.HYBRID.value}
+                ]
+            }
+        }
+    )
+    api_include_progress: bool = Field(
+        default=True,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "boolean",
+                "default": True,
+                "description": "Include progress section in API response payload."
             }
         }
     )

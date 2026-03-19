@@ -11,13 +11,13 @@
 # `asyncio` 是 Python 的异步并发库。
 # 这里会用它并行执行多个 researcher 子任务。
 import asyncio
-from datetime import datetime, timezone
 import re
-from urllib.parse import urlparse
+from datetime import datetime, timezone
 
 # `Literal` 用来声明“只能返回固定几个字符串值”。
 # 这里主要用于给 `Command[...]` 标注合法跳转目标。
 from typing import Literal
+from urllib.parse import urlparse
 
 # `init_chat_model` 用来创建可配置的大语言模型实例。
 # 这个项目里所有节点基本都通过它来派生自己的模型。
@@ -52,7 +52,10 @@ from langgraph.types import Command
 from open_deep_research.configuration import (
     Configuration,
     EvidencePriorityStrategy,
+    MemoryMode,
     MemoryWritePolicy,
+    RagScope,
+    SearchAPI,
 )
 
 # 导入各种 prompt 模板。
@@ -333,6 +336,120 @@ def _build_long_term_memory_clear_update() -> dict:
     }
 
 
+def _resolve_memory_mode(configurable: Configuration) -> MemoryMode:
+    """Resolve memory mode from configuration value with safe fallback."""
+    mode = configurable.memory_mode
+    if isinstance(mode, MemoryMode):
+        return mode
+    try:
+        return MemoryMode(str(mode))
+    except Exception:
+        return MemoryMode.BOTH
+
+
+def _resolve_rag_scope(configurable: Configuration) -> RagScope:
+    """Resolve RAG scope from configuration value with safe fallback."""
+    scope = configurable.rag_scope
+    if isinstance(scope, RagScope):
+        return scope
+    try:
+        return RagScope(str(scope))
+    except Exception:
+        return RagScope.HYBRID
+
+
+def _is_session_memory_active(configurable: Configuration) -> bool:
+    """Whether session memory is active under current memory mode."""
+    if not configurable.memory_enabled:
+        return False
+    return _resolve_memory_mode(configurable) in {MemoryMode.SESSION_ONLY, MemoryMode.BOTH}
+
+
+def _is_long_term_memory_active(configurable: Configuration) -> bool:
+    """Whether long-term memory is active under current memory mode."""
+    if not configurable.memory_enabled:
+        return False
+    return _resolve_memory_mode(configurable) in {MemoryMode.LONG_TERM_ONLY, MemoryMode.BOTH}
+
+
+def _is_local_rag_active(configurable: Configuration) -> bool:
+    """Whether local RAG should be active for the current request."""
+    if not configurable.rag_enabled:
+        return False
+    return _resolve_rag_scope(configurable) in {RagScope.LOCAL_ONLY, RagScope.HYBRID}
+
+
+def _build_effective_tools_config(config: RunnableConfig, configurable: Configuration) -> RunnableConfig:
+    """Apply PR-7 rag_scope runtime overrides before tool assembly."""
+    scope = _resolve_rag_scope(configurable)
+    config_dict = dict(config or {})
+    configurable_dict = dict(config_dict.get("configurable", {}))
+
+    if scope == RagScope.DISABLED:
+        configurable_dict["rag_enabled"] = False
+    elif scope == RagScope.LOCAL_ONLY:
+        configurable_dict["search_api"] = SearchAPI.NONE.value
+
+    config_dict["configurable"] = configurable_dict
+    return config_dict
+
+
+def _extract_token_usage_from_message(message: AIMessage) -> dict[str, int]:
+    """Extract normalized token usage from an AI message when available."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+
+    usage_metadata = getattr(message, "usage_metadata", None)
+    if isinstance(usage_metadata, dict):
+        usage["input_tokens"] = int(usage_metadata.get("input_tokens", 0) or 0)
+        usage["output_tokens"] = int(usage_metadata.get("output_tokens", 0) or 0)
+        usage["total_tokens"] = int(
+            usage_metadata.get(
+                "total_tokens",
+                usage["input_tokens"] + usage["output_tokens"],
+            )
+            or 0
+        )
+        return usage
+
+    response_metadata = getattr(message, "response_metadata", None)
+    if isinstance(response_metadata, dict):
+        raw_usage = response_metadata.get("usage")
+        if isinstance(raw_usage, dict):
+            usage["input_tokens"] = int(raw_usage.get("input_tokens", 0) or 0)
+            usage["output_tokens"] = int(raw_usage.get("output_tokens", 0) or 0)
+            usage["total_tokens"] = int(
+                raw_usage.get("total_tokens", usage["input_tokens"] + usage["output_tokens"])
+                or 0
+            )
+    return usage
+
+
+def _build_api_sources_and_ids(
+    notes: list[str],
+    confirmed_preferences: list[str],
+    configurable: Configuration,
+) -> tuple[list[dict], list[str]]:
+    """Build API-friendly source metadata list and aligned citation ids."""
+    items = _build_evidence_items(notes, confirmed_preferences)
+    ranked = _dedupe_and_rank_evidence(items, configurable.evidence_priority_strategy)
+
+    sources: list[dict] = []
+    citation_ids: list[str] = []
+    for idx, item in enumerate(ranked, start=1):
+        citation = f"SRC-{idx:03d}"
+        citation_ids.append(citation)
+        sources.append(
+            {
+                "id": citation,
+                "channel": item.get("channel", "web"),
+                "source": item.get("source", "unknown"),
+                "updated_at": item.get("updated_at"),
+            }
+        )
+
+    return sources, citation_ids
+
+
 def _normalize_source_for_key(source: str) -> str:
     """Normalize source string for deduplication and grouping."""
     value = (source or "").strip()
@@ -599,7 +716,7 @@ async def _process_long_term_memory_turn(
     store_override=None,
 ) -> dict:
     """Generate candidates, handle explicit confirmation, and manage long-term memory updates."""
-    if not configurable.memory_enabled:
+    if not _is_long_term_memory_active(configurable):
         return {}
 
     existing_pending_candidates = [
@@ -669,22 +786,30 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     # 第 1 步：读取运行时配置，确认是否允许向用户追问澄清问题。
     configurable = Configuration.from_runnable_config(config)
     messages = state.get("messages", [])
+    session_memory_active = _is_session_memory_active(configurable)
+    long_term_memory_active = _is_long_term_memory_active(configurable)
 
-    long_term_memory_update = await _process_long_term_memory_turn(
-        messages=messages,
-        existing_pending_candidates=state.get("memory_candidates_pending_confirmation", []),
-        existing_confirmed_preferences=state.get("confirmed_long_term_preferences", []),
-        configurable=configurable,
-        config=config,
-    )
+    if long_term_memory_active:
+        long_term_memory_update = await _process_long_term_memory_turn(
+            messages=messages,
+            existing_pending_candidates=state.get("memory_candidates_pending_confirmation", []),
+            existing_confirmed_preferences=state.get("confirmed_long_term_preferences", []),
+            configurable=configurable,
+            config=config,
+        )
+    else:
+        long_term_memory_update = _build_long_term_memory_clear_update()
 
     if not configurable.allow_clarification:
-        memory_update = _build_session_memory_update(
-            messages,
-            "Clarification disabled by configuration; proceeding with available user context.",
-            state.get("session_temporary_preferences", []),
-            state.get("session_key_context", []),
-        )
+        if session_memory_active:
+            memory_update = _build_session_memory_update(
+                messages,
+                "Clarification disabled by configuration; proceeding with available user context.",
+                state.get("session_temporary_preferences", []),
+                state.get("session_key_context", []),
+            )
+        else:
+            memory_update = _build_session_memory_clear_update()
         # 如果配置里禁止澄清，就直接跳过这一阶段，进入研究简报节点。
         return Command(goto="write_research_brief", update={**memory_update, **long_term_memory_update})
 
@@ -716,24 +841,30 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     
     # 第 5 步：根据结构化结果决定下一跳。
     if response.need_clarification:
-        memory_update = _build_session_memory_update(
-            messages,
-            response.question,
-            state.get("session_temporary_preferences", []),
-            state.get("session_key_context", []),
-        )
+        if session_memory_active:
+            memory_update = _build_session_memory_update(
+                messages,
+                response.question,
+                state.get("session_temporary_preferences", []),
+                state.get("session_key_context", []),
+            )
+        else:
+            memory_update = _build_session_memory_clear_update()
         # 如果需要澄清，就把提问写成 AIMessage 并结束本轮流程，等待用户回复。
         return Command(
             goto=END, 
             update={"messages": [AIMessage(content=response.question)], **memory_update, **long_term_memory_update}
         )
     else:
-        memory_update = _build_session_memory_update(
-            messages,
-            response.verification,
-            state.get("session_temporary_preferences", []),
-            state.get("session_key_context", []),
-        )
+        if session_memory_active:
+            memory_update = _build_session_memory_update(
+                messages,
+                response.verification,
+                state.get("session_temporary_preferences", []),
+                state.get("session_key_context", []),
+            )
+        else:
+            memory_update = _build_session_memory_clear_update()
         # 如果不需要澄清，就给出确认消息，然后进入研究简报生成阶段。
         return Command(
             goto="write_research_brief", 
@@ -757,6 +888,8 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     """
     # 第 1 步：读取运行时配置。
     configurable = Configuration.from_runnable_config(config)
+    session_memory_active = _is_session_memory_active(configurable)
+    long_term_memory_active = _is_long_term_memory_active(configurable)
 
     # 为“研究简报生成”准备模型配置。
     research_model_config = {
@@ -776,13 +909,15 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     )
     
     # 第 3 步：把消息历史整理成 prompt，请模型生成一份更清晰的研究简报。
-    session_memory_block = _build_session_memory_prompt_block(
-        state.get("session_clarification_summary"),
-        state.get("session_temporary_preferences", []),
-        state.get("session_key_context", []),
-    )
+    session_memory_block = ""
+    if session_memory_active:
+        session_memory_block = _build_session_memory_prompt_block(
+            state.get("session_clarification_summary"),
+            state.get("session_temporary_preferences", []),
+            state.get("session_key_context", []),
+        )
     confirmed_persistent_preferences: list[dict[str, str]] = []
-    if configurable.memory_enabled:
+    if long_term_memory_active:
         confirmed_persistent_preferences = await _load_long_term_preferences(
             configurable,
             config,
@@ -1076,7 +1211,8 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     
     # 第 2 步：加载 researcher 当前可用的所有工具。
     # 这些工具可能包括搜索 API、MCP 工具等。
-    tools = await get_all_tools(config)
+    effective_tools_config = _build_effective_tools_config(config, configurable)
+    tools = await get_all_tools(effective_tools_config)
     if len(tools) == 0:
         # 如果一个工具都没有，就无法做研究，直接抛出错误。
         raise ValueError(
@@ -1095,7 +1231,7 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     # 第 4 步：构造 researcher 的系统提示词。
     # 如果配置里有 `mcp_prompt`，这里会一起注入上下文。
     rag_usage_instructions = ""
-    if configurable.rag_enabled:
+    if _is_local_rag_active(configurable):
         rag_usage_instructions = (
             "3. **rag_search**: Search the local knowledge base first when the topic may rely on personal or internal documents"
         )
@@ -1179,7 +1315,8 @@ async def researcher_tools(state: ResearcherState, config: RunnableConfig) -> Co
         return Command(goto="compress_research")
     
     # 第 3 步：重新加载工具，并建立“工具名 -> 工具对象”的映射表。
-    tools = await get_all_tools(config)
+    effective_tools_config = _build_effective_tools_config(config, configurable)
+    tools = await get_all_tools(effective_tools_config)
     tools_by_name = {
         tool.name if hasattr(tool, "name") else tool.get("name", "web_search"): tool 
         for tool in tools
@@ -1341,7 +1478,18 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
     # 第 1 步：从主状态中读取 supervisor 汇总好的 `notes`。
     configurable = Configuration.from_runnable_config(config)
     notes = state.get("notes", [])
-    confirmed_preferences = state.get("confirmed_long_term_preferences", [])
+    memory_mode_value = _resolve_memory_mode(configurable)
+    rag_scope_value = _resolve_rag_scope(configurable)
+    confirmed_preferences = (
+        state.get("confirmed_long_term_preferences", [])
+        if _is_long_term_memory_active(configurable)
+        else []
+    )
+    api_sources, citation_ids = _build_api_sources_and_ids(
+        notes=notes,
+        confirmed_preferences=confirmed_preferences,
+        configurable=configurable,
+    )
 
     # 这里预先构造一个“清空 notes”的更新对象。
     # 因为 `notes` 在 state.py 里不是普通赋值，而是通过 reducer 合并，
@@ -1399,9 +1547,39 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
             # - `final_report`：报告正文
             # - `messages`：把这次生成结果也放回消息历史
             # - `cleared_state`：清空 notes
+            token_usage = _extract_token_usage_from_message(final_report)
+            api_response = {
+                "report": final_report.content,
+                "sources": api_sources,
+                "cost": {
+                    "model": configurable.final_report_model,
+                    "token_usage": token_usage,
+                    "estimated_cost_usd": None,
+                },
+                "meta": {
+                    "memory_mode": memory_mode_value.value,
+                    "rag_scope": rag_scope_value.value,
+                    "citation_ids": citation_ids,
+                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                },
+            }
+            if configurable.api_include_progress:
+                api_response["progress"] = {
+                    "status": "completed",
+                    "stages": [
+                        "clarification",
+                        "brief",
+                        "supervisor",
+                        "final_report",
+                    ],
+                    "notes_collected": len(notes),
+                    "sources_collected": len(api_sources),
+                }
+
             return {
                 "final_report": final_report.content, 
                 "messages": [final_report],
+                "api_response": api_response,
                 **cleared_state
             }
             
@@ -1433,6 +1611,19 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
                 return {
                     "final_report": f"Error generating final report: {e}",
                     "messages": [AIMessage(content="Report generation failed due to an error")],
+                    "api_response": {
+                        "error": str(e),
+                        "sources": api_sources,
+                        "cost": {
+                            "model": configurable.final_report_model,
+                            "token_usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+                            "estimated_cost_usd": None,
+                        },
+                        "meta": {
+                            "memory_mode": memory_mode_value.value,
+                            "rag_scope": rag_scope_value.value,
+                        },
+                    },
                     **cleared_state
                 }
     
@@ -1440,6 +1631,19 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
     return {
         "final_report": "Error generating final report: Maximum retries exceeded",
         "messages": [AIMessage(content="Report generation failed after maximum retries")],
+        "api_response": {
+            "error": "maximum_retries_exceeded",
+            "sources": api_sources,
+            "cost": {
+                "model": configurable.final_report_model,
+                "token_usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+                "estimated_cost_usd": None,
+            },
+            "meta": {
+                "memory_mode": memory_mode_value.value,
+                "rag_scope": rag_scope_value.value,
+            },
+        },
         **cleared_state
     }
 
