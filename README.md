@@ -57,6 +57,39 @@ This will open the LangGraph Studio UI in your browser.
 
 Ask a question in the `messages` input field and click `Submit`. Select different configuration in the "Manage Assistants" tab.
 
+### What This Version Adds (Fork Highlights)
+
+This branch extends the original Open Deep Research with a practical "personalized research assistant" workflow. The key additions are:
+
+- Local knowledge retrieval (RAG) with Chroma, including ingestion for `md/txt/pdf/docx`
+- Session memory (short-term) for turn-to-turn preference carryover
+- Long-term memory with explicit confirmation before write
+- Unified evidence appendices and citation ids for traceability
+- Runtime controls for API use (`user_id`, memory mode, RAG scope)
+- Expanded evaluation suite (quality + personalization + memory usefulness + source diversity)
+
+If you are reviewing this project as an interviewer, the implementation demonstrates:
+
+- End-to-end product thinking (feature design -> acceptance tests -> regression checks)
+- Config-driven architecture instead of hardcoded behavior
+- Safety and observability defaults (explicit memory confirmation, traceable sources)
+- Practical evaluation engineering with matrix comparisons and baseline summaries
+
+### 5-Minute Demo (For Interviewers)
+
+1. Start server:
+
+```bash
+uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --allow-blocking
+```
+
+2. Open Studio and ask: "Please answer in Chinese, concise style, and avoid tables."
+3. Ask a second question in the same thread to verify preference carryover.
+4. If memory is enabled, send: "确认记忆" (or "confirm memory") and start a new thread to check persistent preference reuse.
+5. Ask a local-doc question (after ingestion) and confirm report citations include local evidence.
+
+Expected outcome: style personalization works, local retrieval works, and critical conclusions can be traced to evidence.
+
 ### ⚙️ Configurations
 
 #### LLM :brain:
@@ -117,7 +150,35 @@ MEMORY_MAX_CANDIDATES_PER_TURN=3
 MEMORY_NAMESPACE_PREFIX=memory
 ```
 
-These settings establish the implementation path for local knowledge and memory in upcoming iterations while remaining backward compatible with existing deep research flows.
+These settings are implemented in this branch and remain backward compatible with existing deep research flows.
+
+#### Typical User Workflow (Non-Technical Friendly)
+
+1. Put your files under a folder (example: `./documents`).
+2. Build local index once:
+
+```bash
+python -m open_deep_research.ingestion --source ./documents --rebuild
+```
+
+3. Start server:
+
+```bash
+uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --allow-blocking
+```
+
+4. Open Studio and ask your question.
+5. Add new files later? Re-run ingestion without rebuild:
+
+```bash
+python -m open_deep_research.ingestion --source ./documents
+```
+
+Notes:
+
+- `--rebuild` clears existing local index first.
+- Ingestion is idempotent at file level (same source path is replaced, not duplicated).
+- Supported file types: `md`, `txt`, `pdf`, `docx`.
 
 #### Build Local Knowledge Base (Chroma)
 
@@ -153,6 +214,32 @@ The dataset is available on [LangSmith via this link](https://smith.langchain.co
 # Run comprehensive evaluation on LangSmith datasets
 python tests/run_evaluate.py
 ```
+
+To run matrix evaluation for regression comparison (RAG on/off x Memory on/off), set:
+
+```bash
+ODR_PR8_MATRIX=true
+```
+
+Then execute:
+
+```bash
+python tests/run_evaluate.py
+```
+
+This produces per-variant outputs and regression summaries (including P50/P95 latency and token cost baselines).
+
+#### Local Acceptance Checks (Fast)
+
+Before sharing/demoing, run these checks:
+
+```bash
+python tests/pr8_acceptance/validate_pr8.py
+python tests/pr1_pr3_acceptance/validate_pr1_pr3.py
+python tests/pr4_acceptance/validate_pr4.py
+```
+
+These validate core configuration, ingestion/RAG behavior, session-memory behavior, and PR-8 evaluator extensions.
 
 This will provide a link to a LangSmith experiment, which will have a name `YOUR_EXPERIMENT_NAME`. Once this is done, extract the results to a JSONL file that can be submitted to the Deep Research Bench.
 
