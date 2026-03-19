@@ -11,8 +11,9 @@
 # `asyncio` 是 Python 的异步并发库。
 # 这里会用它并行执行多个 researcher 子任务。
 import asyncio
-import re
 from datetime import datetime, timezone
+import re
+from urllib.parse import urlparse
 
 # `Literal` 用来声明“只能返回固定几个字符串值”。
 # 这里主要用于给 `Command[...]` 标注合法跳转目标。
@@ -50,6 +51,7 @@ from langgraph.types import Command
 # 它负责把外部传入的运行参数转换成统一的 Python 对象。
 from open_deep_research.configuration import (
     Configuration,
+    EvidencePriorityStrategy,
     MemoryWritePolicy,
 )
 
@@ -329,6 +331,211 @@ def _build_long_term_memory_clear_update() -> dict:
         "memory_candidates_pending_confirmation": {"type": "override", "value": []},
         "confirmed_long_term_preferences": {"type": "override", "value": []},
     }
+
+
+def _normalize_source_for_key(source: str) -> str:
+    """Normalize source string for deduplication and grouping."""
+    value = (source or "").strip()
+    if not value:
+        return "unknown"
+    if value.startswith("http://") or value.startswith("https://"):
+        parsed = urlparse(value)
+        return f"{parsed.netloc}{parsed.path}".lower()
+    return value.lower()
+
+
+def _extract_updated_at_from_note(note: str) -> str | None:
+    """Extract UpdatedAt line value from a note block."""
+    match = re.search(r"UpdatedAt:\s*([^\n]+)", note)
+    if not match:
+        return None
+    return match.group(1).strip()
+
+
+def _extract_urls(note: str) -> list[str]:
+    """Extract URLs from a note block."""
+    return re.findall(r"https?://[^\s)\]>]+", note)
+
+
+def _detect_channel(note: str, source: str) -> str:
+    """Detect evidence channel from note/source content."""
+    lowered_note = note.lower()
+    lowered_source = source.lower()
+    if "long-term-memory" in lowered_source or "memory" in lowered_source:
+        return "memory"
+    if "local source" in lowered_note or "source:" in lowered_note and ("\\" in source or "/" in source and not source.startswith("http")):
+        return "local"
+    if source.startswith("http://") or source.startswith("https://"):
+        return "web"
+    return "web"
+
+
+def _build_claim_key(excerpt: str) -> str:
+    """Build a lightweight claim key for conflict detection."""
+    lines = [line.strip() for line in (excerpt or "").splitlines() if line.strip()]
+    filtered_lines = [
+        line
+        for line in lines
+        if not line.lower().startswith(("source:", "updatedat:", "url:", "--- local source"))
+    ]
+    first_line = filtered_lines[0] if filtered_lines else (lines[0] if lines else "")
+    first_line = first_line.strip()
+    first_line = re.sub(r"^(content|summary)\s*[:：]\s*", "", first_line, flags=re.IGNORECASE)
+    kv_match = re.match(r"([A-Za-z0-9_\u4e00-\u9fff\s]{3,40})\s*[:：]\s*(.+)", first_line)
+    if kv_match:
+        return kv_match.group(1).strip().lower()
+    prefix = re.sub(r"\s+", " ", first_line.lower())
+    return prefix[:40]
+
+
+def _build_evidence_items(notes: list[str], confirmed_preferences: list[str]) -> list[dict]:
+    """Parse raw notes and memory preferences into unified evidence items."""
+    items: list[dict] = []
+
+    for pref in confirmed_preferences:
+        pref_text = str(pref).strip()
+        if not pref_text:
+            continue
+        items.append(
+            {
+                "channel": "memory",
+                "source": "long-term-memory",
+                "updated_at": None,
+                "excerpt": pref_text,
+                "claim_key": _build_claim_key(pref_text),
+            }
+        )
+
+    for note in notes:
+        text = str(note or "").strip()
+        if not text:
+            continue
+
+        sources = []
+        source_matches = re.findall(r"Source:\s*([^\n]+)", text)
+        for match in source_matches:
+            normalized = match.strip()
+            if normalized:
+                sources.append(normalized)
+        sources.extend(_extract_urls(text))
+        if not sources:
+            sources = ["unknown"]
+
+        updated_at = _extract_updated_at_from_note(text)
+        semantic_match = re.search(r"(?:Content|Summary)\s*[:：]\s*([^\n]+)", text, flags=re.IGNORECASE)
+        excerpt = semantic_match.group(1).strip() if semantic_match else text[:260]
+        for source in sources:
+            items.append(
+                {
+                    "channel": _detect_channel(text, source),
+                    "source": source,
+                    "updated_at": updated_at,
+                    "excerpt": excerpt,
+                    "claim_key": _build_claim_key(excerpt),
+                }
+            )
+
+    return items
+
+
+def _compute_evidence_score(item: dict, strategy: EvidencePriorityStrategy) -> float:
+    """Compute ranking score for evidence according to configured strategy."""
+    channel = item.get("channel", "web")
+    channel_score = {"local": 3.0, "memory": 2.0, "web": 1.0}.get(channel, 1.0)
+
+    recency_score = 0.0
+    updated_at = item.get("updated_at")
+    if updated_at:
+        try:
+            dt = datetime.fromisoformat(str(updated_at).replace("Z", "+00:00"))
+            age_hours = max((datetime.now(timezone.utc) - dt).total_seconds() / 3600.0, 0.0)
+            recency_score = max(0.0, 1000.0 - age_hours)
+        except Exception:
+            recency_score = 0.0
+
+    if strategy == EvidencePriorityStrategy.FRESHNESS_FIRST:
+        return recency_score + channel_score
+    return channel_score * 1000.0 + recency_score
+
+
+def _dedupe_and_rank_evidence(
+    items: list[dict],
+    strategy: EvidencePriorityStrategy,
+) -> list[dict]:
+    """Deduplicate evidence and sort by strategy score descending."""
+    deduped: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for item in items:
+        source_key = _normalize_source_for_key(str(item.get("source", "unknown")))
+        excerpt_key = re.sub(r"\s+", " ", str(item.get("excerpt", "")).lower())[:120]
+        key = (source_key, excerpt_key)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(item)
+
+    return sorted(
+        deduped,
+        key=lambda x: _compute_evidence_score(x, strategy),
+        reverse=True,
+    )
+
+
+def _detect_conflicts(items: list[dict]) -> list[str]:
+    """Detect simple conflicting claims across evidence using claim key buckets."""
+    buckets: dict[str, set[str]] = {}
+    for item in items:
+        key = str(item.get("claim_key", "")).strip()
+        excerpt = re.sub(r"\s+", " ", str(item.get("excerpt", "")).strip())
+        if not key or not excerpt:
+            continue
+        buckets.setdefault(key, set()).add(excerpt[:120])
+
+    conflicts: list[str] = []
+    for key, values in buckets.items():
+        if len(values) > 1:
+            conflicts.append(
+                f"Claim '{key}' has divergent statements across sources; keep uncertainty and cite both sides."
+            )
+    return conflicts
+
+
+def _build_traceable_evidence_appendix(
+    notes: list[str],
+    confirmed_preferences: list[str],
+    configurable: Configuration,
+) -> tuple[str, list[str]]:
+    """Build traceable evidence appendix and return citation ids."""
+    items = _build_evidence_items(notes, confirmed_preferences)
+    ranked = _dedupe_and_rank_evidence(items, configurable.evidence_priority_strategy)
+    conflicts = _detect_conflicts(ranked)
+
+    if not ranked:
+        return "", []
+
+    citation_ids: list[str] = []
+    lines = ["<UnifiedEvidence>"]
+    for idx, item in enumerate(ranked, start=1):
+        citation = f"SRC-{idx:03d}"
+        citation_ids.append(citation)
+        channel = item.get("channel", "web")
+        source = item.get("source", "unknown")
+        updated_at = item.get("updated_at") or "unknown"
+        excerpt = str(item.get("excerpt", "")).replace("\n", " ")[:220]
+        lines.append(f"[{citation}] channel={channel} source={source} updated_at={updated_at}")
+        lines.append(f"Excerpt: {excerpt}")
+    lines.append("</UnifiedEvidence>")
+
+    if conflicts:
+        lines.append("<ConflictHandling>")
+        lines.extend([f"- {line}" for line in conflicts])
+        lines.append("</ConflictHandling>")
+
+    lines.append("<CitationRule>")
+    lines.append("Use [SRC-xxx] markers from UnifiedEvidence for every critical conclusion.")
+    lines.append("</CitationRule>")
+
+    return "\n".join(lines), citation_ids
 
 
 async def _load_long_term_preferences(
@@ -1132,7 +1339,9 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
         Dictionary containing the final report and cleared state
     """
     # 第 1 步：从主状态中读取 supervisor 汇总好的 `notes`。
+    configurable = Configuration.from_runnable_config(config)
     notes = state.get("notes", [])
+    confirmed_preferences = state.get("confirmed_long_term_preferences", [])
 
     # 这里预先构造一个“清空 notes”的更新对象。
     # 因为 `notes` 在 state.py 里不是普通赋值，而是通过 reducer 合并，
@@ -1145,9 +1354,15 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
 
     # 把多条笔记拼成一个大字符串，供写报告模型使用。
     findings = "\n".join(notes)
-    
+    evidence_appendix, _ = _build_traceable_evidence_appendix(
+        notes=notes,
+        confirmed_preferences=confirmed_preferences,
+        configurable=configurable,
+    )
+    if evidence_appendix:
+        findings = f"{findings}\n\n{evidence_appendix}"
+
     # 第 2 步：读取配置，并准备最终写报告用的模型参数。
-    configurable = Configuration.from_runnable_config(config)
     writer_model_config = {
         "model": configurable.final_report_model,
         "max_tokens": configurable.final_report_model_max_tokens,
