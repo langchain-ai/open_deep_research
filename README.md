@@ -80,6 +80,65 @@ Open Deep Research supports a wide range of search tools. By default it uses the
 
 See the fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) for various other settings to customize the behavior of Open Deep Research. 
 
+### 🧠 Personalized Q&A Foundation (RAG + Memory)
+
+This repository now includes the configuration foundation for a personalized assistant workflow with:
+
+- Local knowledge base retrieval (RAG)
+- Session memory (short-term)
+- User memory (long-term)
+
+You can configure these fields in LangGraph Studio (Manage Assistants) or via `.env` / `configurable` values:
+
+- `rag_enabled` - Enable local knowledge retrieval
+- `local_knowledge_base_path` - Source folder for local files (md/txt/pdf/docx)
+- `vector_store_provider` - Current default: `chroma`
+- `chroma_persist_directory` - Local Chroma persistence folder
+- `embedding_model` - Embedding model for indexing/search
+- `rag_top_k` - Number of retrieved chunks per query
+- `memory_enabled` - Enable memory features
+- `memory_write_policy` - Default is `explicit_confirmation`
+- `memory_max_candidates_per_turn` - Max memory candidates proposed per turn
+- `memory_namespace_prefix` - Prefix for persistent memory namespaces
+- `user_id` - Optional local fallback user id (when metadata owner is unavailable)
+
+Example `.env` additions:
+
+```bash
+RAG_ENABLED=false
+LOCAL_KNOWLEDGE_BASE_PATH=./knowledge
+VECTOR_STORE_PROVIDER=chroma
+CHROMA_PERSIST_DIRECTORY=.chroma
+EMBEDDING_MODEL=openai:text-embedding-3-small
+RAG_TOP_K=5
+MEMORY_ENABLED=false
+MEMORY_WRITE_POLICY=explicit_confirmation
+MEMORY_MAX_CANDIDATES_PER_TURN=3
+MEMORY_NAMESPACE_PREFIX=memory
+```
+
+These settings establish the implementation path for local knowledge and memory in upcoming iterations while remaining backward compatible with existing deep research flows.
+
+#### Build Local Knowledge Base (Chroma)
+
+After configuring `.env`, build your local index:
+
+```bash
+python -m open_deep_research.ingestion --source ./knowledge --rebuild
+```
+
+This indexes `md`, `txt`, `pdf`, and `docx` files into the configured `CHROMA_PERSIST_DIRECTORY`.
+
+Then set:
+
+```bash
+RAG_ENABLED=true
+MEMORY_ENABLED=true
+MEMORY_WRITE_POLICY=explicit_confirmation
+```
+
+With this enabled, the researcher toolchain can call `rag_search` to retrieve local context alongside web research.
+
 ### 📊 Evaluation
 
 Open Deep Research is configured for evaluation with [Deep Research Bench](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard). This benchmark has 100 PhD-level research tasks (50 English, 50 Chinese), crafted by domain experts across 22 fields (e.g., Science & Tech, Business & Finance) to mirror real-world deep-research needs. It has 2 evaluation metrics, but the leaderboard is based on the RACE score. This uses LLM-as-a-judge (Gemini) to evaluate research reports against a golden set of reports compiled by experts across a set of metrics.

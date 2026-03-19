@@ -5,7 +5,7 @@ import logging
 import os
 import warnings
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Dict, List, Literal, Optional
+from typing import Annotated, Any, List, Literal
 
 import aiohttp
 from langchain.chat_models import init_chat_model
@@ -31,6 +31,7 @@ from tavily import AsyncTavilyClient
 
 from open_deep_research.configuration import Configuration, SearchAPI
 from open_deep_research.prompts import summarize_webpage_prompt
+from open_deep_research.rag import rag_search
 from open_deep_research.state import ResearchComplete, Summary
 
 ##########################
@@ -250,7 +251,7 @@ def think_tool(reflection: str) -> str:
 async def get_mcp_access_token(
     supabase_token: str,
     base_mcp_url: str,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Exchange Supabase token for MCP access token using OAuth token exchange.
     
     Args:
@@ -577,9 +578,18 @@ async def get_all_tools(config: RunnableConfig):
     """
     # Start with core research tools
     tools = [tool(ResearchComplete), think_tool]
-    
-    # Add configured search tools
+
+    # Prefer local knowledge retrieval when enabled.
     configurable = Configuration.from_runnable_config(config)
+    if configurable.rag_enabled:
+        rag_search.metadata = {
+            **(rag_search.metadata or {}),
+            "type": "search",
+            "name": "rag_search",
+        }
+        tools.append(rag_search)
+
+    # Add configured search tools
     search_api = SearchAPI(get_config_value(configurable.search_api))
     search_tools = await get_search_tool(search_api)
     tools.extend(search_tools)
