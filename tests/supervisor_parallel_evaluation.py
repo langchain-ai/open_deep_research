@@ -30,13 +30,13 @@ async def target(inputs: dict):
     config["configurable"]["search_api"] = "tavily"     # NOTE: We use Tavily to stay consistent
     config["configurable"]["max_researcher_iterations"] = 3
     config["configurable"]["max_react_tool_calls"] = 10
-    config["configurable"]["summarization_model"] = "openai:gpt-4.1-nano"
+    config["configurable"]["summarization_model"] = "openai/gpt-oss-120b"
     config["configurable"]["summarization_model_max_tokens"] = 8192
-    config["configurable"]["research_model"] = "openai:gpt-4.1"
+    config["configurable"]["research_model"] = "openai/gpt-oss-120b"
     config["configurable"]["research_model_max_tokens"] = 10000
-    config["configurable"]["compression_model"] = "openai:gpt-4.1-mini"
+    config["configurable"]["compression_model"] = "openai/gpt-oss-120b"
     config["configurable"]["compression_model_max_tokens"] = 10000
-    config["configurable"]["final_report_model"] = "openai:gpt-4.1"
+    config["configurable"]["final_report_model"] = "openai/gpt-oss-120b"
     config["configurable"]["final_report_model_max_tokens"] = 10000
     # NOTE: We do not use MCP tools to stay consistent
     await graph.ainvoke(

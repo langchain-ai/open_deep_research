@@ -118,16 +118,26 @@ class Configuration(BaseModel):
         }
     )
     # Model Configuration
+    # summarization_model: str = Field(
+    #     default="openai:gpt-4.1-mini",
+    #     metadata={
+    #         "x_oap_ui_config": {
+    #             "type": "text",
+    #             "default": "openai:gpt-4.1-mini",
+    #             "description": "Model for summarizing research results from Tavily search results"
+    #         }
+    #     }
+    # )
     summarization_model: str = Field(
-        default="openai:gpt-4.1-mini",
-        metadata={
-            "x_oap_ui_config": {
-                "type": "text",
-                "default": "openai:gpt-4.1-mini",
-                "description": "Model for summarizing research results from Tavily search results"
-            }
+    default="groq:llama-3.3-70b-versatile",
+    metadata={
+        "x_oap_ui_config": {
+            "type": "text",
+            "default": "groq:llama-3.3-70b-versatile",
+            "description": "Model for summarizing research results from Tavily search results (Groq GPT-OSS 120B)"
         }
-    )
+    }
+)
     summarization_model_max_tokens: int = Field(
         default=8192,
         metadata={
@@ -151,11 +161,11 @@ class Configuration(BaseModel):
         }
     )
     research_model: str = Field(
-        default="openai:gpt-4.1",
+        default="groq:llama-3.3-70b-versatile",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
+                "default": "groq:llama-3.3-70b-versatile",
                 "description": "Model for conducting research. NOTE: Make sure your Researcher Model supports the selected search API."
             }
         }
@@ -171,11 +181,11 @@ class Configuration(BaseModel):
         }
     )
     compression_model: str = Field(
-        default="openai:gpt-4.1",
+        default="groq:llama-3.3-70b-versatile",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
+                "default": "groq:llama-3.3-70b-versatile",
                 "description": "Model for compressing research findings from sub-agents. NOTE: Make sure your Compression Model supports the selected search API."
             }
         }
@@ -191,11 +201,11 @@ class Configuration(BaseModel):
         }
     )
     final_report_model: str = Field(
-        default="openai:gpt-4.1",
+        default="groq:llama-3.3-70b-versatile",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
+                "default": "groq:llama-3.3-70b-versatile",
                 "description": "Model for writing the final report from all research findings"
             }
         }
@@ -228,6 +238,16 @@ class Configuration(BaseModel):
             "x_oap_ui_config": {
                 "type": "text",
                 "description": "Any additional instructions to pass along to the Agent regarding the MCP tools that are available to it."
+            }
+        }
+    )
+    model_name: str = Field(
+        default="groq:llama-3.3-70b-versatile",
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "groq:llama-3.3-70b-versatile",
+                "description": "The name of the model to use"
             }
         }
     )
