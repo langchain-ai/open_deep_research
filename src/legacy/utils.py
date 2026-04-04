@@ -375,7 +375,7 @@ async def exa_search(search_queries, max_characters: Optional[int] = None, num_r
                      include_domains: Optional[List[str]] = None, 
                      exclude_domains: Optional[List[str]] = None,
                      subpages: Optional[int] = None):
-    """Search the web using the Exa API.
+    """Search the web using the Exa API, one of the best web search APIs for AI.
     
     Args:
         search_queries (List[SearchQuery]): List of search queries to process
