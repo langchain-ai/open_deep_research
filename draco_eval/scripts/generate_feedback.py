@@ -91,7 +91,7 @@ def build_user_message(original_query: str, failures: list[dict]) -> str:
     "Do not reproduce the evaluator notes verbatim. "
     "Organize the feedback into 3-4 thematic groups rather than addressing each point "
     "individually. The overall message should feel like one coherent user response, "
-    "not a numbered list."      
+    "not a numbered list."
     )
 
     return "\n".join(lines)

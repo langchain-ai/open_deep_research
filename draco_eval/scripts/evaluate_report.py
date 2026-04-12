@@ -76,42 +76,65 @@ def evaluate_criterion(
     }
 
 
+def compute_normalized_score(items: list) -> float:
+    """Compute normalized score per the paper's formula:
+        raw = sum of w_i for all criteria where verdict == MET
+        denominator = sum of max(0, w_i) across all criteria
+        normalized = max(0, min(1, raw / denominator)) * 100
+    """
+    raw = sum(item["weight"] for item in items if item["verdict"] == "MET")
+    denominator = sum(max(0, item["weight"]) for item in items)
+    if denominator == 0:
+        return 0.0
+    return round(max(0.0, min(1.0, raw / denominator)) * 100, 2)
+
+
+def compute_category_summary(items: list) -> dict:
+    """Compute pass/total and normalised score for a single rubric category."""
+    correctly_handled = sum(
+        1 for item in items
+        if (not item["is_negative"] and item["verdict"] == "MET")
+        or (item["is_negative"] and item["verdict"] == "UNMET")
+    )
+    return {
+        "total": len(items),
+        "correctly_handled": correctly_handled,
+        "normalized_score": compute_normalized_score(items),
+    }
+
+
 def compute_summary(results: dict) -> dict:
     total = 0
     positive = 0
     negative = 0
     correctly_handled = 0
-    numerator = 0
-    denominator = 0
+    all_items = []
 
     for category_items in results.values():
         for item in category_items:
             total += 1
-            is_neg = item["is_negative"]
-            weight = item["weight"]
-            verdict = item["verdict"]
-
-            if is_neg:
+            all_items.append(item)
+            if item["is_negative"]:
                 negative += 1
             else:
                 positive += 1
-                denominator += weight  # only positive weights go in denominator
-
-            # Correctly handled: MET for positive, UNMET for negative
-            correct = (not is_neg and verdict == "MET") or (is_neg and verdict == "UNMET")
+            correct = (not item["is_negative"] and item["verdict"] == "MET") or \
+                      (item["is_negative"] and item["verdict"] == "UNMET")
             if correct:
                 correctly_handled += 1
-                numerator += abs(weight)
 
-    normalized_score = round((numerator / denominator) * 100, 2) if denominator else 0.0
+    normalized_score = compute_normalized_score(all_items)
+    pass_rate = round((correctly_handled / total) * 100, 2) if total else 0.0
+    per_category = {cat: compute_category_summary(items) for cat, items in results.items()}
 
     return {
         "total_criteria": total,
         "positive_criteria": positive,
         "negative_criteria": negative,
         "correctly_handled": correctly_handled,
+        "pass_rate": pass_rate,
         "normalized_score": normalized_score,
-        "simple_pass_count": correctly_handled,
+        "per_category": per_category,
     }
 
 
@@ -194,8 +217,12 @@ def main():
     print(f"\n{'='*60}")
     print(f"Total criteria:     {summary['total_criteria']}")
     print(f"Correctly handled:  {summary['correctly_handled']}")
+    print(f"Pass rate:          {summary['pass_rate']}%")
     print(f"Normalized score:   {summary['normalized_score']}%")
-    print(f"Saved to:           {args.output}")
+    print(f"\nPer-category breakdown:")
+    for cat, s in summary["per_category"].items():
+        print(f"  {cat:<38} {s['correctly_handled']}/{s['total']}  score={s['normalized_score']}%")
+    print(f"\nSaved to:           {args.output}")
 
 
 if __name__ == "__main__":

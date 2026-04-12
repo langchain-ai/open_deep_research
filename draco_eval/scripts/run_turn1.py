@@ -11,6 +11,7 @@ import argparse
 import asyncio
 import json
 import os
+import sqlite3
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -44,6 +45,22 @@ async def run(task_path: Path):
     output_file = output_dir / f"{task_id}_v1.md"
 
     CHECKPOINT_DB.parent.mkdir(parents=True, exist_ok=True)
+
+    # If a checkpoint already exists for this thread, wipe it completely
+    # so re-running turn-1 always starts fresh (avoids stacked thread history).
+    if CHECKPOINT_DB.exists():
+        conn = sqlite3.connect(str(CHECKPOINT_DB))
+        existing = conn.execute(
+            "SELECT COUNT(*) FROM checkpoints WHERE thread_id = ?", (thread_id,)
+        ).fetchone()[0]
+        conn.close()
+        if existing:
+            print(f"[Checkpoint] Existing checkpoint found for '{thread_id}' — clearing it before re-run.")
+            conn = sqlite3.connect(str(CHECKPOINT_DB))
+            conn.execute("DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,))
+            conn.execute("DELETE FROM writes WHERE thread_id = ?", (thread_id,))
+            conn.commit()
+            conn.close()
 
     print(f"\n{'='*60}")
     print(f"TASK:      {task_id}")
