@@ -1,29 +1,12 @@
 #!/usr/bin/env bash
-# Generate feedback for all tasks in draco_eval/tasks/, sequentially.
-# Expects evaluation files at draco_eval/evaluations/<task_id>_v<turn>_eval.json
-# Writes feedback to draco_eval/feedback/<task_id>_v<turn>_eval_feedback.txt
-# Writes full response to draco_eval/feedback/<task_id>_v<turn>_eval_feedback_full.txt
-# Logs each task to draco_eval/logs/feedback_turn<turn>_<task_id>.log
-# Usage:
-#   bash draco_eval/scripts/run_all_feedback.sh --turn 1
-#   bash draco_eval/scripts/run_all_feedback.sh --turn 2
+# Generate feedback from turn-1 evaluations for all tasks in draco_eval/tasks/, sequentially.
+# Expects evaluation files at draco_eval/evaluations/<task_id>_v1_eval.json
+# Writes feedback to draco_eval/feedback/<task_id>_v1_eval_feedback.txt
+# Writes full response to draco_eval/feedback/<task_id>_v1_eval_feedback_full.txt
+# Logs each task to draco_eval/logs/feedback_<task_id>.log
+# Usage: bash draco_eval/scripts/run_all_feedback.sh
 
 set -euo pipefail
-
-# --- Parse arguments ---
-TURN=""
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --turn) TURN="$2"; shift 2 ;;
-        *) echo "Unknown argument: $1"; exit 1 ;;
-    esac
-done
-
-if [[ "$TURN" != "1" && "$TURN" != "2" ]]; then
-    echo "Error: --turn must be 1 or 2"
-    echo "Usage: bash draco_eval/scripts/run_all_feedback.sh --turn <1|2>"
-    exit 1
-fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -34,6 +17,8 @@ LOG_DIR="$REPO_ROOT/draco_eval/logs"
 
 mkdir -p "$LOG_DIR" "$FEEDBACK_DIR"
 
+SKIP_TASKS=("task_014" "task_039" "task_078")
+
 tasks=("$TASKS_DIR"/*.json)
 total=${#tasks[@]}
 passed=0
@@ -42,17 +27,23 @@ skipped=0
 failed_tasks=()
 
 echo "============================================================"
-echo "Generating turn-$TURN feedback for $total tasks"
+echo "Generating feedback for $total tasks (from turn-1 evaluations)"
 echo "Logs: $LOG_DIR"
 echo "============================================================"
 
 for task_file in "${tasks[@]}"; do
     task_id="$(basename "$task_file" .json)"
-    eval_file="$EVALS_DIR/${task_id}_v${TURN}_eval.json"
-    log_file="$LOG_DIR/feedback_turn${TURN}_${task_id}.log"
+    eval_file="$EVALS_DIR/${task_id}_v1_eval.json"
+    log_file="$LOG_DIR/feedback_${task_id}.log"
 
     echo ""
     echo "[$((passed + failed + skipped + 1))/$total] $task_id ..."
+
+    if [[ " ${SKIP_TASKS[*]} " == *" $task_id "* ]]; then
+        echo "  SKIPPED — excluded task"
+        ((skipped++)) || true
+        continue
+    fi
 
     if [ ! -f "$eval_file" ]; then
         echo "  SKIPPED — eval file not found: $eval_file"
@@ -75,7 +66,7 @@ done
 
 echo ""
 echo "============================================================"
-echo "Done. $passed/$total succeeded, $skipped skipped (no eval file)."
+echo "Done. $passed/$total succeeded, $skipped skipped."
 if [ ${#failed_tasks[@]} -gt 0 ]; then
     echo "Failed tasks:"
     for t in "${failed_tasks[@]}"; do echo "  - $t"; done

@@ -9,6 +9,11 @@ Usage:
         --report draco_eval/reports/task_002_v1.md \
         --task   draco_eval/tasks/task_002.json \
         --output draco_eval/evaluations/task_002_v1_eval.json
+
+    python draco_eval/scripts/evaluate_report.py \
+        --report draco_eval/reports/task_039_v2.md \
+        --task   draco_eval/tasks/task_039.json \
+        --output draco_eval/evaluations/task_039_v2_eval.json
 """
 
 import argparse
