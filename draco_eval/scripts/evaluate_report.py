@@ -26,7 +26,7 @@ from openai import OpenAI
 
 load_dotenv()
 
-JUDGE_MODEL = "gpt-4.1"
+JUDGE_MODEL = "gpt-5.2-2025-12-11"
 DRACO_DIR = Path(__file__).parent.parent
 JUDGE_PROMPT_PATH = DRACO_DIR / "prompts" / "judge_prompt.txt"
 RUBRIC_CATEGORIES = [
@@ -70,7 +70,7 @@ def evaluate_criterion(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_msg},
         ],
-        temperature=0,
+        reasoning_effort="medium",
         response_format={"type": "json_object"},
     )
     raw = response.choices[0].message.content
