@@ -54,11 +54,13 @@ CRITERION STATUS:
 - "UNMET": The thing described in the criterion IS NOT present/occurring in the response
 
 OUTPUT FORMAT:
-Your response must be valid JSON with this exact format:
+Your response must be valid JSON with EXACTLY these two keys — no more, no less:
 {
   "explanation": <see rules below>,
   "criterion_status": "MET" or "UNMET"
 }
+
+CRITICAL: "criterion_status" is REQUIRED. Every response must include it. Omitting it is an error. The value must be exactly the string "MET" or "UNMET" — nothing else.
 
 Explanation rules:
 - For MET positive criteria: one concise sentence confirming what was found in the response.

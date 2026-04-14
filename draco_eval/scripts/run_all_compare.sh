@@ -16,8 +16,6 @@ LOG_DIR="$REPO_ROOT/draco_eval/logs"
 
 mkdir -p "$LOG_DIR"
 
-SKIP_TASKS=("task_014" "task_039" "task_078")
-
 tasks=("$TASKS_DIR"/*.json)
 total=${#tasks[@]}
 passed=0
@@ -38,12 +36,6 @@ for task_file in "${tasks[@]}"; do
 
     echo ""
     echo "[$((passed + failed + skipped + 1))/$total] $task_id ..."
-
-    if [[ " ${SKIP_TASKS[*]} " == *" $task_id "* ]]; then
-        echo "  SKIPPED — excluded task"
-        ((skipped++)) || true
-        continue
-    fi
 
     if [ ! -f "$v1_eval" ]; then
         echo "  SKIPPED — v1 eval not found: $v1_eval"

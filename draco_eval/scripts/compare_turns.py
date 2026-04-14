@@ -190,7 +190,7 @@ def main():
         out_dir.mkdir(parents=True, exist_ok=True)
         args.output = out_dir / f"{task_id}.json"
 
-    args.output.write_text(json.dumps(result, indent=2))
+    args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False))
 
     ov = result["overall"]
     print(f"\n{'='*60}")

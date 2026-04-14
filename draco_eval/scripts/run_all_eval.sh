@@ -30,8 +30,6 @@ LOG_DIR="$REPO_ROOT/draco_eval/logs"
 
 mkdir -p "$LOG_DIR" "$EVALS_DIR"
 
-SKIP_TASKS=("task_014" "task_039" "task_078")
-
 tasks=("$TASKS_DIR"/*.json)
 total=${#tasks[@]}
 passed=0
@@ -53,12 +51,6 @@ for task_file in "${tasks[@]}"; do
     echo ""
     echo "[$((passed + failed + skipped + 1))/$total] $task_id ..."
 
-    if [[ " ${SKIP_TASKS[*]} " == *" $task_id "* ]]; then
-        echo "  SKIPPED — excluded task"
-        ((skipped++)) || true
-        continue
-    fi
-
     if [ ! -f "$report_file" ]; then
         echo "  SKIPPED — report not found: $report_file"
         ((skipped++)) || true
@@ -79,11 +71,43 @@ for task_file in "${tasks[@]}"; do
     fi
 done
 
+# --- Retry failed tasks once ---
+if [ ${#failed_tasks[@]} -gt 0 ]; then
+    echo ""
+    echo "============================================================"
+    echo "Retrying ${#failed_tasks[@]} failed task(s)..."
+    echo "============================================================"
+
+    still_failed=()
+    for task_id in "${failed_tasks[@]}"; do
+        eval_file="draco_eval/evaluations/${task_id}_v${TURN}_eval.json"
+        log_file="$LOG_DIR/eval_turn${TURN}_${task_id}_retry.log"
+
+        echo ""
+        echo "[RETRY] $task_id ..."
+
+        if uv run python draco_eval/scripts/evaluate_report.py \
+                --report "draco_eval/reports/${task_id}_v${TURN}.md" \
+                --task   "draco_eval/tasks/${task_id}.json" \
+                --output "$eval_file" \
+                > "$log_file" 2>&1; then
+            echo "  OK  -> $log_file"
+            ((passed++)) || true
+            ((failed--)) || true
+        else
+            echo "  FAILED again -> $log_file"
+            still_failed+=("$task_id")
+        fi
+    done
+
+    if [ ${#still_failed[@]} -gt 0 ]; then
+        echo ""
+        echo "WARNING: the following tasks failed twice, please check logs:"
+        for t in "${still_failed[@]}"; do echo "  - $t"; done
+    fi
+fi
+
 echo ""
 echo "============================================================"
 echo "Done. $passed/$total succeeded, $skipped skipped (no report)."
-if [ ${#failed_tasks[@]} -gt 0 ]; then
-    echo "Failed tasks:"
-    for t in "${failed_tasks[@]}"; do echo "  - $t"; done
-fi
 echo "============================================================"

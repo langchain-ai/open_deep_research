@@ -70,13 +70,21 @@ def evaluate_criterion(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_msg},
         ],
-        reasoning_effort="medium",
+        reasoning_effort="none",
+        temperature=0,
         response_format={"type": "json_object"},
     )
     raw = response.choices[0].message.content
     parsed = json.loads(raw)
+    verdict = (
+        parsed.get("criterion_status")
+        or parsed.get("status")
+        or parsed.get("verdict")
+    )
+    if verdict not in ("MET", "UNMET"):
+        raise ValueError(f"Unexpected verdict '{verdict}' from model. Raw: {raw}")
     return {
-        "verdict": parsed["criterion_status"],
+        "verdict": verdict,
         "explanation": parsed["explanation"],
     }
 
@@ -217,7 +225,7 @@ def main():
         "results": results,
     }
 
-    args.output.write_text(json.dumps(output, indent=2))
+    args.output.write_text(json.dumps(output, indent=2, ensure_ascii=False))
 
     print(f"\n{'='*60}")
     print(f"Total criteria:     {summary['total_criteria']}")

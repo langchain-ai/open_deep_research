@@ -30,6 +30,22 @@ from open_deep_research.deep_researcher import deep_researcher_builder  # noqa: 
 DRACO_DIR = Path(__file__).parent.parent
 SKIP_NODES = {"LangGraph", ""}
 
+# TURN2_PROMPT = """\
+# You previously wrote a research report on the following query:
+
+# --- ORIGINAL QUERY ---
+# {original_query}
+
+# --- YOUR PREVIOUS REPORT ---
+# {v1_report}
+
+# --- USER FEEDBACK ---
+# {feedback}
+
+# Please revise your report based on the feedback above.
+# Preserve all content and sections not mentioned in the feedback.
+# Only research and modify sections directly relevant to the feedback provided.
+# """
 TURN2_PROMPT = """\
 You previously wrote a research report on the following query:
 
@@ -43,8 +59,7 @@ You previously wrote a research report on the following query:
 {feedback}
 
 Please revise your report based on the feedback above.
-Preserve all content and sections not mentioned in the feedback.
-Only research and modify sections directly relevant to the feedback provided.
+The feedback has two parts: preservation constraints (what must remain in the report) and improvement guidance (what to research differently). Ensure you retain all content specified as preservation constraints, and focus your new research on the areas identified for improvement.
 """
 
 
