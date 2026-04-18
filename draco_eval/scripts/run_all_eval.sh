@@ -3,8 +3,15 @@
 # Usage:
 #   bash draco_eval/scripts/run_all_eval.sh --turn 1
 #   bash draco_eval/scripts/run_all_eval.sh --turn 2
+#   MODEL=openai:gpt-4.1-mini bash draco_eval/scripts/run_all_eval.sh --turn 1
+#   MODEL=google_vertexai:gemini-2.5-pro bash draco_eval/scripts/run_all_eval.sh --turn 1
 
 set -euo pipefail
+
+# --- Model config ---
+MODEL="${MODEL:-openai:gpt-4.1}"
+MODEL_SLUG="${MODEL##*:}"        # strip provider prefix
+MODEL_SLUG="${MODEL_SLUG//-/}"   # remove hyphens
 
 # --- Parse arguments ---
 TURN=""
@@ -24,9 +31,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TASKS_DIR="$REPO_ROOT/draco_eval/tasks"
-REPORTS_DIR="$REPO_ROOT/draco_eval/reports"
-EVALS_DIR="$REPO_ROOT/draco_eval/evaluations"
-LOG_DIR="$REPO_ROOT/draco_eval/logs"
+REPORTS_DIR="$REPO_ROOT/draco_eval/reports_${MODEL_SLUG}"
+EVALS_DIR="$REPO_ROOT/draco_eval/evaluations_${MODEL_SLUG}"
+LOG_DIR="$REPO_ROOT/draco_eval/logs_${MODEL_SLUG}"
 
 mkdir -p "$LOG_DIR" "$EVALS_DIR"
 
@@ -39,13 +46,16 @@ failed_tasks=()
 
 echo "============================================================"
 echo "Evaluating turn-$TURN reports for $total tasks"
-echo "Logs: $LOG_DIR"
+echo "Model:   $MODEL  (slug: $MODEL_SLUG)"
+echo "Reports: $REPORTS_DIR"
+echo "Evals:   $EVALS_DIR"
+echo "Logs:    $LOG_DIR"
 echo "============================================================"
 
 for task_file in "${tasks[@]}"; do
     task_id="$(basename "$task_file" .json)"
     report_file="$REPORTS_DIR/${task_id}_v${TURN}.md"
-    eval_file="draco_eval/evaluations/${task_id}_v${TURN}_eval.json"
+    eval_file="$EVALS_DIR/${task_id}_v${TURN}_eval.json"
     log_file="$LOG_DIR/eval_turn${TURN}_${task_id}.log"
 
     echo ""
@@ -57,10 +67,17 @@ for task_file in "${tasks[@]}"; do
         continue
     fi
 
+    if [ -f "$eval_file" ]; then
+        echo "  SKIPPED — eval already exists: $eval_file"
+        ((skipped++)) || true
+        continue
+    fi
+
     if uv run python draco_eval/scripts/evaluate_report.py \
-            --report "draco_eval/reports/${task_id}_v${TURN}.md" \
+            --report "$report_file" \
             --task   "draco_eval/tasks/${task_id}.json" \
             --output "$eval_file" \
+            --model  "$MODEL" \
             > "$log_file" 2>&1; then
         echo "  OK  -> $log_file"
         ((passed++)) || true
@@ -80,16 +97,18 @@ if [ ${#failed_tasks[@]} -gt 0 ]; then
 
     still_failed=()
     for task_id in "${failed_tasks[@]}"; do
-        eval_file="draco_eval/evaluations/${task_id}_v${TURN}_eval.json"
+        report_file="$REPORTS_DIR/${task_id}_v${TURN}.md"
+        eval_file="$EVALS_DIR/${task_id}_v${TURN}_eval.json"
         log_file="$LOG_DIR/eval_turn${TURN}_${task_id}_retry.log"
 
         echo ""
         echo "[RETRY] $task_id ..."
 
         if uv run python draco_eval/scripts/evaluate_report.py \
-                --report "draco_eval/reports/${task_id}_v${TURN}.md" \
+                --report "$report_file" \
                 --task   "draco_eval/tasks/${task_id}.json" \
                 --output "$eval_file" \
+                --model  "$MODEL" \
                 > "$log_file" 2>&1; then
             echo "  OK  -> $log_file"
             ((passed++)) || true

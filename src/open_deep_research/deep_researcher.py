@@ -210,9 +210,25 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
     )
     
     # Step 2: Generate supervisor response based on current context
+    # Retry up to 3 times if Gemini returns a MALFORMED_FUNCTION_CALL
     supervisor_messages = state.get("supervisor_messages", [])
-    response = await research_model.ainvoke(supervisor_messages)
-    
+    max_malformed_retries = 3
+    for attempt in range(max_malformed_retries):
+        response = await research_model.ainvoke(supervisor_messages)
+        finish_reason = response.response_metadata.get("finish_reason", "")
+        if finish_reason != "MALFORMED_FUNCTION_CALL":
+            break
+        # Gemini produced a malformed tool call — ask it to retry with a hint
+        supervisor_messages = supervisor_messages + [
+            response,
+            {"role": "user", "content": "Your previous response could not be parsed as a valid tool call. Please call one of the available tools (think_tool, ConductResearch, or ResearchComplete) using the correct format."}
+        ]
+    else:
+        raise RuntimeError(
+            f"MALFORMED_FUNCTION_CALL: Supervisor failed to produce a valid tool call "
+            f"after {max_malformed_retries} retries. Task will be retried."
+        )
+
     # Step 3: Update state and proceed to tool execution
     return Command(
         goto="supervisor_tools",
@@ -411,9 +427,26 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     )
     
     # Step 3: Generate researcher response with system context
+    # Retry up to 3 times if Gemini returns a MALFORMED_FUNCTION_CALL to avoid
+    # adding an empty AIMessage to history (which causes a 400 "no parts" error
+    # on the next Gemini request).
     messages = [SystemMessage(content=researcher_prompt)] + researcher_messages
-    response = await research_model.ainvoke(messages)
-    
+    max_malformed_retries = 3
+    for attempt in range(max_malformed_retries):
+        response = await research_model.ainvoke(messages)
+        finish_reason = response.response_metadata.get("finish_reason", "")
+        if finish_reason != "MALFORMED_FUNCTION_CALL":
+            break
+        messages = messages + [
+            response,
+            {"role": "user", "content": "Your previous response could not be parsed as a valid tool call. Please call one of the available tools using the correct format."},
+        ]
+    else:
+        raise RuntimeError(
+            f"MALFORMED_FUNCTION_CALL: Researcher failed to produce a valid tool call "
+            f"after {max_malformed_retries} retries. Task will be retried."
+        )
+
     # Step 4: Update state and proceed to tool execution
     return Command(
         goto="researcher_tools",
@@ -696,11 +729,109 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
         **cleared_state
     }
 
+async def multimodal_probe(state: AgentState, config: RunnableConfig) -> dict:
+    """Turn-3 multimodal probe node.
+
+    Scans the cited URLs in the final report (or a pre-supplied existing_report),
+    finds the first image that genuinely supports a claim in the report, and
+    stores the structured result in state['turn3_result'].
+
+    This node is completely self-contained — it does not read or write any other
+    agent state fields and has no interaction with the supervisor or researcher
+    subgraphs.
+    """
+    # Import here to avoid circular dependency and keep the probe self-contained
+    import sys
+    from pathlib import Path as _Path
+    _scripts_dir = str(_Path(__file__).parent.parent.parent / "draco_eval" / "scripts")
+    if _scripts_dir not in sys.path:
+        sys.path.insert(0, _scripts_dir)
+    from turn3_probe import run_turn3_probe  # noqa: E402
+
+    configurable = Configuration.from_runnable_config(config)
+
+    # Use the pre-supplied report if available, otherwise use the generated one
+    report_text = state.get("existing_report") or state.get("final_report", "")
+    if not report_text:
+        return {"turn3_result": {"no_image_found": True, "reason_if_none": "No report text available."}}
+
+    # Extract the original task prompt from the first human message.
+    # In turn-2 runs the first message is a combined prompt containing the
+    # original query, the v1 report, and the feedback. Parse out just the
+    # original query so the probe (and later the evaluator) receives the clean
+    # research question rather than the full concatenated context.
+    messages = state.get("messages", [])
+    task_prompt = ""
+    for msg in messages:
+        if hasattr(msg, "type") and msg.type == "human":
+            raw = msg.content if isinstance(msg.content, str) else str(msg.content)
+            # Try to extract the original query from the turn-2 combined prompt
+            _start = "--- ORIGINAL QUERY ---"
+            _end = "--- YOUR PREVIOUS REPORT ---"
+            if _start in raw and _end in raw:
+                task_prompt = raw.split(_start, 1)[1].split(_end, 1)[0].strip()
+            else:
+                task_prompt = raw
+            break
+
+    # Use the research model as the probe model (Turn-3 is part of agent evaluation)
+    # Pass the full model string — init_chat_model in turn3_probe handles routing
+    probe_model = configurable.research_model or configurable.multimodal_probe_model
+
+    task_id = state.get("task_id") or "odr_run"
+
+    # Derive the model slug to find the correct reports folder
+    # e.g. "openai:gpt-4.1" → "gpt4.1", "google_vertexai:gemini-2.5-pro" → "gemini2.5pro"
+    _research_model = configurable.research_model or "openai:gpt-4.1"
+    _model_slug = _research_model.split(":")[-1].replace("-", "")
+    _draco_dir = _Path(__file__).parent.parent.parent / "draco_eval"
+    report_path = _draco_dir / f"reports_{_model_slug}" / f"{task_id}_v2.md"
+
+    # Save the final report to disk BEFORE starting the probe so it is
+    # persisted even if the probe crashes or takes a long time
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(report_text, encoding="utf-8")
+
+    image_save_dir = _draco_dir / f"turn3_outputs_{_model_slug}" / "images"
+
+    result = await run_turn3_probe(
+        report_text=report_text,
+        task_id=task_id,
+        task_prompt=task_prompt,
+        report_path=str(report_path),
+        model=probe_model,
+        image_save_dir=image_save_dir,
+    )
+    return {"turn3_result": result.model_dump()}
+
+
+def _route_from_start(state: AgentState, config: RunnableConfig) -> Literal["multimodal_probe", "clarify_with_user"]:
+    """Route at START:
+    - existing_report provided → skip straight to multimodal_probe
+    - otherwise → normal pipeline starting at clarify_with_user
+    """
+    configurable = Configuration.from_runnable_config(config)
+    if state.get("existing_report") and configurable.enable_multimodal_probe:
+        return "multimodal_probe"
+    return "clarify_with_user"
+
+
+def _route_after_report(state: AgentState, config: RunnableConfig) -> Literal["multimodal_probe", "__end__"]:
+    """Route after final_report_generation:
+    - enable_multimodal_probe=True → run the probe
+    - otherwise → END
+    """
+    configurable = Configuration.from_runnable_config(config)
+    if configurable.enable_multimodal_probe:
+        return "multimodal_probe"
+    return "__end__"
+
+
 # Main Deep Researcher Graph Construction
 # Creates the complete deep research workflow from user input to final report
 deep_researcher_builder = StateGraph(
-    AgentState, 
-    input=AgentInputState, 
+    AgentState,
+    input=AgentInputState,
     config_schema=Configuration
 )
 
@@ -709,11 +840,23 @@ deep_researcher_builder.add_node("clarify_with_user", clarify_with_user)        
 deep_researcher_builder.add_node("write_research_brief", write_research_brief)     # Research planning phase
 deep_researcher_builder.add_node("research_supervisor", supervisor_subgraph)       # Research execution phase
 deep_researcher_builder.add_node("final_report_generation", final_report_generation)  # Report generation phase
+deep_researcher_builder.add_node("multimodal_probe", multimodal_probe)             # Turn-3 multimodal probe
 
-# Define main workflow edges for sequential execution
-deep_researcher_builder.add_edge(START, "clarify_with_user")                       # Entry point
+# Entry point: jump to probe if existing_report supplied, else run full pipeline
+deep_researcher_builder.add_conditional_edges(
+    START,
+    _route_from_start,
+    {"multimodal_probe": "multimodal_probe", "clarify_with_user": "clarify_with_user"},
+)
 deep_researcher_builder.add_edge("research_supervisor", "final_report_generation") # Research to report
-deep_researcher_builder.add_edge("final_report_generation", END)                   # Final exit point
+
+# After report generation: run probe if enabled, else exit
+deep_researcher_builder.add_conditional_edges(
+    "final_report_generation",
+    _route_after_report,
+    {"multimodal_probe": "multimodal_probe", "__end__": END},
+)
+deep_researcher_builder.add_edge("multimodal_probe", END)                          # Probe always exits
 
 # Compile the complete deep researcher workflow
 deep_researcher = deep_researcher_builder.compile()

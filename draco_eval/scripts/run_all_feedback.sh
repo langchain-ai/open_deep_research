@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
 # Generate feedback from turn-1 evaluations for all tasks in draco_eval/tasks/, sequentially.
-# Expects evaluation files at draco_eval/evaluations/<task_id>_v1_eval.json
-# Writes feedback to draco_eval/feedback/<task_id>_v1_eval_feedback.txt
-# Writes full response to draco_eval/feedback/<task_id>_v1_eval_feedback_full.txt
-# Logs each task to draco_eval/logs/feedback_<task_id>.log
-# Usage: bash draco_eval/scripts/run_all_feedback.sh
+# Expects evaluation files at draco_eval/evaluations_<slug>/<task_id>_v1_eval.json
+# Writes feedback to draco_eval/feedback_<slug>/<task_id>_v1_eval_feedback.txt
+# Logs each task to draco_eval/logs_<slug>/feedback_<task_id>.log
+#
+# Usage:
+#   bash draco_eval/scripts/run_all_feedback.sh
+#   MODEL=openai:gpt-4.1-mini bash draco_eval/scripts/run_all_feedback.sh
+#   MODEL=google_vertexai:gemini-2.5-pro bash draco_eval/scripts/run_all_feedback.sh
 
 set -euo pipefail
+
+# --- Model config ---
+MODEL="${MODEL:-openai:gpt-4.1}"
+MODEL_SLUG="${MODEL##*:}"        # strip provider prefix
+MODEL_SLUG="${MODEL_SLUG//-/}"   # remove hyphens
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TASKS_DIR="$REPO_ROOT/draco_eval/tasks"
-EVALS_DIR="$REPO_ROOT/draco_eval/evaluations"
-FEEDBACK_DIR="$REPO_ROOT/draco_eval/feedback"
-LOG_DIR="$REPO_ROOT/draco_eval/logs"
+EVALS_DIR="$REPO_ROOT/draco_eval/evaluations_${MODEL_SLUG}"
+FEEDBACK_DIR="$REPO_ROOT/draco_eval/feedback_${MODEL_SLUG}"
+LOG_DIR="$REPO_ROOT/draco_eval/logs_${MODEL_SLUG}"
 
 mkdir -p "$LOG_DIR" "$FEEDBACK_DIR"
 
@@ -26,7 +34,10 @@ failed_tasks=()
 
 echo "============================================================"
 echo "Generating feedback for $total tasks (from turn-1 evaluations)"
-echo "Logs: $LOG_DIR"
+echo "Model:  $MODEL  (slug: $MODEL_SLUG)"
+echo "Evals:  $EVALS_DIR"
+echo "Output: $FEEDBACK_DIR"
+echo "Logs:   $LOG_DIR"
 echo "============================================================"
 
 for task_file in "${tasks[@]}"; do
@@ -46,6 +57,7 @@ for task_file in "${tasks[@]}"; do
     if uv run python draco_eval/scripts/new_generate_feedback.py \
             --evaluation "$eval_file" \
             --task "$task_file" \
+            --model "$MODEL" \
             > "$log_file" 2>&1; then
         echo "  OK  -> $log_file"
         ((passed++)) || true

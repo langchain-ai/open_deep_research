@@ -60,16 +60,26 @@ def override_reducer(current_value, new_value):
         return operator.add(current_value, new_value)
     
 class AgentInputState(MessagesState):
-    """InputState is only 'messages'."""
+    """InputState is only 'messages', plus optional probe fields."""
+
+    existing_report: Optional[str] = None
+    """Pass a pre-generated report markdown here to skip the full research
+    pipeline and jump directly to the multimodal probe (Turn-3)."""
+    task_id: Optional[str] = None
+    """Optional task identifier (e.g. 'task_003') used by the multimodal probe
+    for output file naming and result labelling."""
 
 class AgentState(MessagesState):
     """Main agent state containing messages and research data."""
-    
+
     supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
     research_brief: Optional[str]
     raw_notes: Annotated[list[str], override_reducer] = []
     notes: Annotated[list[str], override_reducer] = []
     final_report: str
+    existing_report: Optional[str] = None
+    task_id: Optional[str] = None
+    turn3_result: Optional[dict] = None
 
 class SupervisorState(TypedDict):
     """State for the supervisor that manages research tasks."""

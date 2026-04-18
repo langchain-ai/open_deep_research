@@ -1,10 +1,23 @@
 """Run turn-1 of a multi-turn research task WITHOUT checkpointing.
 
+Output goes to draco_eval/reports_<model_slug>/<task_id>_v1.md.
+
 To revert to the checkpointing version, copy run_turn1_with_checkpointing.py
 back over this file.
 
 Usage:
+    # GPT-4.1 (default)
     uv run python draco_eval/scripts/run_turn1.py --task draco_eval/tasks/task_002.json
+
+    # GPT-4.1-mini
+    uv run python draco_eval/scripts/run_turn1.py \
+        --task  draco_eval/tasks/task_002.json \
+        --model openai:gpt-4.1-mini
+
+    # Gemini 2.5 Pro via Vertex AI
+    uv run python draco_eval/scripts/run_turn1.py \
+        --task  draco_eval/tasks/task_002.json \
+        --model google_vertexai:gemini-2.5-pro
 """
 
 import argparse
@@ -26,22 +39,29 @@ DRACO_DIR = Path(__file__).parent.parent
 SKIP_NODES = {"LangGraph", ""}
 
 
+def _model_slug(model: str) -> str:
+    """'openai:gpt-4.1' → 'gpt4.1', 'google_genai:gemini-2.5-pro' → 'gemini2.5pro'"""
+    return model.split(":")[-1].replace("-", "")
+
+
 def _truncate(obj, max_chars=300):
     s = json.dumps(obj, default=str) if not isinstance(obj, str) else obj
     return s[:max_chars] + "..." if len(s) > max_chars else s
 
 
-async def run(task_path: Path):
+async def run(task_path: Path, model: str):
     task = json.loads(task_path.read_text())
     task_id = task_path.stem
     prompt = task["prompt"]
+    slug = _model_slug(model)
 
-    output_dir = DRACO_DIR / "reports"
+    output_dir = DRACO_DIR / f"reports_{slug}"
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / f"{task_id}_v1.md"
 
     print(f"\n{'='*60}")
     print(f"TASK:   {task_id}")
+    print(f"MODEL:  {model}")
     print(f"OUTPUT: {output_file}")
     print(f"{'='*60}")
     print(f"\nPROMPT:\n{prompt}\n")
@@ -58,6 +78,9 @@ async def run(task_path: Path):
             "run_name": f"{task_id}_turn1",
             "configurable": {
                 "allow_clarification": False,
+                "research_model": model,
+                "compression_model": model,
+                "final_report_model": model,
             },
             "callbacks": [tracer],
         },
@@ -108,12 +131,17 @@ async def run(task_path: Path):
 def main():
     parser = argparse.ArgumentParser(description="Run turn-1 of an ODR task without checkpointing.")
     parser.add_argument("--task", type=Path, required=True, help="Path to task JSON file")
+    parser.add_argument(
+        "--model", default="openai:gpt-4.1",
+        help="Agent model (e.g. 'openai:gpt-4.1', 'openai:gpt-4.1-mini', 'google_vertexai:gemini-2.5-pro'). "
+             "Controls which reports_<slug>/ folder outputs go to."
+    )
     args = parser.parse_args()
 
     if not args.task.exists():
         raise FileNotFoundError(f"Task file not found: {args.task}")
 
-    asyncio.run(run(args.task))
+    asyncio.run(run(args.task, args.model))
 
 
 if __name__ == "__main__":

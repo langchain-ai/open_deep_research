@@ -210,6 +210,28 @@ class Configuration(BaseModel):
             }
         }
     )
+    # Multimodal probe configuration
+    enable_multimodal_probe: bool = Field(
+        default=False,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "boolean",
+                "default": False,
+                "description": "After the final report is generated, scan cited URLs for a relevant image and run vision analysis on it."
+            }
+        }
+    )
+    multimodal_probe_model: str = Field(
+        default="openai:gpt-4.1",
+        metadata={
+            "x_oap_ui_config": {
+                "type": "text",
+                "default": "openai:gpt-4.1",
+                "description": "Model for Turn-3 multimodal probe vision calls. Must support vision input."
+            }
+        }
+    )
+
     # MCP server configuration
     mcp_config: Optional[MCPConfig] = Field(
         default=None,

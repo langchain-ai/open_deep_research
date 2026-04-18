@@ -1,12 +1,28 @@
 """Generate consolidated user feedback from a failed evaluation.
 
+Output goes to draco_eval/feedback_<model_slug>/ by default.
+
 Usage:
+    # GPT-4.1 (default)
     python draco_eval/scripts/generate_feedback.py \
-        --evaluation draco_eval/evaluations/task_002_v1_eval.json \
+        --evaluation draco_eval/evaluations_gpt4.1/task_002_v1_eval.json \
         --task       draco_eval/tasks/task_002.json
 
+    # GPT-4.1-mini
     python draco_eval/scripts/generate_feedback.py \
-        --evaluation draco_eval/evaluations/task_002_v1_eval.json \
+        --evaluation draco_eval/evaluations_gpt4.1mini/task_002_v1_eval.json \
+        --task       draco_eval/tasks/task_002.json \
+        --model      openai:gpt-4.1-mini
+
+    # Gemini 2.5 Pro
+    python draco_eval/scripts/generate_feedback.py \
+        --evaluation draco_eval/evaluations_gemini2.5pro/task_002_v1_eval.json \
+        --task       draco_eval/tasks/task_002.json \
+        --model      google_vertexai:gemini-2.5-pro
+
+    # Dry run (prints prompt without calling API)
+    python draco_eval/scripts/generate_feedback.py \
+        --evaluation draco_eval/evaluations_gpt4.1/task_002_v1_eval.json \
         --task       draco_eval/tasks/task_002.json \
         --dry-run
 """
@@ -24,6 +40,11 @@ load_dotenv()
 FEEDBACK_MODEL = "gpt-4.1-mini"
 DRACO_DIR = Path(__file__).parent.parent
 FEEDBACK_PROMPT_PATH = DRACO_DIR / "prompts" / "feedback_prompt.txt"
+
+
+def _model_slug(model: str) -> str:
+    """'openai:gpt-4.1' → 'gpt4.1', 'google_genai:gemini-2.5-pro' → 'gemini2.5pro'"""
+    return model.split(":")[-1].replace("-", "")
 RUBRIC_CATEGORIES = [
     "factual-accuracy",
     "breadth-and-depth-of-analysis",
@@ -103,6 +124,11 @@ def main():
     parser.add_argument("--task", type=Path, required=True, help="Path to task JSON file")
     parser.add_argument("--output", type=Path, default=None, help="Output text path (optional)")
     parser.add_argument("--dry-run", action="store_true", help="Print prompt without calling API")
+    parser.add_argument(
+        "--model", default="openai:gpt-4.1",
+        help="Agent model that generated the evaluated report. "
+             "Controls which feedback_<slug>/ folder outputs go to."
+    )
     args = parser.parse_args()
 
     if not args.evaluation.exists():
@@ -112,7 +138,8 @@ def main():
 
     # Resolve default output path
     if args.output is None:
-        output_dir = DRACO_DIR / "feedback"
+        slug = _model_slug(args.model)
+        output_dir = DRACO_DIR / f"feedback_{slug}"
         output_dir.mkdir(parents=True, exist_ok=True)
         args.output = output_dir / f"{args.evaluation.stem}_feedback.txt"
 

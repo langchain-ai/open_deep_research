@@ -1,12 +1,27 @@
 """Compare two evaluation JSON files (e.g. turn-1 vs turn-2) and save an analysis.
 
+Output goes to draco_eval/analysis_<model_slug>/<task_id>.json by default.
+
 Usage:
+    # GPT-4.1 (default)
     python draco_eval/scripts/compare_turns.py \
-        --v1 draco_eval/evaluations/task_002_v1_eval.json \
-        --v2 draco_eval/evaluations/task_002_v2_eval.json \
+        --v1   draco_eval/evaluations_gpt4.1/task_002_v1_eval.json \
+        --v2   draco_eval/evaluations_gpt4.1/task_002_v2_eval.json \
         --task draco_eval/tasks/task_002.json
 
-Output: draco_eval/analysis/<task_id>.json
+    # GPT-4.1-mini
+    python draco_eval/scripts/compare_turns.py \
+        --v1   draco_eval/evaluations_gpt4.1mini/task_002_v1_eval.json \
+        --v2   draco_eval/evaluations_gpt4.1mini/task_002_v2_eval.json \
+        --task draco_eval/tasks/task_002.json \
+        --model openai:gpt-4.1-mini
+
+    # Gemini 2.5 Pro
+    python draco_eval/scripts/compare_turns.py \
+        --v1   draco_eval/evaluations_gemini2.5pro/task_002_v1_eval.json \
+        --v2   draco_eval/evaluations_gemini2.5pro/task_002_v2_eval.json \
+        --task draco_eval/tasks/task_002.json \
+        --model google_vertexai:gemini-2.5-pro
 """
 
 import argparse
@@ -14,6 +29,11 @@ import json
 from pathlib import Path
 
 DRACO_DIR = Path(__file__).parent.parent
+
+
+def _model_slug(model: str) -> str:
+    """'openai:gpt-4.1' → 'gpt4.1', 'google_genai:gemini-2.5-pro' → 'gemini2.5pro'"""
+    return model.split(":")[-1].replace("-", "")
 RUBRIC_CATEGORIES = [
     "factual-accuracy",
     "breadth-and-depth-of-analysis",
@@ -176,6 +196,10 @@ def main():
     parser.add_argument("--v2", type=Path, required=True, help="Turn-2 eval JSON")
     parser.add_argument("--task", type=Path, required=True, help="Task JSON (for task_id)")
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument(
+        "--model", default="openai:gpt-4.1",
+        help="Agent model being compared. Controls which analysis_<slug>/ folder outputs go to."
+    )
     args = parser.parse_args()
 
     v1_eval = json.loads(args.v1.read_text())
@@ -186,7 +210,8 @@ def main():
     result = analyse(v1_eval, v2_eval)
 
     if args.output is None:
-        out_dir = DRACO_DIR / "analysis"
+        slug = _model_slug(args.model)
+        out_dir = DRACO_DIR / f"analysis_{slug}"
         out_dir.mkdir(parents=True, exist_ok=True)
         args.output = out_dir / f"{task_id}.json"
 

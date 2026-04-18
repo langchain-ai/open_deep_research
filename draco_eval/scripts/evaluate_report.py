@@ -1,19 +1,30 @@
 """Evaluate a research report against a task's rubric criteria.
 
+Output goes to draco_eval/evaluations_<model_slug>/ by default.
+
 Usage:
+    # GPT-4.1 (default)
     python draco_eval/scripts/evaluate_report.py \
-        --report draco_eval/reports/task_002_v1.md \
+        --report draco_eval/reports_gpt4.1/task_002_v1.md \
         --task   draco_eval/tasks/task_002.json
 
+    # GPT-4.1-mini
     python draco_eval/scripts/evaluate_report.py \
-        --report draco_eval/reports/task_002_v1.md \
+        --report draco_eval/reports_gpt4.1mini/task_002_v1.md \
         --task   draco_eval/tasks/task_002.json \
-        --output draco_eval/evaluations/task_002_v1_eval.json
+        --model  openai:gpt-4.1-mini
 
+    # Gemini 2.5 Pro
     python draco_eval/scripts/evaluate_report.py \
-        --report draco_eval/reports/task_039_v2.md \
+        --report draco_eval/reports_gemini2.5pro/task_002_v1.md \
+        --task   draco_eval/tasks/task_002.json \
+        --model  google_vertexai:gemini-2.5-pro
+
+    # Override output path explicitly
+    python draco_eval/scripts/evaluate_report.py \
+        --report draco_eval/reports_gpt4.1/task_039_v2.md \
         --task   draco_eval/tasks/task_039.json \
-        --output draco_eval/evaluations/task_039_v2_eval.json
+        --output draco_eval/evaluations_gpt4.1/task_039_v2_eval.json
 """
 
 import argparse
@@ -29,6 +40,11 @@ load_dotenv()
 JUDGE_MODEL = "gpt-5.2-2025-12-11"
 DRACO_DIR = Path(__file__).parent.parent
 JUDGE_PROMPT_PATH = DRACO_DIR / "prompts" / "judge_prompt.txt"
+
+
+def _model_slug(model: str) -> str:
+    """'openai:gpt-4.1' → 'gpt4.1', 'google_genai:gemini-2.5-pro' → 'gemini2.5pro'"""
+    return model.split(":")[-1].replace("-", "")
 RUBRIC_CATEGORIES = [
     "factual-accuracy",
     "breadth-and-depth-of-analysis",
@@ -156,6 +172,11 @@ def main():
     parser.add_argument("--report", type=Path, required=True, help="Path to report markdown file")
     parser.add_argument("--task", type=Path, required=True, help="Path to task JSON file")
     parser.add_argument("--output", type=Path, default=None, help="Output JSON path (optional)")
+    parser.add_argument(
+        "--model", default="openai:gpt-4.1",
+        help="Agent model that generated the report (e.g. 'openai:gpt-4.1', 'openai:gpt-4.1-mini', 'google_vertexai:gemini-2.5-pro'). "
+             "Controls which evaluations_<slug>/ folder outputs go to."
+    )
     args = parser.parse_args()
 
     if not args.report.exists():
@@ -165,7 +186,8 @@ def main():
 
     # Resolve default output path
     if args.output is None:
-        output_dir = DRACO_DIR / "evaluations"
+        slug = _model_slug(args.model)
+        output_dir = DRACO_DIR / f"evaluations_{slug}"
         output_dir.mkdir(parents=True, exist_ok=True)
         args.output = output_dir / f"{args.report.stem}_eval.json"
 

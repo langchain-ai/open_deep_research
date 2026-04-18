@@ -1,9 +1,23 @@
-"""Summarize evaluation results from draco_eval/evaluations/.
+"""Summarize evaluation results from draco_eval/evaluations_<model_slug>/.
+
+Reads from evaluations_<slug>/ and writes summary to analysis_<slug>/.
 
 Usage:
+    # GPT-4.1 turn-1 (default)
     python draco_eval/scripts/summarize_evals.py
+
+    # GPT-4.1 turn-2
     python draco_eval/scripts/summarize_evals.py --turn 2
+
+    # GPT-4.1 turn-1 vs turn-2 comparison
     python draco_eval/scripts/summarize_evals.py --turn 1 --compare-turn 2
+
+    # GPT-4.1-mini
+    python draco_eval/scripts/summarize_evals.py --model openai:gpt-4.1-mini
+
+    # Gemini 2.5 Pro
+    python draco_eval/scripts/summarize_evals.py --model google_vertexai:gemini-2.5-pro
+    python draco_eval/scripts/summarize_evals.py --turn 1 --compare-turn 2 --model google_vertexai:gemini-2.5-pro
 """
 
 import argparse
@@ -12,9 +26,12 @@ from pathlib import Path
 from collections import defaultdict
 
 DRACO_DIR = Path(__file__).parent.parent
-EVALS_DIR = DRACO_DIR / "evaluations"
 TASKS_DIR = DRACO_DIR / "tasks"
-ANALYSIS_DIR = DRACO_DIR / "analysis"
+
+
+def _model_slug(model: str) -> str:
+    """'openai:gpt-4.1' → 'gpt4.1', 'google_genai:gemini-2.5-pro' → 'gemini2.5pro'"""
+    return model.split(":")[-1].replace("-", "")
 
 CATEGORIES = [
     "factual-accuracy",
@@ -42,9 +59,9 @@ def load_domain_map():
     return domain_map
 
 
-def load_turn_data(turn):
+def load_turn_data(turn, evals_dir):
     pattern = f"*_v{turn}_eval.json"
-    eval_files = sorted(EVALS_DIR.glob(pattern))
+    eval_files = sorted(evals_dir.glob(pattern))
     results = {}
     for f in eval_files:
         data = json.loads(f.read_text())
@@ -153,11 +170,19 @@ def main():
     parser.add_argument("--turn", default="1", choices=["1", "2"])
     parser.add_argument("--compare-turn", choices=["1", "2"], default=None,
                         help="Optional second turn to compare against")
+    parser.add_argument(
+        "--model", default="openai:gpt-4.1",
+        help="Agent model being summarised. Controls which evaluations_<slug>/ and analysis_<slug>/ folders are used."
+    )
     args = parser.parse_args()
+
+    slug = _model_slug(args.model)
+    EVALS_DIR = DRACO_DIR / f"evaluations_{slug}"
+    ANALYSIS_DIR = DRACO_DIR / f"analysis_{slug}"
 
     domain_map = load_domain_map()
 
-    eval_files, data = load_turn_data(args.turn)
+    eval_files, data = load_turn_data(args.turn, EVALS_DIR)
 
     if not eval_files:
         print(f"No evaluation files found matching: {EVALS_DIR / f'*_v{args.turn}_eval.json'}")
@@ -165,7 +190,7 @@ def main():
 
     compare_files, compare_data = None, None
     if args.compare_turn and args.compare_turn != args.turn:
-        compare_files, compare_data = load_turn_data(args.compare_turn)
+        compare_files, compare_data = load_turn_data(args.compare_turn, EVALS_DIR)
         if not compare_files:
             print(f"No evaluation files found for compare turn {args.compare_turn}, skipping comparison.")
             compare_data = None
@@ -278,7 +303,7 @@ def main():
         "per_task": per_task,
     }
 
-    ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
+    ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)  # type: ignore[union-attr]
     out_path = ANALYSIS_DIR / f"overall_summary_v{args.turn}.json"
     out_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
     print(f"\n[Saved] {out_path}")
