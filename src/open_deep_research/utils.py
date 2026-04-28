@@ -29,6 +29,11 @@ from langgraph.config import get_store
 from mcp import McpError
 from tavily import AsyncTavilyClient
 
+try:
+    from exa_py import Exa
+except ImportError:
+    Exa = None
+
 from open_deep_research.configuration import Configuration, SearchAPI
 from open_deep_research.prompts import summarize_webpage_prompt
 from open_deep_research.state import ResearchComplete, Summary
@@ -211,6 +216,286 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         # Other errors during summarization - log and return original content
         logging.warning(f"Summarization failed with error: {str(e)}, returning original content")
         return webpage_content
+
+##########################
+# Exa Search Tool Utils
+##########################
+EXA_SEARCH_DESCRIPTION = (
+    "An AI-powered search engine that returns high-quality, semantically relevant "
+    "web results with rich content extraction (full text, AI summaries, and "
+    "highlights). Useful for research-oriented queries that benefit from "
+    "neural search and on-demand content retrieval."
+)
+
+
+@tool(description=EXA_SEARCH_DESCRIPTION)
+async def exa_search(
+    queries: List[str],
+    max_results: Annotated[int, InjectedToolArg] = 5,
+    search_type: Annotated[Literal["auto", "neural", "fast"], InjectedToolArg] = "auto",
+    category: Annotated[
+        Literal[
+            "company",
+            "research paper",
+            "news",
+            "personal site",
+            "financial report",
+            "people",
+        ] | None,
+        InjectedToolArg,
+    ] = None,
+    include_domains: Annotated[List[str] | None, InjectedToolArg] = None,
+    exclude_domains: Annotated[List[str] | None, InjectedToolArg] = None,
+    start_published_date: Annotated[str | None, InjectedToolArg] = None,
+    end_published_date: Annotated[str | None, InjectedToolArg] = None,
+    config: RunnableConfig = None,
+) -> str:
+    """Fetch and summarize search results from the Exa search API.
+
+    Args:
+        queries: List of search queries to execute
+        max_results: Maximum number of results to return per query
+        search_type: Exa search type ("auto", "neural", or "fast")
+        category: Optional category filter (e.g. "research paper", "news")
+        include_domains: Optional list of domains to restrict results to
+        exclude_domains: Optional list of domains to exclude from results
+        start_published_date: Optional ISO 8601 lower bound for publish date
+        end_published_date: Optional ISO 8601 upper bound for publish date
+        config: Runtime configuration for API keys and model settings
+
+    Returns:
+        Formatted string containing summarized search results
+    """
+    # Step 1: Execute search queries asynchronously
+    search_results = await exa_search_async(
+        queries,
+        max_results=max_results,
+        search_type=search_type,
+        category=category,
+        include_domains=include_domains,
+        exclude_domains=exclude_domains,
+        start_published_date=start_published_date,
+        end_published_date=end_published_date,
+        config=config,
+    )
+
+    # Step 2: Deduplicate results by URL to avoid processing the same content multiple times
+    unique_results: Dict[str, Dict[str, Any]] = {}
+    for response in search_results:
+        for result in response["results"]:
+            url = result["url"]
+            if url not in unique_results:
+                unique_results[url] = {**result, "query": response["query"]}
+
+    # Step 3: Set up the summarization model with configuration
+    configurable = Configuration.from_runnable_config(config)
+
+    # Character limit to stay within model token limits (configurable)
+    max_char_to_include = configurable.max_content_length
+
+    # Initialize summarization model with retry logic
+    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
+    summarization_model = init_chat_model(
+        model=configurable.summarization_model,
+        max_tokens=configurable.summarization_model_max_tokens,
+        api_key=model_api_key,
+        tags=["langsmith:nostream"],
+    ).with_structured_output(Summary).with_retry(
+        stop_after_attempt=configurable.max_structured_output_retries
+    )
+
+    # Step 4: Create summarization tasks (skip empty content)
+    async def noop():
+        """No-op function for results without raw content."""
+        return None
+
+    summarization_tasks = [
+        noop()
+        if not result.get("raw_content")
+        else summarize_webpage(
+            summarization_model,
+            result["raw_content"][:max_char_to_include],
+        )
+        for result in unique_results.values()
+    ]
+
+    # Step 5: Execute all summarization tasks in parallel
+    summaries = await asyncio.gather(*summarization_tasks)
+
+    # Step 6: Combine results with their summaries
+    summarized_results = {
+        url: {
+            "title": result["title"],
+            "content": result["content"] if summary is None else summary,
+        }
+        for url, result, summary in zip(
+            unique_results.keys(),
+            unique_results.values(),
+            summaries,
+        )
+    }
+
+    # Step 7: Format the final output
+    if not summarized_results:
+        return "No valid search results found. Please try different search queries or use a different search API."
+
+    formatted_output = "Search results: \n\n"
+    for i, (url, result) in enumerate(summarized_results.items()):
+        formatted_output += f"\n\n--- SOURCE {i + 1}: {result['title']} ---\n"
+        formatted_output += f"URL: {url}\n\n"
+        formatted_output += f"SUMMARY:\n{result['content']}\n\n"
+        formatted_output += "\n\n" + "-" * 80 + "\n"
+
+    return formatted_output
+
+
+async def exa_search_async(
+    search_queries,
+    max_results: int = 5,
+    search_type: Literal["auto", "neural", "fast"] = "auto",
+    category: str | None = None,
+    include_domains: List[str] | None = None,
+    exclude_domains: List[str] | None = None,
+    start_published_date: str | None = None,
+    end_published_date: str | None = None,
+    config: RunnableConfig = None,
+):
+    """Execute multiple Exa search queries asynchronously.
+
+    Args:
+        search_queries: List of search query strings to execute
+        max_results: Maximum number of results per query
+        search_type: Exa search type ("auto", "neural", or "fast")
+        category: Optional category filter
+        include_domains: Optional list of domains to restrict results to
+        exclude_domains: Optional list of domains to exclude
+        start_published_date: Optional ISO 8601 lower bound for publish date
+        end_published_date: Optional ISO 8601 upper bound for publish date
+        config: Runtime configuration for API key access
+
+    Returns:
+        List of search response dictionaries with the same shape used by the
+        Tavily search path, so downstream summarization is identical.
+    """
+    if Exa is None:
+        raise ImportError(
+            "The exa-py package is required for Exa search. "
+            "Install it with `pip install exa-py`."
+        )
+
+    api_key = get_exa_api_key(config)
+    if not api_key:
+        raise ValueError(
+            "EXA_API_KEY is not set. Get a key at https://dashboard.exa.ai "
+            "and configure it in your environment."
+        )
+
+    if include_domains and exclude_domains:
+        raise ValueError(
+            "Cannot specify both include_domains and exclude_domains for Exa search."
+        )
+
+    exa_client = Exa(api_key=api_key)
+    exa_client.headers["x-exa-integration"] = "open-deep-research"
+
+    def run_query(query: str) -> Dict[str, Any]:
+        kwargs: Dict[str, Any] = {
+            "num_results": max_results,
+            "type": search_type,
+            "text": True,
+            "highlights": True,
+            "summary": True,
+        }
+        if category is not None:
+            kwargs["category"] = category
+        if include_domains:
+            kwargs["include_domains"] = include_domains
+        if exclude_domains:
+            kwargs["exclude_domains"] = exclude_domains
+        if start_published_date:
+            kwargs["start_published_date"] = start_published_date
+        if end_published_date:
+            kwargs["end_published_date"] = end_published_date
+
+        response = exa_client.search_and_contents(query, **kwargs)
+        return _format_exa_response(query, response)
+
+    # Run the synchronous SDK calls off the event loop, in parallel per query.
+    return await asyncio.gather(
+        *[asyncio.to_thread(run_query, q) for q in search_queries]
+    )
+
+
+def _format_exa_response(query: str, response: Any) -> Dict[str, Any]:
+    """Convert an Exa SearchResponse into the Tavily-shaped result dict.
+
+    Exa returns either dicts or typed result objects depending on the SDK
+    version, so attribute access is normalized via ``_get_attr``. Content for
+    each result cascades through text -> summary -> highlights so the
+    downstream summarizer always has something to work with.
+    """
+    results_list = _get_attr(response, "results", []) or []
+    formatted_results: List[Dict[str, Any]] = []
+    seen_urls: set = set()
+
+    for result in results_list:
+        url = _get_attr(result, "url")
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+
+        text = _get_attr(result, "text") or ""
+        summary = _get_attr(result, "summary") or ""
+        highlights = _get_attr(result, "highlights") or []
+        if isinstance(highlights, list):
+            highlights_str = "\n".join(str(h) for h in highlights if h)
+        else:
+            highlights_str = str(highlights)
+
+        # Snippet shown in the deduped "content" field. Prefer a concise
+        # source: summary first, then highlights, then a text excerpt.
+        if summary:
+            snippet = summary
+        elif highlights_str:
+            snippet = highlights_str
+        elif text:
+            snippet = text[:1000]
+        else:
+            snippet = ""
+
+        # Raw content fed into the summarization step. Prefer full text;
+        # fall back to summary/highlights so empty-text pages still
+        # contribute something.
+        raw_content_parts = [p for p in (text, summary, highlights_str) if p]
+        raw_content = "\n\n".join(raw_content_parts) if raw_content_parts else None
+
+        formatted_results.append(
+            {
+                "title": _get_attr(result, "title") or "",
+                "url": url,
+                "content": snippet,
+                "score": _get_attr(result, "score"),
+                "raw_content": raw_content,
+            }
+        )
+
+    return {
+        "query": query,
+        "follow_up_questions": None,
+        "answer": None,
+        "images": [],
+        "results": formatted_results,
+    }
+
+
+def _get_attr(obj: Any, key: str, default: Any = None) -> Any:
+    """Read ``key`` from a dict or attribute-access object."""
+    if obj is None:
+        return default
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
 
 ##########################
 # Reflection Tool Utils
@@ -553,12 +838,22 @@ async def get_search_tool(search_api: SearchAPI):
         # Configure Tavily search tool with metadata
         search_tool = tavily_search
         search_tool.metadata = {
-            **(search_tool.metadata or {}), 
-            "type": "search", 
+            **(search_tool.metadata or {}),
+            "type": "search",
             "name": "web_search"
         }
         return [search_tool]
-        
+
+    elif search_api == SearchAPI.EXA:
+        # Configure Exa search tool with metadata
+        search_tool = exa_search
+        search_tool.metadata = {
+            **(search_tool.metadata or {}),
+            "type": "search",
+            "name": "web_search",
+        }
+        return [search_tool]
+
     elif search_api == SearchAPI.NONE:
         # No search functionality configured
         return []
@@ -923,3 +1218,15 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+
+def get_exa_api_key(config: RunnableConfig):
+    """Get Exa API key from environment or config."""
+    should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
+    if should_get_from_config.lower() == "true":
+        api_keys = (config or {}).get("configurable", {}).get("apiKeys", {})
+        if not api_keys:
+            return None
+        return api_keys.get("EXA_API_KEY")
+    else:
+        return os.getenv("EXA_API_KEY")
