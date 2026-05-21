@@ -860,7 +860,7 @@ def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> l
     for i in range(len(messages) - 1, -1, -1):
         if isinstance(messages[i], AIMessage):
             # Return everything up to (but not including) the last AI message
-            return messages[:i]
+            return messages[i:]
     
     # No AI messages found, return original list
     return messages
