@@ -53,9 +53,18 @@ from open_deep_research.utils import (
     think_tool,
 )
 
+from langchain_openrouter import ChatOpenRouter
+from langchain_core.runnables import ConfigurableField
+
 # Initialize a configurable model that we will use throughout the agent
-configurable_model = init_chat_model(
-    configurable_fields=("model", "max_tokens", "api_key"),
+configurable_model = ChatOpenRouter(
+    model_name="openai/gpt-4o-mini",
+    app_url="http://localhost:8000",
+    app_title="Open Deep Research"
+).configurable_fields(
+    model_name=ConfigurableField(id="model"),
+    max_tokens=ConfigurableField(id="max_tokens"),
+    openrouter_api_key=ConfigurableField(id="api_key"),
 )
 
 async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["write_research_brief", "__end__"]]:

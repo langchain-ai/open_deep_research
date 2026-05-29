@@ -82,12 +82,14 @@ async def tavily_search(
     max_char_to_include = configurable.max_content_length
     
     # Initialize summarization model with retry logic
+    from langchain_openrouter import ChatOpenRouter
     model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model = init_chat_model(
-        model=configurable.summarization_model,
+    summarization_model = ChatOpenRouter(
+        model_name=configurable.summarization_model,
         max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
+        openrouter_api_key=model_api_key,
+        app_url="http://localhost:8000",
+        app_title="Open Deep Research"
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
@@ -904,6 +906,8 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return api_keys.get("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return api_keys.get("GOOGLE_API_KEY")
+        else:
+            return api_keys.get("OPENROUTER_API_KEY")
         return None
     else:
         if model_name.startswith("openai:"): 
