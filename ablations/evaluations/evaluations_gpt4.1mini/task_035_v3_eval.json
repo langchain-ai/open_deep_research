@@ -1,0 +1,317 @@
+{
+  "task_id": "task_035",
+  "domain": "Technology",
+  "report_file": "task_035_v3.md",
+  "summary": {
+    "total_criteria": 34,
+    "positive_criteria": 30,
+    "negative_criteria": 4,
+    "correctly_handled": 20,
+    "pass_rate": 58.82,
+    "normalized_score": 46.82,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 14,
+        "correctly_handled": 8,
+        "normalized_score": 57.14
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 7,
+        "correctly_handled": 6,
+        "normalized_score": 83.33
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 3,
+        "normalized_score": 0.0
+      },
+      "citation-quality": {
+        "total": 7,
+        "correctly_handled": 3,
+        "normalized_score": 12.82
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "manufacturing-cloud-baseline-latency",
+        "requirement": "States manufacturing cloud-centric baseline latency as 200-1000ms or includes 300ms or similar multi-hundred millisecond baseline",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "In the manufacturing predictive maintenance section, the response states cloud-centric roundtrip latencies ranging from “80 to over 500 ms” and later compares “~5 ms (edge) vs 80–200+ ms (cloud).” These are multi-hundred millisecond cloud baselines, satisfying the required 200–1000 ms or similar range."
+      },
+      {
+        "id": "manufacturing-edge-latency-target",
+        "requirement": "States manufacturing edge-distributed latency as 5-50ms or 10-50ms achieving 80-95% reduction",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives manufacturing PdM edge latencies such as 1–5 ms and 15–50 ms and mentions bandwidth reductions (>70–90%), but it never states a manufacturing edge-distributed latency of specifically 5–50 ms or 10–50 ms paired with an 80–95% reduction. The exact latency range and the 80–95% reduction figure are missing as a combined claim."
+      },
+      {
+        "id": "manufacturing-availability-improvement",
+        "requirement": "Demonstrates manufacturing availability improvement through edge-distributed architecture (e.g., offline operation capability, local failover, reduced dependency on cloud connectivity)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The manufacturing predictive maintenance section describes a hierarchical edge-cloud model with on-device processing and site edge servers, emphasizing reduced cloud round trips and improved uptime/downtime metrics. It also implies resilience via local processing and OTA/rollback, reducing dependency on continuous cloud connectivity. This demonstrates improved manufacturing availability through an edge-distributed architecture."
+      },
+      {
+        "id": "manufacturing-edge-platforms",
+        "requirement": "Names at least 3 edge platforms/gateways: Siemens Industrial Edge, AWS IoT Greengrass, Azure IoT Edge, PTC ThingWorx Edge, Rockwell FactoryTalk Edge",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names “Siemens Industrial Edge” and also mentions “Azure IoT Edge” and “AWS IoT Greengrass,” satisfying the requirement to name at least three listed edge platforms/gateways."
+      },
+      {
+        "id": "manufacturing-roi-timeline",
+        "requirement": "States manufacturing ROI or payback period as 14-18 months or 16-18 months or similar sub-24-month timeframe",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states manufacturing predictive maintenance ROI/payback as “payback 8–18 months” in the summary table, which is a sub-24-month timeframe and includes the 14–18 month range."
+      },
+      {
+        "id": "amr-edge-safety-latency",
+        "requirement": "States AMR edge safety/perception latency as 1-10ms or 5-10ms for collision avoidance or obstacle detection",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "In the AMRs section, the response states that on-device edge executes obstacle detection/perception with latencies “below 1–10 ms,” explicitly tying this to safety-critical decision loops. This matches the required 1–10 ms range for collision avoidance/obstacle detection."
+      },
+      {
+        "id": "amr-bandwidth-percentage",
+        "requirement": "States AMR bandwidth reduction as 88-99% or 90-99% or 90%+",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives AMR bandwidth savings as “65–78%” and elsewhere mentions “up to 90%” generally, but it never states AMR bandwidth reduction as 88–99%, 90–99%, or 90%+. The required AMR-specific bandwidth reduction range/threshold is absent."
+      },
+      {
+        "id": "amr-edge-hardware",
+        "requirement": "Names at least 2 onboard edge compute platforms: NVIDIA Jetson (Orin, Xavier, AGX), Intel Movidius, Qualcomm",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response names multiple onboard edge compute platforms, including NVIDIA Jetson (Nano/Orin) and Intel Movidius, satisfying the requirement to list at least two."
+      },
+      {
+        "id": "amr-roi-timeline",
+        "requirement": "States AMR ROI or payback period as 18-24 months or 22 months or similar sub-24-month timeframe",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes ROI/payback figures under 24 months, such as “payback 8–18 months,” “ROI 11–18 months,” and “ROI within 12–24 months,” which satisfies the requirement for a sub-24-month timeframe."
+      },
+      {
+        "id": "energy-cloud-baseline-latency",
+        "requirement": "States energy cloud/centralized baseline fault detection as 500ms-5 seconds or 500ms-5s or 1.2 seconds or similar",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The energy distribution section gives cloud-centric latency as 80–120 ms and edge decision-making as “below 10 ms,” but it never states a centralized baseline fault-detection time of 500 ms–5 seconds (or ~1.2 seconds). No 500ms–5s/1.2s-style baseline appears anywhere in the response."
+      },
+      {
+        "id": "energy-edge-fault-detection",
+        "requirement": "States energy edge fault detection latency as 10-100ms or 20-100ms or 45ms achieving 80-95% reduction",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives energy distribution latency figures like “below 10 ms” and “80–120+ ms,” but it never states an energy edge fault detection latency of 10–100 ms, 20–100 ms, or 45 ms, nor does it mention achieving an 80–95% reduction tied to that latency. The specific latency range/value and the 80–95% reduction claim are absent."
+      },
+      {
+        "id": "energy-goose-messaging",
+        "requirement": "States IEC 61850 GOOSE peer-to-peer messaging latency as <3ms or sub-3ms or millisecond-scale",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses millisecond-level latencies (e.g., “below 10 ms”) and mentions OPC UA over TSN sub-millisecond latency, but it never mentions IEC 61850 GOOSE peer-to-peer messaging or states its latency as <3 ms/sub-3 ms. The specific IEC 61850 GOOSE latency requirement is absent."
+      },
+      {
+        "id": "energy-saidi-improvement",
+        "requirement": "States SAIDI improvement from 8-40 hours/year to 2-8 hours/year OR 98-120 minutes to 65-78 minutes OR 20-50% outage reduction",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses latency, bandwidth savings, and SLA violation reductions, but it does not mention SAIDI or provide any of the specified improvement ranges (8–40 hours/year to 2–8 hours/year, 98–120 minutes to 65–78 minutes) or a 20–50% outage reduction figure. No SAIDI-related outage-duration metric is stated for energy distribution."
+      },
+      {
+        "id": "energy-protocols-standards",
+        "requirement": "Names at least 3 relevant protocols/standards: IEC 61850 (GOOSE/SV/MMS), IEEE 1547, NERC CIP, IEC 62351, IEC 62443, OpenFMB",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response names at least three of the listed protocols/standards, including IEC 62443 (manufacturing section), NERC-CIP (energy distribution section), and it also references IEC 61850/IEEE 1547/IEC 62351/OpenFMB as relevant grid standards."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "hierarchical-architecture-layering",
+        "requirement": "Describes multi-tier edge architecture with specific latency targets for each layer (device/gateway/regional/cloud or similar hierarchy)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes a multi-tier edge hierarchy (device/on-device, local/fog/regional, and cloud) and provides explicit latency targets for each layer (e.g., device 1–5 ms, fog/regional 10–50 ms, cloud >100 ms) across the use cases."
+      },
+      {
+        "id": "cross-cutting-design-patterns",
+        "requirement": "Identifies at least 3 architectural patterns across use cases (store-and-forward, event-driven, peer-to-peer, hierarchical intelligence, digital twins)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies multiple architectural patterns across the use cases, including hierarchical edge–fog–cloud intelligence, event-driven transmissions (sending only alerts/summaries), and digital twins (cloud layer handling digital twin simulations). These constitute at least three of the listed patterns."
+      },
+      {
+        "id": "regulatory-architecture-drivers",
+        "requirement": "Connects specific regulations to architecture requirements (FERC 2222, IEEE 1547, IEC 62443, GDPR/CCPA/PIPL) for at least 2 use cases",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response links IEC 62443 and GDPR/CCPA to architectural choices (e.g., edge localization, secure boot/encryption) across multiple use cases. However, it does not connect FERC 2222 or IEEE 1547 to energy distribution architecture requirements, nor does it mention PIPL, so the specified regulation set is not satisfied for at least two use cases."
+      },
+      {
+        "id": "edge-ml-lifecycle-management",
+        "requirement": "Discusses model compression percentages, drift detection, retraining orchestration, or MLOps platforms for distributed edge deployments",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response mentions edge lifecycle management elements such as OTA update pipelines and names edge platforms like Siemens Industrial Edge and TTTech Nerve, which are relevant MLOps/edge platforms for distributed deployments. However, it does not explicitly discuss model compression percentages, drift detection, or retraining orchestration in detail."
+      },
+      {
+        "id": "maintainability-success-metrics",
+        "requirement": "Provides quantified OTA update success rates, deployment time reductions, or remote diagnostics resolution percentages for edge fleet management",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes quantified OTA update success rates (e.g., “exceed 95%” and “>95%” across use cases) in the maintainability sections and the summary table. However, it does not provide quantified deployment time reductions or remote diagnostics resolution percentages (it gives time-to-resolve in minutes/hours, not percentages)."
+      },
+      {
+        "id": "qualitative-tradeoff-analysis",
+        "requirement": "Explains at least 2 edge trade-offs such as security attack surface vs data sovereignty, cost vs latency, or maintainability vs autonomy",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses multiple edge trade-offs, including data privacy/sovereignty driving localized edge processing versus cloud centralization, and security implications like increased need for secure boot/zero-trust/hardware roots of trust across distributed nodes (larger attack surface). It also addresses maintainability trade-offs via OTA updates, lifecycle management, and patching complexity across heterogeneous edge devices."
+      },
+      {
+        "id": "undifferentiated-use-cases",
+        "requirement": "Provides identical analysis or generic benefits for all three use cases without addressing their distinct technical requirements",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response differentiates the three use cases with distinct architectures (e.g., on-device control loops for AMRs, substation far-edge for energy, hierarchical PdM), different latency targets, bandwidth reductions, and different protocols/standards and regulatory constraints. It is not a generic, identical benefits write-up repeated across all three."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "requested-subsection-structure",
+        "requirement": "Organizes each use case with distinct (a) architecture, (b) metrics, and (c) trade-offs subsections as specified in the query",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response structures each of the three use cases into clearly labeled subsections that cover (a) an architectural comparison, (b) quantified metrics for latency/bandwidth/SLA, and (c) trade-offs content (addressed within broader maintainability/security/cost discussion and summary). These elements are distinct and repeated per use case."
+      },
+      {
+        "id": "technical-objective-tone",
+        "requirement": "Maintains technical, objective tone without marketing language, hype, first-person commentary, or casual phrasing",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses some hype/marketing phrasing such as “profoundly reshaping,” “dramatic latency reductions,” “unprecedented operational agility,” and “indispensable paradigm,” and includes evaluative first-person framing like “This report provides…,” which is not purely technical/objective."
+      },
+      {
+        "id": "metrics-in-comparison-tables",
+        "requirement": "Presents latency, bandwidth, and availability metrics in comparison tables showing before vs after values",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a summary comparison table that lists latency, bandwidth savings, and SLA/availability-related metrics with explicit edge vs cloud (before vs after) values for each use case (e.g., “~5 ms vs 80–200+ ms,” “SLA violations 23% → <6%”)."
+      },
+      {
+        "id": "architecture-data-flow-descriptions",
+        "requirement": "Provides clear before/after architecture descriptions showing data flow from sensors through edge tiers to cloud",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes explicit cloud-centric vs edge-distributed architecture comparisons for all three use cases, describing tiered data flow from sensors/on-device processing through local/fog edge servers to the cloud (e.g., device layer → fog/site edge → cloud; on-device edge → local edge servers → cloud; far-edge/substation → fog/regional → cloud)."
+      },
+      {
+        "id": "metrics-not-tabulated",
+        "requirement": "Lists quantitative metrics inline within paragraphs rather than in structured comparison tables or formatted lists",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response presents many quantitative metrics inline within paragraphs (e.g., latency ranges like “80–500 ms,” “1–5 ms,” bandwidth “>90%,” and SLA “23% → <6%”) across the use-case sections, not solely in structured tables or formatted lists."
+      },
+      {
+        "id": "verbose-filler",
+        "requirement": "Uses excessive wordiness, filler phrases, or vague qualifiers that extend length without adding technical substance",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response contains substantial filler and vague qualifiers that add length without technical value, e.g., “profoundly reshaping,” “rigorous analysis,” “meticulously quantifies,” and repeated broad claims about being “authoritative” and “well-evidenced.” It also includes extended sections (protocols/regulatory overviews and a long sources list) that often don’t directly support the requested quantified comparisons, increasing wordiness."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "manufacturing-vendor-case-studies",
+        "requirement": "Cites at least 2 manufacturing case studies with quantified results from major players such as BMW, Siemens, Bosch Rexroth, FANUC, Rockwell, Schaeffler, SKF, Texmark, or Schneider or equivalent leaders",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions some vendors (e.g., Siemens Industrial Edge, Schneider Electric EcoStruxure) but does not provide at least two clearly identified manufacturing case studies from major players like BMW, Siemens, Bosch Rexroth, FANUC, Rockwell, Schaeffler, SKF, Texmark, or Schneider with quantified results tied to those players. Quantified figures are mostly attributed to non-major sources (e.g., Sixfab, iFactory) or are generic/unsourced to a specific major manufacturer."
+      },
+      {
+        "id": "amr-vendor-case-studies",
+        "requirement": "Cites at least 2 AMR case studies with quantified results from major players such as Amazon Robotics, Locus Robotics, DHL/Fetch, Boston Dynamics, OTTO Motors, MiR, or Zebra or equivalent leaders",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses AMR architectures and provides general latency/bandwidth/SLA figures, but it does not cite at least two AMR case studies from major AMR players (e.g., Amazon Robotics, Locus, DHL/Fetch, OTTO, MiR, Zebra) with quantified results. It references generic benchmarks and an NVIDIA press release without specific AMR deployment outcomes from those leaders."
+      },
+      {
+        "id": "energy-utility-case-studies",
+        "requirement": "Cites at least 2 utility case studies with quantified results from major players such as Duke Energy, National Grid, ConEd, SCE, FPL, Enel X, SDG&E, or Tesla VPP or equivalent leaders",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response’s energy distribution section cites Schneider Electric and generic “smart grid pilot projects,” but it does not provide at least two utility case studies from major utilities (e.g., Duke, National Grid, ConEd, SCE, FPL, SDG&E) or Tesla VPP with quantified results. No named utility case studies with specific measured outcomes are included."
+      },
+      {
+        "id": "edge-platforms-and-hardware",
+        "requirement": "References specific edge computing platforms and hardware by name: AWS IoT Greengrass, Azure IoT Edge, Siemens Industrial Edge, NVIDIA Jetson series, K3s/Kubernetes edge distributions, or similar commercial platforms",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references specific edge hardware and platforms by name, including NVIDIA Jetson Nano/Orin and Siemens Industrial Edge (and also mentions Schneider Electric EcoStruxure). These are explicit commercial edge computing products/platforms, satisfying the requirement to name specific platforms/hardware."
+      },
+      {
+        "id": "standards-protocols-frameworks",
+        "requirement": "References industry standards and protocols: IEC 61850, IEEE 1547, IEC 62443, NERC CIP, IEC 62351, OpenFMB, ISO 13849, ISO 26262, or similar technical standards",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references multiple industry standards and protocols, including IEC 62443 and NERC-CIP, and also mentions ISO 13849-1 in the AMR section."
+      },
+      {
+        "id": "industry-analyst-research",
+        "requirement": "Cites industry analyst firms or research organizations for market trends and adoption data: Gartner, IDC, Forrester, Linux Foundation Edge, CNCF, 5G-ACIA, or similar authoritative sources",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Gartner explicitly in the sources list (“Insights from Gartner’s 2024 Market Guide”), which satisfies the requirement to cite an industry analyst firm or authoritative research organization for market trends/adoption data."
+      },
+      {
+        "id": "informal-industrial-sources",
+        "requirement": "Cites Reddit posts, generic tech blogs, or YouTube videos as authoritative sources for industrial performance claims",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response does not cite Reddit posts or YouTube videos, but it does cite generic tech/blog-style sources (e.g., Medium, Shopify enterprise blog, hacod.tech, iotforall.com, industryidx.com) as support for quantified industrial performance claims like latency, bandwidth reduction, and SLA improvements."
+      }
+    ]
+  }
+}

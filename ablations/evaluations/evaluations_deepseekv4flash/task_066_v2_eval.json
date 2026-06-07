@@ -1,0 +1,325 @@
+{
+  "task_id": "task_066",
+  "domain": "Personalized Assistant",
+  "report_file": "task_066_v2.md",
+  "summary": {
+    "total_criteria": 35,
+    "positive_criteria": 32,
+    "negative_criteria": 3,
+    "correctly_handled": 29,
+    "pass_rate": 82.86,
+    "normalized_score": 76.35,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 17,
+        "correctly_handled": 12,
+        "normalized_score": 66.67
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 8,
+        "normalized_score": 100.0
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 5,
+        "normalized_score": 100.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "austin-school-district-entry-price",
+        "requirement": "States Austin 8+/10 school district home prices $600K-$800K in premium areas OR identifies affordable high-rated districts (Round Rock ~$400K-$450K, Leander ~$420K-$450K)",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives Austin 8+/10 district pricing (Round Rock ISD) but lists it as ~$520K and does not state the required $600K–$800K premium-area range. It also does not identify the specified affordable high-rated district price ranges (Round Rock ~$400K–$450K and Leander ~$420K–$450K); Leander is shown as 7/10 with higher figures."
+      },
+      {
+        "id": "raleigh-school-district-entry-price",
+        "requirement": "States Raleigh 8+/10 school district home prices $425K-$650K in areas like Wake County, Cary, Apex, or Morrisville",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states Raleigh/Wake County (Cary, Apex, Morrisville) 8+/10 school-zone home prices in the range of roughly $500K-$635K and also mentions an Apex entry point around $400K-$500K. However, it does not explicitly give the requested consolidated range of \"$425K-$650K\" for Raleigh 8+/10 areas."
+      },
+      {
+        "id": "nashville-school-district-entry-price",
+        "requirement": "States Nashville 8+/10 school district requires $600K-$1M+ home prices in Williamson County suburbs (Franklin, Brentwood)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that in Nashville, top-rated (10/10) Williamson County schools in Franklin and Brentwood require high home prices, citing Franklin at ~$940K+ and Brentwood up to ~$1.7M. This matches the requirement that 8+/10 districts in those Williamson County suburbs require roughly $600K–$1M+ homes."
+      },
+      {
+        "id": "raleigh-property-tax-rate",
+        "requirement": "States Raleigh/Wake County property tax rate between 0.70%-0.90% effective rate",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives Wake County’s combined property tax rate as $0.8721 per $100 assessed value, which corresponds to an effective rate of about 0.872% of home value. This falls within the required 0.70%-0.90% effective rate range for Raleigh/Wake County."
+      },
+      {
+        "id": "nashville-property-tax-rate",
+        "requirement": "States Nashville/Davidson County property tax rate between 0.68%-0.72% effective rate (25% assessment ratio × ~2.80% tax rate per $100 assessed value)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives Davidson County’s Nashville tax rate as $2.782 per $100 of assessed value with a 25% assessment ratio and computes $3,477.50 on a $500,000 home, which implies an effective rate of about 0.6955% of market value. This falls within the required 0.68%–0.72% effective-rate range."
+      },
+      {
+        "id": "property-tax-dollar-comparison",
+        "requirement": "Calculates annual property tax in dollars on $500K home for at least 2 cities, accounting for combined city/county/school district rates",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response calculates annual property tax on a $500,000 home for multiple locations, including Austin (Round Rock ISD and Eanes ISD), Raleigh (Wake County + Raleigh), and Nashville (Davidson and Williamson/Franklin). It explicitly breaks out combined components such as city + county + school district rates for the Texas examples, satisfying the combined-rate requirement for at least two cities."
+      },
+      {
+        "id": "texas-income-tax-status",
+        "requirement": "States Texas has 0% state income tax",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states under the “State Income Tax” section that Austin (Texas) has a “0%” state income tax rate and shows “$0.00” annual state income tax, which conveys that Texas has 0% state income tax."
+      },
+      {
+        "id": "north-carolina-income-tax-rate",
+        "requirement": "States North Carolina income tax rate at 4.25% for 2025 or 3.99% for 2026+ (flat rate with scheduled reductions)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states North Carolina has a 3.99% flat state income tax rate for 2026 (e.g., in the “State Income Tax” table and later discussion). This matches the criterion’s requirement of stating 3.99% for 2026+."
+      },
+      {
+        "id": "tennessee-income-tax-status",
+        "requirement": "States Tennessee has 0% state income tax on wages/salary",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states “Nashville — 0% (Tennessee)” under State Income Tax and also notes “Tennessee Comptroller (no wage income tax),” which conveys that Tennessee has 0% state income tax on wages/salary."
+      },
+      {
+        "id": "austin-job-market-depth",
+        "requirement": "States Austin has 450-600 mechanical engineer postings OR 500-600 aerospace postings, identifies market as strongest/largest",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states Austin has 565 “Senior Mechanical Engineer” postings on Indeed, which falls within the 450–600 range, and it explicitly labels Austin as the “Winner” with the “deepest”/strongest job market depth. This satisfies the requirement to give the specified posting range and identify Austin as the strongest/largest market."
+      },
+      {
+        "id": "raleigh-job-market-depth",
+        "requirement": "States Raleigh has 300+ to 1000+ mechanical engineer postings OR describes Research Triangle Park as strong/diversified market",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes Raleigh’s job market as centered in Research Triangle Park, calling it a centralized hub with many major employers and consistent sub-30-minute commutes, which conveys RTP as a strong/diversified market."
+      },
+      {
+        "id": "nashville-job-market-depth",
+        "requirement": "States Nashville has 250-800 mechanical engineer postings, identifies market as moderate/weaker than Austin or Raleigh",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives Nashville job posting counts (~1,490 total) but does not state that Nashville has 250–800 mechanical engineer postings. It also does not explicitly identify Nashville’s market as moderate/weaker than Austin or Raleigh using that framing alongside the 250–800 range."
+      },
+      {
+        "id": "major-employers-identification",
+        "requirement": "Names at least 2 major aerospace/manufacturing employers from Austin (Tesla, SpaceX, Samsung, Applied Materials, Firefly) AND at least 2 from Raleigh (GE Aviation, BAE Systems, John Deere) AND at least 1 from Nashville (Nissan, Bridgestone, Electrolux)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response names at least two Austin employers (Tesla, Samsung, Firefly) and at least one Nashville employer (Nissan, Bridgestone). However, it does not name at least two Raleigh employers from the specified set (GE Aviation/GE Aviation, BAE Systems, John Deere); it only mentions GE Aerospace, which is one."
+      },
+      {
+        "id": "austin-top-school-districts",
+        "requirement": "Identifies at least 3 specific Austin ISDs rated 8-10/10 from Eanes ISD, Lake Travis ISD, Round Rock ISD, or Leander ISD",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies three Austin-area ISDs from the specified list with ratings in the 8-10/10 range: Eanes ISD (10/10), Lake Travis ISD (9/10), and Round Rock ISD (8/10). These are explicitly listed in the Austin housing table with their GreatSchools ratings."
+      },
+      {
+        "id": "raleigh-school-context",
+        "requirement": "Describes Wake County schools OR identifies high-performing areas like Cary, Apex, Chapel Hill-Carrboro, or mentions strong charter options",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses Raleigh-area schools in Wake County and identifies high-performing areas including Cary, Apex, and Morrisville, with multiple examples of specific elementary schools and ratings."
+      },
+      {
+        "id": "nashville-school-geography",
+        "requirement": "States Davidson County schools average 2/10 AND best public schools are in suburban Williamson County or Rutherford County",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that Davidson County schools average 2/10, nor does it explicitly say the best public schools are in suburban Williamson County or Rutherford County. It mentions Davidson County as 5/10 in a property-tax table and highlights Williamson County schools, but Rutherford County is described as 6–7/10 rather than “best.”"
+      },
+      {
+        "id": "industrial-zone-commutes",
+        "requirement": "Identifies specific neighborhoods within 30 minutes of industrial zones for at least 2 cities (e.g., Round Rock/Cedar Park/Pflugerville for Austin, Cary/Morrisville for Raleigh RTP)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response names specific neighborhoods near industrial/employment zones for at least two cities: Austin (e.g., Round Rock, Cedar Park, Pflugerville) and Raleigh (e.g., Cary, Apex, Morrisville), and it also provides Nashville areas (Brentwood, Franklin, Mt. Juliet, Murfreesboro) with commute-time context."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "scenario-conditional-recommendations",
+        "requirement": "Provides at least 2 different city recommendations based on varying priorities (e.g., \"if career depth, choose Austin; if school access, choose Raleigh\")",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives multiple conditional recommendations tied to different priorities, e.g., Raleigh as the overall choice, Austin “if and only if” the job is at Samsung/Dell, and Nashville “if” the employer is in Cool Springs and taxes are the priority."
+      },
+      {
+        "id": "cross-dimensional-optimization",
+        "requirement": "Describes strategy combining favorable factors across dimensions in at least 1 city (e.g., Austin salary premium + Round Rock suburb affordability)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly combines favorable factors across dimensions for at least one city, e.g., recommending Raleigh/Cary or Morrisville by tying together affordable homes in 8–10/10 school zones, consistent sub-30-minute commutes to RTP, and stable appreciation/tax considerations. It also similarly frames Austin as competitive only if working near Samsung/Dell with Round Rock ISD schools and commute feasibility."
+      },
+      {
+        "id": "school-tier-price-quantification",
+        "requirement": "Quantifies specific dollar ranges to access 8+/10 schools in at least 2 cities (e.g., \"$450K-$625K Raleigh\" vs \"$600K-$800K Austin premium districts\")",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides explicit dollar ranges tied to 8+/10 school access in multiple cities, including Austin (e.g., Round Rock ISD ~$450K-$600K; Eanes $1.2M+), Raleigh (e.g., ~$400K-$650K in Apex/Cary zones), and Nashville (e.g., Mt. Juliet ~$510K-$593K; Williamson County ~$900K-$1.1M+). This satisfies the requirement for quantified ranges in at least two cities."
+      },
+      {
+        "id": "three-way-tradeoff-analysis",
+        "requirement": "Analyzes commute-school-price triangle showing how optimizing one factor forces compromises in the other two for at least 1 city",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses tradeoffs among commute, school quality, and home price for multiple cities (e.g., Austin: affordable 8+/10 in Round Rock but 45–65 min to Tesla; Nashville: top Williamson schools but $900K+ homes and commute limits; Raleigh: best balance). This directly analyzes how optimizing one factor forces compromises in the other two."
+      },
+      {
+        "id": "cumulative-ten-year-synthesis",
+        "requirement": "Provides integrated 10-year totals combining property tax + income tax + appreciation/equity for at least 2 cities with approximate dollar amounts",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes 10-year scenario projections for Austin, Raleigh, and Nashville with approximate dollar figures for tax burden (10-year tax cost) and home equity/appreciation, and it reports integrated “net wealth position” totals for each city. These totals combine income, taxes, and housing/equity effects for at least two cities (in fact, all three)."
+      },
+      {
+        "id": "job-market-character-differentiation",
+        "requirement": "Distinguishes market types beyond posting volume (aerospace concentration vs diversified sectors, or career risk profiles) for at least 2 cities",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response distinguishes market types beyond posting volume for multiple cities, e.g., Austin as an aerospace/semiconductor-heavy cluster (Tesla, Samsung, Firefly) versus Raleigh as an RTP-centered, more diversified industrial/tech/biomanufacturing hub, and it flags Nashville’s dispersed job base and Nissan restructuring as added career risk."
+      },
+      {
+        "id": "intra-metro-school-geography",
+        "requirement": "Identifies within-metro geographic splits where top schools cluster in specific suburbs with entry-cost implications (e.g., Williamson County premium, Round Rock advantage)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly highlights within-metro clustering of top schools in specific suburbs and ties them to entry-cost differences, e.g., Austin’s Eanes ISD (Westlake) premium vs Round Rock ISD as the affordable 8+/10 option, and Nashville’s Williamson County (Brentwood/Franklin) premium vs Mt. Juliet as a cheaper 8/10 alternative."
+      },
+      {
+        "id": "recommendation-without-financial-basis",
+        "requirement": "Makes a definitive city recommendation without providing any 10-year cumulative cost or financial projection analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response makes a definitive recommendation (“relocate to Raleigh, North Carolina. Live in Cary or Morrisville”) while also providing explicit 10-year financial projection analysis in Section 7, including 10-year tax costs and scenario-based net wealth positions. Because it includes 10-year cumulative cost/projection figures, it is not a recommendation made without such analysis."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "structured-comparative-format",
+        "requirement": "Uses tables, headings, or bullet lists to organize multi-city comparison across multiple dimensions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses extensive headings (e.g., numbered sections), multiple comparison tables (housing, property tax, job postings, schools, commute, taxes, projections), and bullet-style structured lists to organize a multi-city comparison across many dimensions."
+      },
+      {
+        "id": "professional-advisory-tone",
+        "requirement": "Maintains professional advisory tone appropriate for personalized financial/life decision guidance without marketing language",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a formal, analytical advisory style with caveats and contingent recommendations tailored to the user’s situation. It avoids promotional calls-to-action or salesy phrasing and stays focused on comparative decision guidance."
+      },
+      {
+        "id": "quantitative-precision",
+        "requirement": "Presents all quantitative data with explicit units, time periods, and ranges (e.g., '$500K', '2020-2024', '1.5%-1.7%')",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes many quantitative figures with units and time periods (e.g., “$520,000,” “May 2026,” “4.5% annual,” “$0.8721 per $100”). However, several quantities are not consistently expressed with explicit units or clear ranges (e.g., “~1,400+ active postings,” “High/Low,” “Top 1%,” and some “estimated” values without defined bounds)."
+      },
+      {
+        "id": "recommendation-upfront",
+        "requirement": "States primary city recommendation and key findings within the first few paragraphs before detailed analysis",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response opens with an “Executive Summary” that immediately recommends Raleigh as the top choice and briefly states the key reasons (housing in top school districts, job market, commute, tax burden) before moving into detailed section-by-section analysis."
+      },
+      {
+        "id": "informal-hedging-language",
+        "requirement": "Uses casual hedging phrases like \"I heard\", \"seems like\", \"pretty much\", or \"kind of\" instead of authoritative sourced statements",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response uses an authoritative tone with specific figures, methodologies, and extensive citations. It does not use casual hedging phrases such as \"I heard,\" \"seems like,\" \"pretty much,\" or \"kind of.\""
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "housing-market-data-sources",
+        "requirement": "References real estate data platforms (Zillow, Redfin, Realtor.com) or local market data with dates for home price claims",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Redfin, Zillow, and Realtor.com as sources for median home prices and repeatedly includes specific dates (e.g., Mar–May 2026) for those housing market figures."
+      },
+      {
+        "id": "employment-market-sources",
+        "requirement": "Cites job search platforms (LinkedIn, Indeed, Glassdoor) for mechanical engineer posting volumes",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a “JOB MARKET — Multi-Platform Job Posting Volumes” section that lists posting counts for senior mechanical engineer roles on Indeed, LinkedIn, and Glassdoor for Austin, Raleigh, and Nashville."
+      },
+      {
+        "id": "school-rating-sources",
+        "requirement": "References school rating sources (GreatSchools, Niche, state education departments) for district performance metrics",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites GreatSchools.org for district/school ratings, Niche.com for school grades, and multiple state education departments/report cards (TEA, NC DPI, Tennessee DOE) as sources for school performance metrics."
+      },
+      {
+        "id": "official-data-sources",
+        "requirement": "Cites official government sources (BLS for regional wages, state tax departments, Tax Foundation) for salary or tax information",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites BLS OEWS wage data for mechanical engineers and includes multiple references to official tax authorities (e.g., Texas Comptroller, NC Department of Revenue, TN Comptroller/TN Dept. of Revenue). It also explicitly references Tax Foundation pages for state income tax information."
+      },
+      {
+        "id": "anecdotal-evidence",
+        "requirement": "Presents quantitative claims based on hearsay phrases like \"I heard\" or \"from what I've seen\" without citing verifiable sources",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response presents many quantitative claims but attributes them to specific sources (e.g., Redfin, Zillow, BLS, county assessors) and includes a long reference list with URLs. It does not use hearsay phrasing like “I heard” or “from what I’ve seen” as the basis for numbers without verifiable citations."
+      }
+    ]
+  }
+}

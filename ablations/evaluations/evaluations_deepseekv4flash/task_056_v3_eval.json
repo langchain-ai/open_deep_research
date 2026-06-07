@@ -1,0 +1,301 @@
+{
+  "task_id": "task_056",
+  "domain": "Finance",
+  "report_file": "task_056_v3.md",
+  "summary": {
+    "total_criteria": 32,
+    "positive_criteria": 29,
+    "negative_criteria": 3,
+    "correctly_handled": 22,
+    "pass_rate": 68.75,
+    "normalized_score": 62.85,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 12,
+        "correctly_handled": 8,
+        "normalized_score": 66.1
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 7,
+        "normalized_score": 85.71
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 3,
+        "normalized_score": 25.0
+      },
+      "citation-quality": {
+        "total": 6,
+        "correctly_handled": 4,
+        "normalized_score": 58.97
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "anzsic-classification",
+        "requirement": "Identifies market using ANZSIC C2221 or ANZSIC06 C2221 classification",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies the industry as “ANZSIC C2221” multiple times (e.g., in the executive summary and market size/employment sections) and ties figures to that classification."
+      },
+      {
+        "id": "employment-data-range",
+        "requirement": "States employment figures in range 4,200-4,600 for multiple years within 2018-2024 period",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides employment estimates for multiple years within 2018–2024 that fall in the 4,200–4,600 range, specifically ~4,500 for 2023 and ~4,300 for 2024. These figures appear in the constructed employment time series table for 2018–2024."
+      },
+      {
+        "id": "market-revenue-magnitude",
+        "requirement": "States market revenue approximately NZD 1.4-1.9 billion for 2023-2024 period",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives market size estimates around NZD $1.5–$2.0 billion for 2018–2024 and cites ~$1.8 billion for 2025–2026, but it never states market revenue approximately NZD 1.4–1.9 billion specifically for the 2023–2024 period. The required 2023–2024 range is not explicitly provided as a bounded estimate."
+      },
+      {
+        "id": "fabrication-capacity-range",
+        "requirement": "States domestic fabrication capacity between 120,000-150,000 tonnes per annum",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that annual structural steel fabrication capacity expanded from “120,000 to 150,000 tonnes” and repeats “current annual structural steel fabrication capacity 120,000–150,000 tonnes,” which falls within the required 120,000–150,000 tonnes per annum range."
+      },
+      {
+        "id": "fabricator-locations",
+        "requirement": "Provides geographic locations for at least 3 major fabricators (e.g., Auckland, Christchurch, Whangārei, Lower Hutt, Timaru)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides geographic locations for multiple major fabricators, including Auckland (Steel & Tube, Fletcher Steel, D&H Steel), Whangarei (Culham Engineering), and Christchurch (Te Kaha/VIP Structural Steel context), satisfying the requirement for at least three locations."
+      },
+      {
+        "id": "steel-hs-codes",
+        "requirement": "Specifies HS codes 7207-7216 or relevant subset for structural steel imports",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly lists HS code ranges 7207 through 7216 in a tariff table for steel products and discusses them as relevant to raw steel imports, also mentioning HS 7308 for structures."
+      },
+      {
+        "id": "tariff-rate-structure",
+        "requirement": "States most structural steel inputs under HS 7207-7216 are duty-free under NZ Normal Tariff, while noting some tariff lines (e.g., certain 7216 sections) carry 5% rates",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes HS 7207–7216 as generally subject to a 5% MFN rate (with 0% under FTAs) and does not state that most structural steel inputs are duty-free under the NZ Normal Tariff. It also does not note any specific exceptions such as certain 7216 tariff lines carrying 5% while most are 0%."
+      },
+      {
+        "id": "crl-steel-tonnage",
+        "requirement": "States City Rail Link steel demand: approximately 30,000-32,000 tonnes reinforcing and/or 3,000-5,000 tonnes structural",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response estimates City Rail Link steel demand as ~29,000 tonnes total, comprising 25,000 tonnes reinforcing and 4,000 tonnes structural. It does not state the required ranges of approximately 30,000–32,000 tonnes reinforcing and/or 3,000–5,000 tonnes structural. Therefore the specified demand figures are not provided."
+      },
+      {
+        "id": "crl-completion-timeline",
+        "requirement": "States City Rail Link completion or opening circa 2026",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states City Rail Link’s “Operational opening” as “second half of 2026” and also notes “passenger services starting in 2026,” which places completion/opening circa 2026."
+      },
+      {
+        "id": "te-kaha-roof-steel",
+        "requirement": "States Te Kaha/Christchurch Stadium roof steel approximately 9,000 tonnes",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states under the “Te Kaha Stadium (One New Zealand Stadium)—Christchurch” section that the roof structural steel is “9,000 tonnes,” and reiterates “Best estimate: 9,000 tonnes structural steel.”"
+      },
+      {
+        "id": "te-kaha-opening",
+        "requirement": "States Te Kaha Stadium opening 2026",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states Te Kaha Stadium’s opening as “27 March 2026” in section 3.5, not an opening in 2026 generally and not specifically “opening 2026.” It does not state that Te Kaha Stadium opens in 2026 as a year-only opening statement; it gives a specific date and even claims the project is complete."
+      },
+      {
+        "id": "dunedin-hospital-project",
+        "requirement": "Identifies New Dunedin Hospital as major infrastructure project requiring significant structural steel components",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a dedicated section on “New Dunedin Hospital (Project Whakatuputupu)” describing substantial fabricated steel elements (e.g., “~1,600 units of fabricated steel,” large beams and 26-metre columns) and treats it as a major infrastructure project with significant steel requirements."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "scope-definition-reconciliation",
+        "requirement": "Reconciles conflicting market size figures by explaining scope definition differences (narrow product vs. broad service boundaries)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly reconciles conflicting figures by explaining scope/definition differences, e.g., SCNZ “steel industry” vs SCNZ “structural steel industry” vs IBISWorld ANZSIC C2221, and similarly for tonnage (SCNZ member output vs broader throughput proxies). It also notes IBISWorld market size includes reinforcing steel, making it broader than pure structural fabrication."
+      },
+      {
+        "id": "fabricator-vs-supplier-distinction",
+        "requirement": "Distinguishes construction fabricators from distributors/mills/producers when identifying top companies (e.g., Steel & Tube, Pacific Steel)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that Steel & Tube and Fletcher Steel are primarily distributors/processors and that Pacific Steel is a reinforcing steel producer, not a structural steel fabricator. It flags these as classification notes while listing them, thereby distinguishing fabricators from distributors/mills/producers."
+      },
+      {
+        "id": "tariff-margin-causal-mechanism",
+        "requirement": "Explains why low/zero tariffs remove price umbrella, making margins dependent on global mill prices/FX/freight rather than border protection",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that NZ’s low/zero tariffs mean there is minimal border protection, so fabricators don’t get a tariff-driven price umbrella. It explicitly states margins/competitive dynamics are instead driven by global steel prices, NZD/USD exchange rates, and ocean freight costs rather than tariff policy."
+      },
+      {
+        "id": "data-extraction-methodology",
+        "requirement": "Specifies actionable method to obtain class-level data (e.g., filter Stats NZ AES CSV by ANZSIC L4 code for C2221)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes triangulating multiple sources and constructing estimates, but it does not give an actionable, step-by-step method to pull class-level data from Stats NZ/MBIE (e.g., using Stats NZ AES microdata/CSV and filtering by ANZSIC06 level-4 code C2221). It also does not specify which Stats NZ dataset/table to download and exactly how to filter it to isolate C2221."
+      },
+      {
+        "id": "cyclical-context-for-employment-trends",
+        "requirement": "Connects employment or revenue trends to construction cycle timing (e.g., 2023 peak preceding mid-2022 slowdown)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly links construction-cycle timing to steel fabrication/employment/revenue trends, noting a 2018–2019 peak, a COVID 2020 trough, a 2021–2022 boom/peak in consents, and a 2023–2024 contraction tied to OCR tightening, with a stated 6–12 month lag between consents and steel fabrication."
+      },
+      {
+        "id": "capacity-validation-via-project-aggregation",
+        "requirement": "Validates stated fabrication capacity/throughput by aggregating steel demand across multiple named projects with tonnages",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response aggregates steel tonnage estimates across multiple named projects (e.g., City Rail Link ~29,000t total, Te Kaha 9,000t, Christchurch Hospital Tower C 1,500t, plus others) and explicitly compares the summed demand against stated annual fabrication capacity (120,000–150,000t). This functions as a validation of throughput/capacity via multi-project tonnage aggregation."
+      },
+      {
+        "id": "proxy-method-for-missing-official-series",
+        "requirement": "Identifies absent official tonnage series and proposes specific triangulation approach using SCNZ capacity, trade data, or project disclosures",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that no published steel tonnage figures exist for some projects and that IBISWorld/Stats NZ do not provide an official fabricated-tonnage series, then proposes triangulation using SCNZ capacity/spare-capacity surveys, Customs/OIA trade data (e.g., HS 7308 imports/exports), and project disclosures (e.g., CRL steel quantities)."
+      },
+      {
+        "id": "misattributes-tariff-impact",
+        "requirement": "Attributes fabricator margin pressure or competitive challenges to NZ import tariffs or border protection rather than global price/FX exposure",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly argues the opposite: it states tariffs provide “minimal direct protection” and that competitive pressure and margins are driven by global steel prices, NZD/USD exchange rates, and freight costs, not local tariff policy. It does not attribute margin pressure or competitive challenges to NZ import tariffs or border protection."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "quantitative-data-precision",
+        "requirement": "Presents all quantitative data with explicit units (NZD, tonnes, %), specific timeframes (years/FY), and measurement precision",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "Most quantitative figures include units (e.g., NZD, tonnes, %, km) and many specify years or FY periods (e.g., FY2024, June 2023). However, several values are unit-ambiguous or inconsistently specified (e.g., “$1.8 billion” without always stating NZD, “$1,166 USD/T” mixed with NZ context, and some estimates without clear timeframe/precision), so the requirement is not fully satisfied."
+      },
+      {
+        "id": "multi-dimensional-organization",
+        "requirement": "Organizes analysis into distinct sections addressing each requested dimension (market size, companies, tariffs, projects, risks)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections that map to the requested dimensions: market size/time series (Section 1), tariffs (Section 2), major projects (Section 3), companies/top fabricators (Section 5), and risks/opportunities (Section 6). These distinct headings make each required dimension easy to locate."
+      },
+      {
+        "id": "professional-analytical-objectivity",
+        "requirement": "Maintains professional market research tone without promotional language, speculation, or unsupported forward claims",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response is largely written in a professional, analytical tone, but it includes speculative/unsupported forward-looking claims (e.g., “outlook to 2031,” demand “250,000–500,000+ tonnes,” and recovery expectations) that are not strictly evidenced as firm outcomes. It also uses some promotional phrasing such as “unprecedented” and “best positioned,” which reads as advocacy rather than neutral market research."
+      },
+      {
+        "id": "tabular-time-series",
+        "requirement": "Presents historical employment, revenue, or capacity data (2018-2024) in tables or structured year-by-year format",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes multiple tables with year-by-year historical data spanning 2018–2024, including estimated employment (2018–2024), market size/revenue (2018–2024), and structural steel fabrication tonnage/capacity figures tied to specific years/periods within 2018–2024."
+      },
+      {
+        "id": "casual-register",
+        "requirement": "Uses colloquial phrasing, rhetorical questions, or informal register inappropriate for investment-grade research",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response maintains a formal, report-style register with structured headings, tables, and analytical language. It does not use rhetorical questions or colloquial/informal phrasing (e.g., slang, conversational asides) that would be inappropriate for investment-grade research."
+      },
+      {
+        "id": "verbose-slop",
+        "requirement": "Uses excessive wordiness, filler phrases, or unnecessary elaboration that extends length without adding substantive information",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response is extremely long and includes extensive methodology sections, macroeconomic context, multi-page project lists, and outlook content beyond the 2018–2024 scope. It repeatedly adds explanatory filler (e.g., “reconciliation,” “cross-validation,” “reasoned best estimate”) and many tangential details that don’t directly answer the requested items. This substantially extends length without proportional added substance."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "stats-nz-employment-data",
+        "requirement": "Cites Stats NZ Business Demography or equivalent Stats NZ publication for employment figures",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions “Stats NZ Business Demography Statistics” as a key source but does not actually cite a specific Stats NZ Business Demography (or equivalent Stats NZ) publication with a hyperlink/date for the employment figures used. Employment estimates are primarily attributed to SCNZ and IBISWorld, not to a Stats NZ Business Demography release."
+      },
+      {
+        "id": "stats-nz-revenue-data",
+        "requirement": "Cites Stats NZ Annual Enterprise Survey (AES) or equivalent Stats NZ economic survey for revenue/sales data",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not cite Stats NZ’s Annual Enterprise Survey (AES) or any equivalent Stats NZ economic survey as the source for revenue/sales data. It references various Stats NZ releases (e.g., building consents, construction focus report) but these are not AES/economic survey revenue datasets, and no AES hyperlink/date is provided."
+      },
+      {
+        "id": "nz-customs-tariff-document",
+        "requirement": "Cites NZ Customs Working Tariff Document or official NZ tariff schedule for HS code duty rates",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites NZ Customs sources for tariff rates, including the “NZ Customs Service — Working Tariff Document Introduction” and “Section XV Base Metals and Articles of Base Metal,” and links to the official Customs “Tariff classifications and rates” page, which are official NZ tariff schedule materials."
+      },
+      {
+        "id": "scnz-capacity-data",
+        "requirement": "References Steel Construction NZ (SCNZ) or industry body for fabrication capacity/throughput data",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly references Steel Construction New Zealand (SCNZ) as the industry body providing fabrication capacity/throughput data, including citing SCNZ Structural Steel Industry Updates (e.g., Nov 2020, Dec 2021, Mar 2023, Sep 2023) for capacity (120,000–150,000 tonnes) and output (~85,000–100,000 tonnes)."
+      },
+      {
+        "id": "companies-office-reference",
+        "requirement": "Either references NZ Companies Office as a data source OR notes that private fabricators have limited public financials",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references the NZ Companies Office as a data source, including a Companies Office link in the sources list and Companies Office details in the Culham Engineering profile."
+      },
+      {
+        "id": "infrastructure-project-sources",
+        "requirement": "Cites specific data sources for at least 2 major infrastructure projects (CRL, Te Kaha, or hospital projects)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites specific sources for at least two major infrastructure projects: City Rail Link (NZ Steel and WSP links) and New Dunedin Hospital (Beehive.govt.nz and Health NZ links). It also provides sources for Te Kaha (Wikipedia and Builders & Contractors), exceeding the minimum requirement."
+      }
+    ]
+  }
+}

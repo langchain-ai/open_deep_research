@@ -1,0 +1,349 @@
+{
+  "task_id": "task_015",
+  "domain": "Shopping/Product Comparison",
+  "report_file": "task_015_v2.md",
+  "summary": {
+    "total_criteria": 38,
+    "positive_criteria": 34,
+    "negative_criteria": 4,
+    "correctly_handled": 28,
+    "pass_rate": 73.68,
+    "normalized_score": 71.08,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 20,
+        "correctly_handled": 13,
+        "normalized_score": 65.0
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 7,
+        "normalized_score": 85.71
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 5,
+        "normalized_score": 100.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 44.83
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "battery-no-cooling-clarification",
+        "requirement": "Explicitly states battery backup powers only controller/alarms/logging, NOT compressor/cooling system",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that internal batteries do not power the compressor/cooling and instead power only monitoring/alarm systems, e.g., “Internal batteries power only monitoring/alarm systems” and “No internal compressor battery backup exists.”"
+      },
+      {
+        "id": "helmer-battery-duration",
+        "requirement": "States Helmer GX i.Series battery backup approximately 20 hours for controller/alarms/logging",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states: “Helmer i.Series: Monitoring backup: 20 hours (without access control), 2 hours (with access control); chart recorder: 14 hours,” which covers approximately 20 hours of battery backup for controller/alarms/logging."
+      },
+      {
+        "id": "thermo-battery-duration",
+        "requirement": "States TSX has battery-backed alarm/monitoring capability; only states a runtime (hours) if a Thermo primary document for the specific TSX model explicitly specifies it.",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that Thermo Fisher TSX has a NiCad battery for the alarm system only, indicating battery-backed alarm/monitoring capability. It does not provide a TSX battery runtime in hours, so it does not violate the requirement to only state runtime if explicitly specified in a Thermo primary document for the specific TSX model."
+      },
+      {
+        "id": "panasonic-backup-systems",
+        "requirement": "States PHCbi MDF‑DU702VH class ULT freezers can be equipped with a liquid CO2 backup cooling kit; does not claim duration/cylinder sizing unless documented for that configuration.",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses the PHCbi MDF-DU702VH-PA as a ULT freezer but does not state that it can be equipped with a liquid CO2 backup cooling kit. It also does not mention any CO2 backup duration or cylinder sizing, so the required statement about the kit is missing."
+      },
+      {
+        "id": "helmer-temperature-recovery",
+        "requirement": "States Helmer GX temperature recovery times (pull-down 45-65 min to setpoint OR door-open recovery 9-15 min to ≤8°C)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides Helmer GX recovery figures, stating pull-down to 5°C from ambient startup is 46 minutes and door-opening recovery to ≤8°C occurs within 10 minutes (and within 15 minutes under NSF/ANSI 456 context). These values fall within the required ranges for pull-down (45–65 min) and door-open recovery (9–15 min)."
+      },
+      {
+        "id": "thermo-temperature-recovery",
+        "requirement": "States Thermo TSX recovery conforms to NSF/ANSI 456 (≤15 min after 3-min door open) with 7-min compressor restart delay",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that Thermo TSX recovery conforms to NSF/ANSI 456 with a ≤15-minute recovery after a 3-minute door open, nor does it mention a 7-minute compressor restart delay. It instead says Thermo TSX has no published door-opening recovery time in minutes and provides only qualitative claims."
+      },
+      {
+        "id": "panasonic-ult-recovery-comparison",
+        "requirement": "Notes Panasonic ULT recovery metrics not comparable to 2-8°C vaccine refrigerators (ULT-class vs pharmacy fridge)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the Panasonic/PHCbi MDF-DU702VH-PA is an ultra-low temperature (ULT) freezer and “NOT appropriate for routine vaccine storage (2°C to 8°C),” and it switches to a comparable 2–8°C-class pharmacy refrigerator model for the main comparison."
+      },
+      {
+        "id": "cdc-toolkit-update-date",
+        "requirement": "States CDC Vaccine Storage & Handling Toolkit last updated March 29, 2024",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses CDC guidance generally but never states that the CDC Vaccine Storage & Handling Toolkit was last updated on March 29, 2024. There is no mention of that date anywhere in the report. Thus the required “last updated March 29, 2024” element is missing."
+      },
+      {
+        "id": "nsf-ansi-456-standard",
+        "requirement": "Identifies NSF/ANSI 456 as relevant performance standard for vaccine storage refrigerators (2-8°C range)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references NSF/ANSI 456 in the comparison table and elsewhere (e.g., “Helmer NSF/ANSI 456 One-Pager”), treating it as a vaccine storage performance standard relevant to 2–8°C vaccine refrigerators."
+      },
+      {
+        "id": "helmer-nsf-certification",
+        "requirement": "States Helmer GX Solutions certified to NSF/ANSI 456",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that Helmer iPR256-GX (GX Solutions) is “NSF/ANSI 456” certified in the comparative table and reiterates Helmer’s NSF/ANSI 456 documentation in the sources."
+      },
+      {
+        "id": "thermo-nsf-certification",
+        "requirement": "States Thermo Fisher TSX Series certified to NSF/ANSI 456",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a comparison table stating “NSF/ANSI 456: Certified” for the Thermo Fisher TSX Series, indicating it is certified to NSF/ANSI 456."
+      },
+      {
+        "id": "panasonic-ult-temperature-range",
+        "requirement": "Identifies Panasonic MDF-DU702VH-PA as -86°C ultra-low temperature freezer, not 2-8°C vaccine refrigerator",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly corrects the classification by stating that the Panasonic/PHCbi MDF-DU702VH-PA is an ultra-low temperature freezer with a -86°C to -40°C range and that it is not appropriate for routine 2°C to 8°C vaccine refrigerator storage."
+      },
+      {
+        "id": "montana-wyoming-utility-rates",
+        "requirement": "States Montana/Wyoming commercial electricity rates (Wyoming approximately 9-10¢/kWh, Montana approximately 12-14¢/kWh).",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives Montana commercial electricity as ~11.6¢/kWh and Wyoming as ~6.467¢/kWh (with other tariff components), but it does not state Wyoming at approximately 9–10¢/kWh or Montana at approximately 12–14¢/kWh. The required approximate ranges for both states are therefore missing."
+      },
+      {
+        "id": "helmer-energy-and-cost",
+        "requirement": "States Helmer GX (~20 cu ft) consumes approximately 2.5-3.0 kWh/day (~1,100 kWh/year) with 10-year cost approximately $800-$1,200",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that a Helmer GX (~20 cu ft) consumes approximately 2.5–3.0 kWh/day (~1,100 kWh/year) nor does it give a 10-year cost of ~$800–$1,200. It instead cites Helmer iPR256-GX at 3.94 kWh/day and 1,438 kWh/year with a much higher 10-year energy cost."
+      },
+      {
+        "id": "thermo-energy-and-cost",
+        "requirement": "States Thermo TSX approximately 23 cu ft consumes approximately 4-5 kWh/day (approximately 1,600-1,700 kWh/year) with 10-year cost approximately $1,500-$2,000",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that a ~23 cu ft Thermo TSX consumes ~4–5 kWh/day or ~1,600–1,700 kWh/year, nor does it give a 10-year cost of ~$1,500–$2,000. It only mentions Thermo TSX2305GA energy use as “~580 kWh/year” and provides no matching daily/annual consumption range or 10-year cost figure for that model."
+      },
+      {
+        "id": "panasonic-energy-and-cost",
+        "requirement": "States Panasonic ULT approximately 25-27 cu ft consumes approximately 7.5-8.5 kWh/day (approximately 2,800-3,100 kWh/year) with 10-year cost approximately $2,700-$3,500",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that a Panasonic ULT (25–27 cu ft) consumes approximately 7.5–8.5 kWh/day (2,800–3,100 kWh/year) nor does it give a 10-year cost of $2,700–$3,500. It instead lists the MDF-DU702VH-PA energy consumption as ~7.97 kWh/day and provides no matching annual kWh range or 10-year cost range for that unit."
+      },
+      {
+        "id": "cellular-monitoring-products",
+        "requirement": "Names specific cellular monitoring solutions (Smart-Vue Pro LoRa with 4G gateway OR SensoScientific 4G loggers)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response names a specific cellular monitoring solution: “Smart-Vue Pro with 4G cellular gateway” (also phrased as “Smart-Vue Pro with 4G gateways”) for Thermo Fisher TSX Series."
+      },
+      {
+        "id": "backup-power-requirement",
+        "requirement": "States 6-12 hour outages require generator or UPS backup to maintain temperature",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that for 6–12 hour outages the refrigerators require external UPS and/or generator backup to maintain vaccine temperatures, noting none have passive holdover and recommending UPS + standby generator for 6–12 hour outages."
+      },
+      {
+        "id": "generator-sizing-guidance",
+        "requirement": "States generator or UPS sizing requirements (pharmacy fridge ~150-200W running load, ~1.5-2kW per unit for startup surge headroom).",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a “Load Requirements for Vaccine Refrigerators” table listing running watts (~100–250W) and recommends sizing at 600W continuous with 1,500W surge headroom. This covers the stated generator/UPS sizing requirement range (~150–200W running and ~1.5–2kW startup surge headroom)."
+      },
+      {
+        "id": "battery-cooling-misconception",
+        "requirement": "Claims or implies that battery backup maintains compressor operation or refrigeration temperatures during power outages",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly states that none of the evaluated refrigerators can maintain 2°C–8°C temperatures during outages using internal batteries and that internal batteries power only alarms/monitoring, requiring external UPS or generators for extended outages."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "critical-limitation-framing",
+        "requirement": "Frames entire analysis around battery providing NO cooling before detailed comparison to avoid strategic misconception",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly frames the backup discussion around the fact that internal batteries do not provide cooling, stating early that none of the refrigerators have passive holdover and later that internal batteries power only alarms/monitoring, before proceeding into detailed UPS/generator comparisons."
+      },
+      {
+        "id": "product-category-appropriateness",
+        "requirement": "Explains ULT freezer is wrong product category for routine vaccines needing 2-8°C or -30°C ranges with specific use-case guidance",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly corrects that the MDF-DU702VH-PA is a ULT freezer (-86°C to -40°C) and states it is not appropriate for routine vaccine storage, recommending a standard 2°C–8°C pharmaceutical refrigerator instead and noting ULT use only for mRNA vaccine needs."
+      },
+      {
+        "id": "multi-component-tco-breakdown",
+        "requirement": "Breaks down 10-year TCO into 3+ distinct cost components with regional variance explanation (energy rates, service travel, monitoring)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides a 10-year TCO table that breaks costs into multiple components (purchase price, UPS systems, generators, 10-year energy, maintenance, backup fuel, battery replacement) and separately reports MT vs WY totals. It also explains regional variance via Montana and Wyoming electricity rate structures and discusses remote-service travel/coverage impacts and cellular monitoring options."
+      },
+      {
+        "id": "backup-power-load-calculations",
+        "requirement": "Provides quantified sizing guidance for backup systems (wattage per unit, duration calculations, OR load headroom requirements)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides quantified backup sizing guidance, including estimated running watts per refrigerator model, startup surge multipliers, a recommended continuous/surge sizing target with headroom, and explicit runtime calculations (e.g., 600W load for 6–12 hours, Wh-based runtime estimates, and battery-pack counts/costs for ~8-hour runtime)."
+      },
+      {
+        "id": "rural-technology-rationale",
+        "requirement": "Explains specific technical advantages of recommended monitoring for rural constraints (range, penetration, LAN independence, etc.)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains rural-appropriate monitoring advantages, including Thermo’s Smart-Vue Pro with LoRaWAN plus a 4G cellular gateway, citing long range (up to 9 km), reduced dependence on local LAN, and suitability for spotty connectivity with SMS alerting."
+      },
+      {
+        "id": "data-gap-vendor-actions",
+        "requirement": "Identifies missing data and specifies what to request in vendor quotes or site validations (recovery times, service pricing, etc.)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly flags missing manufacturer-published power-outage recovery times and notes other gaps (e.g., unclear local authorized service coverage), then recommends what to request/validate: outage simulation testing, time-to-exceed-8°C and recovery-to-setpoint metrics, and clarifying service plan response/travel charges and maintenance arrangements in quotes."
+      },
+      {
+        "id": "standardization-strategic-benefits",
+        "requirement": "Explains strategic rationale for fleet standardization (service efficiency, monitoring integration, multi-site bundling, OR training)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses multi-site standardization benefits via the Helmer case study and notes simplified maintenance/consistency across facilities, plus emphasizes remote monitoring deployment and staff training. However, it does not clearly lay out the full strategic rationale elements requested (service efficiency, monitoring integration, multi-site bundling, OR training) as an explicit rationale section."
+      },
+      {
+        "id": "false-holdover-assurance",
+        "requirement": "Claims vaccines will remain viable during 6-12 hour outages without recommending generator or UPS backup",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly states that none of the refrigerators can maintain 2–8°C during outages using internal batteries and repeatedly recommends external UPS and standby generator backup for 6–12 hour outages. It does not claim vaccines will remain viable during 6–12 hour outages without recommending generator or UPS backup."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "quantitative-precision-with-units",
+        "requirement": "Presents quantitative data with specific units and time periods (temperatures in °C, times in minutes/hours, energy in kWh/day)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes multiple quantitative figures with explicit units and time periods, such as temperatures in °C (e.g., 2°C–14°C, -86°C), recovery times in minutes/hours (e.g., 10 minutes, ~3 hours), and energy consumption in kWh/day (e.g., 1.35 kWh/day, ~7.97 kWh/day)."
+      },
+      {
+        "id": "medical-regulatory-terminology",
+        "requirement": "Uses precise medical-grade equipment and regulatory terminology (NSF/ANSI standards, CDC compliance, purpose-built, certified)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly uses medical-grade and regulatory terminology, including NSF/ANSI 456 certification, CDC Vaccine Storage and Handling Toolkit/guidelines compliance, and references to purpose-built pharmaceutical/vaccine refrigerators and certified/authorized service and calibration (e.g., ISO 17025/NIST calibration)."
+      },
+      {
+        "id": "decision-oriented-structure",
+        "requirement": "Organizes information with clear headings, comparison tables, or practical implications sections for decision support",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized with clear section headings (e.g., Executive Summary, UPS Sizing, Utility Rates, Case Studies) and includes multiple comparison tables and recommendation/implications sections (e.g., “Recommended Approach,” “Per-Location Final Recommendations,” and TCO tables) to support decision-making."
+      },
+      {
+        "id": "recommendation-prominent",
+        "requirement": "Places the main recommendation or verdict in the opening or a clearly marked summary section",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes an \"Executive Summary\" at the beginning that states key findings and provides an overall recommendation (e.g., recommending Thermo Fisher TSX Series) before the detailed analysis."
+      },
+      {
+        "id": "comparison-as-prose",
+        "requirement": "Describes the three refrigeration systems in sequential paragraphs rather than side-by-side or tabular format",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response uses a mixed structure with multiple comparison tables and side-by-side summaries (e.g., specification and feature tables) rather than presenting the three refrigeration systems in sequential, separate paragraphs. While it has some narrative sections, the overall comparison is not sequential-paragraph-only."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-cdc-toolkit-2024",
+        "requirement": "References CDC Vaccine Storage and Handling Toolkit (2024 edition or March 29, 2024 update)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions CDC guidance generally (e.g., “CDC guidelines” and a CDC link about power outages) but does not reference the CDC Vaccine Storage and Handling Toolkit specifically, nor does it cite the 2024 edition or the March 29, 2024 update."
+      },
+      {
+        "id": "cites-nsf-ansi-456-standard",
+        "requirement": "References NSF/ANSI 456 as performance standard for vaccine storage refrigerators",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references NSF/ANSI 456 multiple times, including in the comparison table (“NSF/ANSI 456 … Certified”) and cites a “Helmer NSF/ANSI 456 One-Pager,” treating it as a vaccine storage performance standard."
+      },
+      {
+        "id": "cites-all-manufacturer-specs",
+        "requirement": "References official manufacturer specifications for all 3 products compared (Helmer GX Solutions, Thermo TSX Series, Panasonic MDF-DU702VH-PA)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites official manufacturer documentation for Helmer (Helmer technical data sheet/manual) and Thermo (Thermo brochure/manual), and it cites PHCbi pages for the Panasonic/PHCbi line. However, it does not reference official manufacturer specifications for the specific Panasonic MDF-DU702VH-PA in the comparison; it largely substitutes MPR-S500H-PA and uses third-party links for MDF-DU702VH-PA."
+      },
+      {
+        "id": "cites-energy-utility-data",
+        "requirement": "References Energy Star data, manufacturer energy specifications, or Montana/Wyoming utility rate sources",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Montana and Wyoming utility rate sources (e.g., NorthWestern Energy and Rocky Mountain Power tariffs) and references manufacturer energy specifications including ENERGY STAR certification and kWh/day figures with linked product data sheets."
+      },
+      {
+        "id": "informal-sources",
+        "requirement": "Cites Reddit, user forums, or promotional sites as primary evidence for equipment specifications or compliance claims",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites manufacturer pages, PDFs, government/utility sources, NIST, CDC, and news/journal articles, but does not cite Reddit, user forums, or promotional sites as primary evidence for equipment specifications or compliance claims."
+      }
+    ]
+  }
+}

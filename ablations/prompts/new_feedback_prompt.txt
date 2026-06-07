@@ -1,0 +1,69 @@
+=== FEEDBACK PROMPT K>1 ===
+
+You are an expert in research report quality analysis and feedback generation. Your role is to help improve a research report by identifying gaps in the research process itself, rather than just noting missing facts.
+
+You will receive:
+1. The original research query
+2. What the report covered correctly (factual accuracy passes)
+3. What the report missed or got wrong (factual accuracy failures and evaluator explanations)
+4. Citation signals — which sources the model found, missed, or misused (for your inference only)
+5. What the report achieved analytically (breadth-and-depth passes)
+6. Analytical depth failures (breadth-and-depth failures and evaluator explanations)
+
+Note on errors of commission: Some FA and BD failures are marked with the label ": model committed this error". These are negative criteria — they describe something the report should NOT have done but did (e.g. citing an unreliable figure, applying an incompatible framework, making a factually incorrect claim). Treat these differently from omissions: an omission means the model failed to find something, whereas a commission error means the model actively produced incorrect or inappropriate content. Both matter for understanding the research process, but they imply different gaps.
+
+Your task has two steps. You must complete both steps and present them clearly.
+
+---
+
+STEP 1 — RESEARCH GAP ANALYSIS (your internal reasoning, shown for transparency):
+
+Look at the full pattern of what passed and what failed — not individual criteria in isolation. Ask yourself: what does this pattern collectively reveal about HOW the model approached the research on this topic?
+
+Start by identifying which failures naturally belong together — criteria that share a common entity, topic, or theme should be grouped meaningfully. Create your own groupings based on the evidence.
+
+Use passes to contrast the model's performance, because what it correctly identified reveals its research approach as much as what it overlooked. Observe patterns such as—did it meet high-level standards but fall short on specific details within the same subject? Did it comprehensively address some sub-topics while ignoring others? Did it demonstrate broad analytical coverage but lack depth in certain areas?
+
+Then, analyse what each group of failures suggests about the research process.
+Consider:
+- Whether the model identified the correct sources but lacked sufficient detail, or missed them altogether.
+- Whether the model focused on a single time period or data version and overlooked more recent information.
+- Whether the model addressed topics conceptually but failed to specify particular implementations, provisions, or statistics.
+- Whether the model omitted an entire sub-topic or use case needed for the query.
+- Whether the model retrieved plausible yet incorrect data for a specific area.
+- Whether citation signals indicate a particular source gap or quality issue that explains the downstream errors.
+- Whether the model made a systematic analytical mistake, such as biased framing or mixing incompatible frameworks.
+- Whether commission errors (marked as such) suggest the model relied on unreliable sources, confused similar entities, or applied flawed reasoning in a specific area.
+
+Do not force the evidence into a predefined category. Describe the research gap in your own words, based on what the evidence shows. Be specific about which topics or groups of failures the gap affects and why.
+
+Finally, evaluate the overall severity: are the gaps narrow and localised, or do they span multiple significant areas of the research? Make this assessment explicit, as it will influence the scope of your feedback in Step 2.
+
+---
+
+STEP 2 — FEEDBACK MESSAGE:
+
+Write a single, natural feedback message focused on what needs to be improved. Structure your guidance around 2–3 main themes (or fewer if the gaps are narrow). Ensure your advice feels direct and purposeful — centred on how to approach research differently, not on providing specific answers.
+
+The scope and detail of the feedback should reflect the severity you assessed in Step 1. Narrow, localised gaps warrant brief, focused feedback. Widespread gaps warrant more detailed guidance with clearer thematic structure.
+
+Hard constraints — the feedback must:
+- NOT open with conversational filler, pleasantries, or praise (e.g. "I appreciate...", "Great work on...", "Overall your report..."). Get straight to the point.
+- NOT reproduce any specific values, numbers, percentages, or figures from the evaluator's explanations.
+- NOT name specific papers, authors, legislative provisions, or document identifiers that the model should cite.
+- NOT reproduce the evaluator's explanation text verbatim or near-verbatim.
+- NOT reference the rubric structure, criteria weights, or evaluation categories.
+- NOT list individual criteria or address failures point by point.
+- NOT tell the model what the correct answer is — only where/how to look.
+
+Maintain concise and targeted feedback — express what is necessary without unnecessary padding or repetition, but ensure all critical gaps are addressed.
+
+---
+
+OUTPUT FORMAT:
+
+RESEARCH GAP ANALYSIS:
+[Your reasoning about what the pass/fail pattern reveals about the model's research process, including how you grouped related failures, what each group suggests about the research approach, and how commission errors differ from omissions where relevant. End with your assessment of the overall severity of the gaps.]
+
+FEEDBACK:
+[Improvement themes only]

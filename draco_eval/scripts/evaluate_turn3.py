@@ -1,23 +1,31 @@
 """Evaluate Turn-3 multimodal probe outputs using an LLM judge.
 
-For each task, loads the turn3 JSON + saved image + relevant report section,
-then evaluates two criteria scored as +1 / 0:
+For each task, loads the turn3 JSON + saved images + relevant report section,
+then produces three binary scores:
 
-  1. description_accuracy  — does what_it_shows accurately describe the image?
-  2. section_fit           — does the image genuinely add value to the named section?
+  1. description_score  — does what_it_shows accurately describe the selected image?
+  2. selection_score    — does the judge independently prefer the same image the agent chose?
+  3. explanation_score  — is the agent's section placement explanation accurate?
 
-Both criteria are vision calls (gpt-4.1, multimodal).
-section_fit uses a two-step process: independent assessment first, then agent
-explanation evaluated in light of that assessment.
+Output per task (flat JSON):
+  {
+    "task_id": "task_001",
+    "description_score": 1,
+    "selection_score": 0,
+    "explanation_score": 1,
+    "candidates_evaluated": 3,
+    "judge_preferred_index": 2,
+    "agent_selected_index": 0
+  }
+  no_image_found tasks receive all scores = 0 and candidates_evaluated = 0.
 
-Scoring per task:
-  task_score = (description_accuracy + section_fit) / 2   → 0.0, 0.5, or 1.0
-  no_image_found tasks receive task_score = 0.0
-
-Aggregate metrics across all tasks (computed by aggregate_scores()):
-  coverage  = tasks with image found / total tasks
-  quality   = mean task_score over tasks where image was found
-  overall   = mean task_score over ALL tasks  (coverage x quality, comparable across models)
+Aggregate metrics (computed by aggregate_scores()):
+  coverage          = tasks with image found / total tasks
+  description_mean  = mean description_score over tasks with image found
+  selection_mean    = mean selection_score over tasks with image found
+  explanation_mean  = mean explanation_score over tasks with image found
+  selection_by_n    = selection_mean stratified by candidate count (1, 2, 3)
+  candidate_dist    = distribution of candidate counts
 
 Reads from draco_eval/turn3_outputs_<slug>/ and writes to
 draco_eval/turn3_evaluations_<slug>/. The slug is derived from --model.
@@ -61,7 +69,7 @@ _SCRIPTS_DIR = Path(__file__).parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from turn3_probe import extract_section  # noqa: E402
+from turn3_probe import extract_section, extract_headings  # noqa: E402
 
 DRACO_DIR = _SCRIPTS_DIR.parent
 
@@ -103,17 +111,14 @@ Return only raw JSON starting with {, no backticks.
 # ---------------------------------------------------------------------------
 
 _DESC_ACCURACY_PROMPT = """\
-<criterion>
-The description in what_it_shows accurately describes what the image actually \
-shows. It should not hallucinate content that is absent from the image, and \
-should not omit the most visually prominent elements.
-</criterion>
+Look at this image. The agent described it as:
 
-<what_it_shows_claim>
-{what_it_shows}
-</what_it_shows_claim>
+"{what_it_shows}"
 
-The image to evaluate is attached. Does the claim above accurately describe it?
+Is this description accurate? Does it correctly capture what is visually \
+present in the image?
+
+Score 1 if accurate, 0 if not.
 Return your verdict as JSON.
 """
 
@@ -203,6 +208,86 @@ OUTPUT FORMAT — return exactly:
 Return only raw JSON starting with {{, no backticks.
 """
 
+# ---------------------------------------------------------------------------
+# Score 2 — selection score
+# ---------------------------------------------------------------------------
+
+_SELECTION_RANK_PROMPT = """\
+You are evaluating whether any of the candidate images below would genuinely \
+add value to a research report, and if so, which is best.
+
+ORIGINAL RESEARCH QUESTION:
+{task_prompt}
+
+REPORT SUMMARY:
+{report_summary}
+
+SECTION HEADINGS FROM THE REPORT:
+{headings_list}
+
+---
+Below are {n_candidates} candidate images retrieved from the report's cited sources.
+They are labelled Candidate 0, Candidate 1, etc.
+
+First decide: does ANY candidate genuinely add value to a reader of this report? \
+An image adds value only if it conveys substantive information that the report \
+text alone cannot provide and is relevant to the research question's analytical intent.
+
+If NO candidate adds genuine value, return best_index = -1.
+If at least one does, return the 0-based index of the best one.
+
+OUTPUT FORMAT — return exactly:
+{{"best_index": <0-based integer, or -1 if none are worth including>, "explanation": "<your reasoning, under 80 words>"}}
+
+Return only raw JSON starting with {{, no backticks.
+"""
+
+_SELECTION_SINGLE_PROMPT = """\
+You are evaluating whether an image would add genuine value to a research report.
+
+ORIGINAL RESEARCH QUESTION:
+{task_prompt}
+
+REPORT SUMMARY:
+{report_summary}
+
+---
+The image below was retrieved from one of the report's cited sources.
+
+Would this image add genuine value to a reader of this report? \
+Score 1 if it conveys information that meaningfully complements the report, \
+0 if it does not.
+
+OUTPUT FORMAT — return exactly:
+{{"score": 1 or 0, "explanation": "<your reasoning, under 80 words>"}}
+
+Return only raw JSON starting with {{, no backticks.
+"""
+
+# ---------------------------------------------------------------------------
+# Score 3 — explanation score
+# ---------------------------------------------------------------------------
+
+_EXPLANATION_PROMPT = """\
+Here is an image selected for a research report. The agent claims it fits in \
+the following section:
+
+SECTION HEADING: {section_heading}
+
+AGENT'S EXPLANATION:
+{where_it_fits}
+
+FULL SECTION CONTENT:
+{section_text}
+
+---
+The image is attached. Does the image genuinely support or illustrate content \
+in this section, and is the agent's explanation accurate?
+
+Score 1 if the explanation is accurate and the image fits the section, 0 if not.
+Return your verdict as JSON.
+"""
+
 
 # ---------------------------------------------------------------------------
 # Judge helpers
@@ -245,6 +330,126 @@ def _judge_with_image(client: OpenAI, prompt: str, image_path: str) -> dict:
         text={"format": {"type": "json_object"}},
     )
     return _parse_scored_verdict(response.output_text)
+
+
+def _judge_selection_score(
+    client: OpenAI,
+    all_candidates: list[dict],
+    selected_candidate_index: int,
+    task_prompt: str,
+    report_summary: str,
+    report_headings: list[str],
+) -> dict:
+    """Score 2: does the judge independently prefer the same image the agent chose?
+
+    Multi-candidate path: show all images (no agent labels/reasoning), ask judge
+    to pick the best. Compare judge's pick to selected_candidate_index.
+    Match → score 1, no match → score 0.
+
+    Single-candidate fallback: ask judge whether the one image adds genuine value.
+    Score 1 if yes, 0 if no.
+
+    Returns {score, explanation, judge_best_index} (judge_best_index is None for
+    the single-candidate path).
+    """
+    headings_text = "\n".join(report_headings) if report_headings else "  (none)"
+
+    if len(all_candidates) == 1:
+        # Single-candidate fallback — binary evaluation
+        b64, mime = _encode_image(all_candidates[0]["local_path"])
+        prompt = _SELECTION_SINGLE_PROMPT.format(
+            task_prompt=task_prompt,
+            report_summary=report_summary,
+        )
+        response = client.responses.create(
+            model=JUDGE_MODEL,
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "input_text", "text": prompt},
+                        {"type": "input_image", "image_url": f"data:{mime};base64,{b64}"},
+                    ],
+                }
+            ],
+            reasoning={"effort": "none"},
+            temperature=0,
+            text={"format": {"type": "json_object"}},
+        )
+        verdict = _parse_scored_verdict(response.output_text)
+        return {
+            "score": verdict["score"],
+            "explanation": verdict["explanation"],
+            "judge_best_index": None,
+        }
+
+    # Multi-candidate ranking path
+    prompt = _SELECTION_RANK_PROMPT.format(
+        task_prompt=task_prompt,
+        report_summary=report_summary,
+        headings_list=headings_text,
+        n_candidates=len(all_candidates),
+    )
+    # Build content: prompt text, then labelled image blocks (no agent metadata)
+    content: list[dict] = [{"type": "input_text", "text": prompt}]
+    for i, c in enumerate(all_candidates):
+        b64, mime = _encode_image(c["local_path"])
+        content.append({"type": "input_text", "text": f"--- Candidate {i} ---"})
+        content.append({"type": "input_image", "image_url": f"data:{mime};base64,{b64}"})
+
+    response = client.responses.create(
+        model=JUDGE_MODEL,
+        input=[{"role": "user", "content": content}],
+        reasoning={"effort": "none"},
+        temperature=0,
+        text={"format": {"type": "json_object"}},
+    )
+    parsed = json.loads(response.output_text)
+    judge_idx = parsed.get("best_index")
+    explanation = parsed.get("explanation", "")
+
+    # -1 means the judge rejected all candidates — score 0
+    if judge_idx == -1:
+        return {
+            "score": 0,
+            "explanation": explanation,
+            "judge_best_index": -1,
+        }
+
+    if not isinstance(judge_idx, int) or not (0 <= judge_idx < len(all_candidates)):
+        # Malformed index — treat as no match
+        return {
+            "score": 0,
+            "explanation": f"Judge returned invalid best_index {judge_idx!r}. {explanation}",
+            "judge_best_index": judge_idx,
+        }
+
+    score = 1 if judge_idx == selected_candidate_index else 0
+    return {
+        "score": score,
+        "explanation": explanation,
+        "judge_best_index": judge_idx,
+    }
+
+
+def _judge_explanation_score(
+    client: OpenAI,
+    image_path: str,
+    section_heading: str,
+    where_it_fits: str,
+    section_text: str,
+) -> dict:
+    """Score 3: is the agent's section placement explanation accurate?
+
+    Single vision call: judge sees image + section heading + agent's explanation
+    + full section text. Returns {score, explanation}.
+    """
+    prompt = _EXPLANATION_PROMPT.format(
+        section_heading=section_heading,
+        where_it_fits=where_it_fits,
+        section_text=section_text,
+    )
+    return _judge_with_image(client, prompt, image_path)
 
 
 def _judge_section_fit_two_step(
@@ -328,24 +533,23 @@ def _judge_section_fit_two_step(
 # ---------------------------------------------------------------------------
 
 def evaluate_turn3(client: OpenAI, turn3_result: dict) -> dict:
-    """Evaluate a single Turn-3 result. Returns structured evaluation dict.
+    """Evaluate a single Turn-3 result. Returns flat evaluation dict.
 
-    task_score is normalised 0.0-1.0 (sum of criterion scores / n_criteria).
-    Tasks where no image was found receive task_score = 0.0.
+    Produces three binary scores. Tasks where no image was found receive
+    all scores = 0 and candidates_evaluated = 0.
     """
     task_id = turn3_result["task_id"]
     no_image_found = turn3_result.get("no_image_found", True)
 
     if no_image_found:
-        zero = {"score": 0, "explanation": "No image was found by the probe."}
         return {
             "task_id": task_id,
-            "image_found": False,
-            "criteria": {
-                "description_accuracy": zero,
-                "section_fit": zero,
-            },
-            "task_score": 0.0,
+            "description_score": 0,
+            "selection_score": 0,
+            "explanation_score": 0,
+            "candidates_evaluated": 0,
+            "judge_preferred_index": None,
+            "agent_selected_index": None,
         }
 
     image_path = turn3_result.get("local_image_path", "")
@@ -354,41 +558,58 @@ def evaluate_turn3(client: OpenAI, turn3_result: dict) -> dict:
     what_it_shows = turn3_result.get("what_it_shows", "")
     where_it_fits = turn3_result.get("where_it_fits", "")
     section_heading = turn3_result.get("section_heading", "")
+    report_summary = turn3_result.get("report_summary", "")
+    all_candidates: list[dict] = turn3_result.get("all_candidates", [])
+    selected_candidate_index: int = turn3_result.get("selected_candidate_index", 0)
 
     section_text = "(section not available)"
+    report_headings: list[str] = []
     if report_path and Path(report_path).exists():
         report_text = Path(report_path).read_text(encoding="utf-8")
+        report_headings = extract_headings(report_text, max_level=2)
         if section_heading:
             section_text = extract_section(report_text, section_heading)
             if not section_text:
                 section_text = "(section heading not found in report)"
 
-    criteria: dict = {}
-
-    # Criterion 1 — description accuracy (single vision call)
-    prompt1 = _DESC_ACCURACY_PROMPT.format(what_it_shows=what_it_shows)
-    criteria["description_accuracy"] = _judge_with_image(client, prompt1, image_path)
-
-    # Criterion 2 — section fit (two-step)
-    criteria["section_fit"] = _judge_section_fit_two_step(
-        client=client,
-        image_path=image_path,
-        section_text=section_text,
-        task_prompt=task_prompt,
-        where_it_fits=where_it_fits,
+    # Score 1 — description accuracy (image + what_it_shows only)
+    desc_result = _judge_with_image(
+        client,
+        _DESC_ACCURACY_PROMPT.format(what_it_shows=what_it_shows),
+        image_path,
     )
 
-    n_criteria = len(criteria)
-    total_score = sum(c["score"] for c in criteria.values())
-    task_score = round(total_score / n_criteria, 4)
+    # Score 2 — selection score (all candidates, NO agent reasoning visible)
+    sel_result = _judge_selection_score(
+        client=client,
+        all_candidates=all_candidates,
+        selected_candidate_index=selected_candidate_index,
+        task_prompt=task_prompt,
+        report_summary=report_summary,
+        report_headings=report_headings,
+    )
+
+    # Score 3 — explanation score (image + section heading + where_it_fits + section text)
+    expl_result = _judge_explanation_score(
+        client=client,
+        image_path=image_path,
+        section_heading=section_heading,
+        where_it_fits=where_it_fits,
+        section_text=section_text,
+    )
 
     return {
         "task_id": task_id,
-        "image_found": True,
-        "image_path": image_path,
-        "section_heading": section_heading,
-        "criteria": criteria,
-        "task_score": task_score,
+        "description_score": desc_result["score"],
+        "selection_score": sel_result["score"],
+        "explanation_score": expl_result["score"],
+        "candidates_evaluated": len(all_candidates),
+        "judge_preferred_index": sel_result.get("judge_best_index"),
+        "agent_selected_index": selected_candidate_index,
+        # Verbose fields for inspection
+        "description_explanation": desc_result.get("explanation", ""),
+        "selection_explanation": sel_result.get("explanation", ""),
+        "explanation_explanation": expl_result.get("explanation", ""),
     }
 
 
@@ -397,38 +618,47 @@ def evaluate_turn3(client: OpenAI, turn3_result: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def aggregate_scores(eval_dir: Path) -> dict:
-    """Compute coverage, quality, and overall score across all eval files.
+    """Compute per-score means, coverage, and candidate count distribution.
 
-    coverage  = tasks with image found / total tasks
-    quality   = mean task_score over tasks where image was found
-                (pure signal on image usefulness, unaffected by coverage gaps)
-    overall   = mean task_score over ALL tasks, no_image_found treated as 0
-                (single comparable number across models; penalises missing images)
+    Scores are only averaged over tasks where an image was found (candidates_evaluated > 0).
+    selection_by_n breaks down selection accuracy by candidate count (1, 2, 3).
     """
     files = sorted(eval_dir.glob("*_turn3_eval.json"))
     if not files:
         return {}
 
-    all_scores: list[float] = []
-    found_scores: list[float] = []
+    n_total = len(files)
+    n_with_image = 0
+    desc_scores: list[int] = []
+    sel_scores: list[int] = []
+    expl_scores: list[int] = []
+    sel_by_n: dict[int, list[int]] = {}
+    candidate_dist: dict[int, int] = {}
 
     for f in files:
         result = json.loads(f.read_text(encoding="utf-8"))
-        score = result.get("task_score", 0.0)
-        image_found = result.get("image_found", False)
-        all_scores.append(score)
-        if image_found:
-            found_scores.append(score)
+        n_cands = result.get("candidates_evaluated", 0)
+        candidate_dist[n_cands] = candidate_dist.get(n_cands, 0) + 1
+        if n_cands == 0:
+            continue
+        n_with_image += 1
+        desc_scores.append(result.get("description_score", 0))
+        sel_scores.append(result.get("selection_score", 0))
+        expl_scores.append(result.get("explanation_score", 0))
+        sel_by_n.setdefault(n_cands, []).append(result.get("selection_score", 0))
 
-    n_total = len(all_scores)
-    n_found = len(found_scores)
+    def _mean(xs: list) -> float:
+        return round(sum(xs) / len(xs), 4) if xs else 0.0
 
     return {
         "n_tasks": n_total,
-        "n_with_image": n_found,
-        "coverage": round(n_found / n_total, 4) if n_total else 0.0,
-        "quality": round(sum(found_scores) / n_found, 4) if n_found else 0.0,
-        "overall": round(sum(all_scores) / n_total, 4) if n_total else 0.0,
+        "n_with_image": n_with_image,
+        "coverage": round(n_with_image / n_total, 4) if n_total else 0.0,
+        "description_mean": _mean(desc_scores),
+        "selection_mean": _mean(sel_scores),
+        "explanation_mean": _mean(expl_scores),
+        "selection_by_n": {k: _mean(v) for k, v in sorted(sel_by_n.items())},
+        "candidate_dist": {k: v for k, v in sorted(candidate_dist.items())},
     }
 
 
@@ -490,14 +720,16 @@ def main() -> None:
                 encoding="utf-8",
             )
             elapsed = time.monotonic() - t0
-            print(f"done ({elapsed:.1f}s)  task_score={eval_result['task_score']:.2f}")
-            for criterion, r in eval_result["criteria"].items():
-                ind = ""
-                if "independent_assessment" in r:
-                    useful = r["independent_assessment"]["independently_useful"]
-                    override = r.get("independent_override", False)
-                    ind = f"  [independent: {'useful' if useful else 'not useful'}{'  OVERRIDE→0.5' if override else ''}]"
-                print(f"    {criterion:<24} {r['score']}  — {r['explanation'][:80]}{ind}")
+            d = eval_result.get("description_score", 0)
+            s = eval_result.get("selection_score", 0)
+            e = eval_result.get("explanation_score", 0)
+            n = eval_result.get("candidates_evaluated", 0)
+            j = eval_result.get("judge_preferred_index")
+            a = eval_result.get("agent_selected_index")
+            print(f"done ({elapsed:.1f}s)  desc={d}  sel={s}  expl={e}  cands={n}")
+            if n > 0:
+                print(f"    judge_pick={j}  agent_pick={a}  "
+                      f"{'MATCH' if j == a else 'MISMATCH'}")
             done += 1
 
         except Exception as exc:
@@ -514,12 +746,17 @@ def main() -> None:
         agg = aggregate_scores(EVAL_OUTPUT_DIR)  # type: ignore[arg-type]
         if agg:
             print(f"\n{'='*55}")
-            print("Aggregate metrics")
-            print(f"  Tasks evaluated : {agg['n_tasks']}")
-            print(f"  With image      : {agg['n_with_image']}")
-            print(f"  Coverage        : {agg['coverage']:.3f}")
-            print(f"  Quality         : {agg['quality']:.3f}  (mean score | image found)")
-            print(f"  Overall         : {agg['overall']:.3f}  (mean score | all tasks)")
+            print("Aggregate metrics  (scores over tasks with image found)")
+            print(f"  Tasks evaluated  : {agg['n_tasks']}")
+            print(f"  With image       : {agg['n_with_image']}  "
+                  f"(coverage={agg['coverage']:.3f})")
+            print(f"  Description mean : {agg['description_mean']:.3f}")
+            print(f"  Selection mean   : {agg['selection_mean']:.3f}")
+            print(f"  Explanation mean : {agg['explanation_mean']:.3f}")
+            print(f"  Selection by N candidates:")
+            for n, v in agg.get("selection_by_n", {}).items():
+                print(f"    N={n}: {v:.3f}")
+            print(f"  Candidate dist   : {agg.get('candidate_dist', {})}")
 
 
 if __name__ == "__main__":

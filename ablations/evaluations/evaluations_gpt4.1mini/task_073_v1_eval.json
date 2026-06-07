@@ -1,0 +1,493 @@
+{
+  "task_id": "task_073",
+  "domain": "Medicine",
+  "report_file": "task_073_v1.md",
+  "summary": {
+    "total_criteria": 56,
+    "positive_criteria": 52,
+    "negative_criteria": 4,
+    "correctly_handled": 28,
+    "pass_rate": 50.0,
+    "normalized_score": 47.06,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 34,
+        "correctly_handled": 13,
+        "normalized_score": 39.07
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 3,
+        "normalized_score": 28.57
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 6,
+        "normalized_score": 100.0
+      },
+      "citation-quality": {
+        "total": 8,
+        "correctly_handled": 6,
+        "normalized_score": 77.27
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "no-head-to-head-studies-exists",
+        "requirement": "Explicitly states no published head-to-head DSM-5 vs ICD-11 diagnostic accuracy studies exist as of query date",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not explicitly state that no published head-to-head DSM-5 vs ICD-11 diagnostic accuracy studies exist as of the query date. It discusses limited ICD-11 validation and lack of ICD-11-aligned tools, but never makes the required clear, direct statement about the absence of head-to-head diagnostic accuracy studies."
+      },
+      {
+        "id": "table-social-communication-dsm5",
+        "requirement": "States DSM-5 requires all 3 social-communication subdomains (social-emotional reciprocity, nonverbal behaviors, relationships)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states DSM-5 \"requires persistent deficits across 3 areas\" and then lists social-emotional reciprocity, nonverbal communicative behaviors, and relationships as required components of the core social-communication criteria."
+      },
+      {
+        "id": "table-social-communication-icd11",
+        "requirement": "States ICD-11 uses examples-based approach for social communication/reciprocity rather than fixed checklist",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that ICD-11 relies on broader, less operationalized language and emphasizes clinical judgment over strict symptom counts, but it does not explicitly describe ICD-11 as using an examples-based approach for social communication/reciprocity rather than a fixed checklist."
+      },
+      {
+        "id": "table-sensory-dsm5-criterion",
+        "requirement": "States DSM-5 requires at least 2 of 4 restricted and repetitive behavior categories and explicitly includes hyper- or hyporeactivity to sensory input as one category.",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says DSM-5 requires “at least two RRB symptoms required, including hyper- or hypo-reactivity to sensory input,” explicitly naming sensory reactivity as part of the RRB criterion. However, it does not state DSM-5 requires “at least 2 of 4” RRB categories; it only mentions “two RRB symptoms” without the 4-category framing."
+      },
+      {
+        "id": "table-sensory-icd11-approach",
+        "requirement": "States ICD-11 includes sensory reactivity within RRB domain as examples without numeric threshold",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes ICD-11 sensory sensitivities as being noted under restricted/repetitive patterns and indicates they are less explicitly weighted and not operationalized with strict symptom counts. However, it does not clearly state that ICD-11 includes sensory reactivity specifically as examples within the RRB domain, nor does it explicitly note the absence of any numeric threshold for sensory reactivity examples."
+      },
+      {
+        "id": "table-severity-dsm5-levels",
+        "requirement": "States DSM-5 uses three severity levels (Level 1, 2, 3) based on support needed",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states DSM-5 has three severity levels (Level 1 requiring support, Level 2 substantial support, Level 3 very substantial support) and explicitly ties them to required support in the “Severity Specifiers” row."
+      },
+      {
+        "id": "table-severity-icd11-specifiers",
+        "requirement": "States ICD-11 uses subcategories by intellectual development and language impairment (codes 6A02.0-6A02.5)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions ICD-11 ASD codes “6A02” and broadly notes subtypes based on intellectual and language ability, but it does not state the specific ICD-11 subcategories by intellectual development and language impairment nor list the code range 6A02.0–6A02.5. The required explicit code span and subcategory structure are missing."
+      },
+      {
+        "id": "table-onset-both-manuals",
+        "requirement": "States both require symptoms present in early developmental period but may manifest later when demands exceed capacities or be masked",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states for DSM-5 that symptoms must be present in the early developmental period but may manifest later when demands exceed capacities, and for ICD-11 that symptoms begin in the developmental period and may be subtle/compensated (masked) and manifest later when demands increase."
+      },
+      {
+        "id": "table-impairment-both-manuals",
+        "requirement": "States both require clinically significant impairment in social, occupational, or other important functioning areas",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The table’s “Functional Impairment Thresholds” row states DSM-5 requires “clinically significant impairment in social, occupational, or other important areas,” and ICD-11 requires “significant impairment” across important functioning areas. This explicitly indicates both manuals require clinically significant functional impairment."
+      },
+      {
+        "id": "evidence-kulage-meta-analysis",
+        "requirement": "Cites Kulage et al. 2019 (or similar 2019 meta-analysis) showing approximately 20-21% decrease in DSM-5 diagnoses vs DSM-IV-TR",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not cite Kulage et al. (2019) or any similar 2019 meta-analysis, nor does it report an approximately 20–21% decrease in DSM-5 diagnoses versus DSM-IV-TR. It discusses DSM-5 sensitivity/specificity and other studies, but the specific 2019 meta-analytic finding and citation are absent."
+      },
+      {
+        "id": "evidence-includes-systematic-review",
+        "requirement": "Includes at least 1 systematic review or meta-analysis with study design, sample size, and pooled statistics specified",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a purported systematic review/meta-analysis (“Ricci et al. (2025)”) and specifies the study design, an aggregated sample size description (“tens of thousands”), and pooled statistics (e.g., sensitivity ~0.90, specificity ~0.69). This satisfies the requirement of at least one systematic review/meta-analysis with design, sample size, and pooled statistics."
+      },
+      {
+        "id": "evidence-primary-empirical-study",
+        "requirement": "Includes at least 1 primary empirical study (e.g., Wiggins et al. 2019 SEED2 n=1,061 or similar) with sample size and sensitivity/specificity data",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes at least one primary empirical study with both sample size and sensitivity/specificity data (e.g., Mahajan et al. 2019, N=1,061, sensitivity 0.95, specificity 0.78; also McPartland et al. 2012, N=933 with sensitivity/specificity)."
+      },
+      {
+        "id": "evidence-grade-ratings-provided",
+        "requirement": "Reports GRADE quality ratings (High/Moderate/Low/Very Low) for at least 2 sources with justification",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response assigns GRADE ratings with brief justifications for multiple sources, including Ricci et al. (\"Moderate GRADE\" due to heterogeneity) and Blázquez Hinojosa et al. (\"Moderate\" due to retrospective design/sample), and also provides GRADE judgments for McPartland et al. and Mahajan et al."
+      },
+      {
+        "id": "evidence-notes-indirectness",
+        "requirement": "Notes available evidence compares DSM-5 vs DSM-IV or discusses ICD-11 conceptually rather than head-to-head testing",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that there is limited direct DSM-5 vs ICD-11 head-to-head validation and instead cites evidence comparing DSM-5 vs DSM-IV (e.g., McPartland 2012; Blázquez Hinojosa 2021; Mahajan 2019) and includes an ICD-11 discussion largely as conceptual critique rather than accuracy testing (Schmitt 2023)."
+      },
+      {
+        "id": "who-cddr-release-date",
+        "requirement": "States WHO released ICD-11 CDDR in March 2024 with ASD code 6A02",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions ICD-11 ASD code 6A02, but it does not state that WHO released the ICD-11 CDDR in March 2024. It also does not connect March 2024 specifically to the CDDR release alongside code 6A02."
+      },
+      {
+        "id": "who-sensory-in-rrb-domain",
+        "requirement": "States WHO ICD-11 includes atypical sensory reactivity within restricted/inflexible RRB domain",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that ICD-11 notes sensory sensitivities under “restricted, repetitive, and inflexible patterns of behavior” and describes them as hypersensitivity/hyposensitivity to stimuli. However, it does not explicitly say ICD-11 includes “atypical sensory reactivity” within a restricted/inflexible RRB domain using that specific framing, so the required statement is not clearly made."
+      },
+      {
+        "id": "apa-dsm5-three-subdomains",
+        "requirement": "States APA DSM-5 requires all 3 social-communication subdomains and at least 2 of 4 RRBs",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states DSM-5 requires persistent deficits across 3 social-communication areas and also notes it requires “all three social communication deficits plus at least two RRBs,” matching the required symptom-count structure (3/3 social-communication subdomains and ≥2/4 RRBs)."
+      },
+      {
+        "id": "aap-dsm5-reference",
+        "requirement": "States AAP 2020 clinical report references DSM-5 for US practice",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions that AAP clinical reports recommend DSM-5 criteria in the U.S., but it does not state that the AAP 2020 clinical report specifically references DSM-5 for U.S. practice. There is no explicit linkage to the 2020 AAP report’s position on DSM-5 as the U.S. standard."
+      },
+      {
+        "id": "aap-sensory-disorder-position",
+        "requirement": "States AAP notes limited/inconclusive evidence for standalone sensory processing disorder diagnosis",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that the AAP urges caution around sensory integration therapies due to limited evidence, but it does not state that the AAP considers evidence limited or inconclusive for a standalone “sensory processing disorder” diagnosis. There is no explicit mention of SPD as a distinct diagnosis or the AAP’s position on its diagnostic validity."
+      },
+      {
+        "id": "nice-nhs-icd11-primary",
+        "requirement": "States NICE or NHS England 2024 framework specifies ICD-11 criteria for primary clinical description",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses NICE guidelines and WHO/APA/AAP positions but does not state that any NICE or NHS England 2024 framework specifies ICD-11 criteria for the primary clinical description. It mentions NICE CG128/142/170 and a 2021 surveillance document, not a 2024 NICE/NHS England framework or ICD-11 primary-description specification."
+      },
+      {
+        "id": "nice-nhs-icd10-mapping",
+        "requirement": "States NHS requires ICD-10 mapping for national datasets during transition period",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses WHO, APA, AAP, NICE positions and reimbursement/coding transitions, but it never states that the NHS requires ICD-10 mapping for national datasets during a transition period. There is no mention of NHS national datasets or an ICD-10 mapping requirement."
+      },
+      {
+        "id": "asan-inclusive-diagnosis",
+        "requirement": "States ASAN supported inclusive unified spectrum diagnosis accounting for masking and compensation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes ASAN’s general neurodiversity-affirming stance and mentions masking/compensation in relation to ICD-11, but it does not state that ASAN specifically supported an inclusive unified spectrum diagnosis accounting for masking and compensation."
+      },
+      {
+        "id": "nas-both-manuals-similar",
+        "requirement": "States National Autistic Society presents both DSM-5 and ICD-11 as largely similar regarding core characteristics",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response summarizes the National Autistic Society as discussing DSM-5 and ICD-11 in terms of diagnostic clarity and sensory inclusion, but it does not state that the NAS presents DSM-5 and ICD-11 as largely similar regarding core characteristics. It instead contrasts DSM-5 as more structured and ICD-11 as broader/less explicit, without the required “largely similar” framing."
+      },
+      {
+        "id": "nas-neurodiversity-language",
+        "requirement": "States NAS uses identity-affirming or neurodiversity-affirming language",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes the National Autistic Society as emphasizing respect for autistic identity and neurodiversity and uses affirming phrasing such as “respect autistic identity” and “neurodiversity,” which constitutes identity-/neurodiversity-affirming language."
+      },
+      {
+        "id": "autism-speaks-dsm5-no-preference",
+        "requirement": "States Autism Speaks provides DSM-5 text but does not take formal position on DSM vs ICD preference",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes Autism Speaks as using DSM-5 criteria and highlighting sensory processing differences, but it does not state that Autism Speaks provides DSM-5 text while taking no formal position on DSM vs ICD preference. There is no explicit or implicit claim that Autism Speaks is neutral regarding DSM versus ICD."
+      },
+      {
+        "id": "safety-dsm5-under-diagnosis",
+        "requirement": "States meta-analysis or empirical evidence shows DSM-5 resulted in approximately 20-21% decrease in diagnoses vs DSM-IV-TR",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses DSM-5 vs DSM-IV-TR sensitivity/specificity and potential exclusion of PDD-NOS cases, but it never states that meta-analysis or empirical evidence shows DSM-5 resulted in an approximately 20–21% decrease in diagnoses versus DSM-IV-TR. No such percentage decrease figure is provided anywhere in the evidence synthesis or summary."
+      },
+      {
+        "id": "safety-reduced-sensitivity-subgroups",
+        "requirement": "Notes DSM-5 showed reduced sensitivity for PDD-NOS, Asperger profiles, or cognitively able subgroups",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response notes reduced DSM-5 sensitivity for Asperger’s and PDD-NOS (e.g., “Asperger’s and PDD-NOS sensitivity low”) and also states sensitivity was lower in normative IQ/higher-functioning groups, covering cognitively able subgroups."
+      },
+      {
+        "id": "safety-icd11-specificity-concern",
+        "requirement": "Notes ICD-11 breadth and compensation language may increase false positives or over-diagnosis (concern awaiting empirical testing)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly warns that ICD-11’s broader, less specific language could increase false positives/overdiagnosis (e.g., in sections B, E, and the Summary) and frames this as a concern needing more empirical validation/testing."
+      },
+      {
+        "id": "safety-sensory-low-specificity",
+        "requirement": "States sensory features have high sensitivity but lower specificity for ASD (occur in other neurodevelopmental conditions)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses sensory symptoms as part of DSM-5 RRB criteria and notes overlap risks (e.g., ICD-11 may overdiagnose due to traits overlapping with other neurodevelopmental/psychiatric conditions), but it does not explicitly state that sensory features have high sensitivity yet lower specificity for ASD. No clear claim is made that sensory features commonly occur in other neurodevelopmental conditions and therefore reduce specificity."
+      },
+      {
+        "id": "reimbursement-us-icd10cm-code",
+        "requirement": "States US uses ICD-10-CM code F84.0 for autism spectrum disorder",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response’s reimbursement section explicitly states that in the United States DSM-5 autism diagnoses are coded using ICD-10-CM codes and gives “F84.0 for Autistic Disorder,” thereby indicating the US uses ICD-10-CM code F84.0 for autism spectrum disorder."
+      },
+      {
+        "id": "reimbursement-us-no-icd11-date",
+        "requirement": "States US has no official ICD-11-CM implementation date or transition timeline announced",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that the U.S. has not fully integrated ICD-11 coding and that transitions are gradual, but it does not explicitly state that the U.S. has no official ICD-11-CM implementation date or transition timeline announced. It also does not mention ICD-11-CM specifically or the absence of an announced timeline."
+      },
+      {
+        "id": "reimbursement-uk-icd11-clinical",
+        "requirement": "States NHS England uses ICD-11 for clinical description of autism, noting that the transition from ICD-10 to ICD-11 is underway. ",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses WHO, APA, AAP, and NICE positions but never states that NHS England uses ICD-11 for clinical description of autism or that an ICD-10 to ICD-11 transition is underway. It also does not mention NHS England at all, so the required NHS-specific adoption/transition statement is missing."
+      },
+      {
+        "id": "reimbursement-uk-icd10-datasets",
+        "requirement": "States UK still requires ICD-10 mapping for national datasets during transition",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses ICD-10-CM use in the US and general EU adoption of ICD-11, but it never states that the UK still requires ICD-10 mapping for national datasets during the transition. There is no explicit mention of UK national datasets or an ICD-10 mapping requirement in the UK context."
+      },
+      {
+        "id": "reimbursement-who-effective-date",
+        "requirement": "States WHO ICD-11 took effect January 1, 2022 for member states",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says ICD-11 was endorsed in 2019 and “intended for WHO member countries’ adoption starting 2022,” but it does not state that ICD-11 took effect on January 1, 2022 for member states. The specific effective date and the “for member states” phrasing are missing."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "flags-evidence-gap-and-distinguishes-inference",
+        "requirement": "Explicitly flags absence of direct DSM-5 vs ICD-11 studies and distinguishes projections/inferences from empirical data",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes a lack of direct DSM-5 vs ICD-11 empirical comparisons (e.g., “no ICD-11 direct comparison” and “lack of validated ICD-11 aligned tools”), but it does not explicitly flag the absence of direct DSM-5 vs ICD-11 studies as a key limitation nor clearly separate projections/inferences from empirical findings throughout."
+      },
+      {
+        "id": "quantifies-differential-subgroup-impact",
+        "requirement": "Quantifies diagnostic impact by subgroup (e.g., ~21% decrease overall, differential PDD-NOS/Asperger/cognitively able outcomes)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response reports subgroup diagnostic impacts for DSM-5 vs DSM-IV (e.g., sensitivity 60.6% overall, 70% low IQ vs 46% normative IQ, and low sensitivity for Asperger’s and PDD-NOS). However, it does not quantify an overall percent decrease in diagnoses (e.g., ~21% decrease) nor provide ICD-11 vs DSM-5 subgroup impact estimates."
+      },
+      {
+        "id": "explains-decision-logic-structural-difference",
+        "requirement": "Contrasts DSM-5 numeric RRB threshold (≥2 of 4) vs ICD-11 clinical judgment approach without fixed count",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response contrasts DSM-5’s fixed RRB symptom-count requirement (“at least two RRB symptoms required”) with ICD-11’s lack of strict symptom counts (“No strict symptom count thresholds; clinical judgment emphasized”). However, it does not explicitly state the DSM-5 numeric threshold as “≥2 of 4,” so the required numeric contrast is incomplete."
+      },
+      {
+        "id": "separates-accuracy-from-utility-with-grade",
+        "requirement": "Distinguishes test accuracy studies from clinical utility perspectives and provides GRADE ratings with justification",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides GRADE ratings for several cited sources and briefly justifies them (e.g., noting retrospective design, heterogeneity, lack of ICD-11 tools). However, it does not clearly distinguish diagnostic test accuracy evidence (sensitivity/specificity) from clinical utility outcomes, and most evidence summarized is DSM-5 vs DSM-IV rather than DSM-5 vs ICD-11."
+      },
+      {
+        "id": "synthesizes-practical-decision-framework",
+        "requirement": "Integrates sensory role, functional impairment, and social-communication + RRB dyad into actionable clinical decision guidance",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response links sensory processing differences to the RRB domain, discusses functional impairment thresholds, and frames social-communication deficits alongside RRBs, then translates these into clinical implications (e.g., under/overdiagnosis risks and intervention/access consequences). This integrates the sensory role + impairment + social-communication/RRB dyad into actionable decision guidance."
+      },
+      {
+        "id": "analyzes-reimbursement-practice-timeline-gap",
+        "requirement": "Explains disconnect between clinical ICD-11 adoption and administrative ICD-10 mapping/coding during transition",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that clinicians may use DSM-5 criteria while billing uses ICD-10-CM codes, and that ICD-11 is not yet integrated for US reimbursement. However, it does not explicitly explain the transition disconnect between clinical adoption of ICD-11 criteria and continued administrative ICD-10 mapping/coding (e.g., dual systems, crosswalks, or how criteria changes translate into codes)."
+      },
+      {
+        "id": "frames-icd11-specificity-as-testable-hypothesis",
+        "requirement": "Identifies ICD-11 breadth trading sensitivity for specificity as hypothesis requiring empirical validation rather than settled fact",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly frames ICD-11’s broader criteria as raising false-positive risk and notes that it “calls for more empirical validation” and that there is a “lack of validated ICD-11 aligned tools,” treating the sensitivity/specificity tradeoff as not fully settled."
+      },
+      {
+        "id": "conflates-systems-equivalent",
+        "requirement": "States DSM-5 and ICD-11 are essentially identical or interchangeable without acknowledging differences in RRB thresholds or severity systems",
+        "weight": -50,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not claim DSM-5 and ICD-11 are identical or interchangeable; it repeatedly contrasts them (e.g., DSM-5 has explicit RRB symptom counts and severity levels, while ICD-11 is broader with no formal severity system and less explicit sensory weighting). It explicitly acknowledges differences in RRB thresholds and severity specifiers."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "six-section-structure",
+        "requirement": "Organizes response with six lettered sections (A through F) addressing each query component as specified",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into six clearly labeled sections corresponding to A through F (A. table, B. evidence synthesis, C. guidelines, D. advocacy, E. safety risks, F. reimbursement/coding), matching the query’s required structure."
+      },
+      {
+        "id": "side-by-side-table-format",
+        "requirement": "Presents DSM-5 vs ICD-11 criteria comparison in a table or structured side-by-side format for Section A",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "Section A includes a side-by-side table comparing DSM-5 (2013) and ICD-11 (2019) across the requested rows, including sensory processing mention/weighting, presented in a structured two-column format."
+      },
+      {
+        "id": "diagnostic-psychometric-terminology",
+        "requirement": "Uses precise diagnostic and psychometric terminology (e.g., sensitivity, specificity, GRADE, diagnostic criteria)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses diagnostic and psychometric terminology such as “sensitivity,” “specificity,” “diagnostic accuracy,” “κ,” “GRADE quality,” “criteria,” “severity specifiers,” and “functional impairment thresholds,” including reporting sensitivity/specificity values and assigning GRADE ratings."
+      },
+      {
+        "id": "scholarly-objectivity",
+        "requirement": "Maintains scholarly, evidence-based tone distinguishing empirical findings from clinical inference or opinion",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response generally uses an academic tone and presents claims as summaries of manuals and studies, often using cautious language (e.g., “risk,” “may,” “concerns”). It also distinguishes evidence-based findings (e.g., reported sensitivity/specificity figures) from interpretive judgments (e.g., clinical-utility critiques and advocacy perspectives)."
+      },
+      {
+        "id": "criteria-comparison-as-prose",
+        "requirement": "Presents DSM-5 vs ICD-11 criteria comparison as prose paragraphs without table or structured side-by-side format",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response includes a structured side-by-side comparison table in section A with DSM-5 and ICD-11 columns. Because it uses a table format rather than only prose paragraphs, it does not present the comparison solely as unstructured prose."
+      },
+      {
+        "id": "informal-clinical-language",
+        "requirement": "Uses colloquial phrasing (e.g., 'sensory stuff', 'pretty similar', 'basically the same') instead of clinical terminology",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response consistently uses clinical/technical terminology (e.g., “restricted, repetitive behaviors,” “hyper- or hypo-reactivity,” “clinically significant impairment,” “sensitivity/specificity”) and does not use colloquial phrases like “sensory stuff,” “pretty similar,” or “basically the same.”"
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-official-dsm5-sources",
+        "requirement": "Cites official DSM-5 sources from APA, CDC, or cdc.gov/ncbddd/autism/hcp-dsm.html",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites an official APA DSM-5 source via an APA-hosted PDF link from psychiatry.org (\"APA_DSM-5-Autism-Spectrum-Disorder.pdf\"). This satisfies the requirement to cite official DSM-5 sources from APA, CDC, or the specified CDC URL."
+      },
+      {
+        "id": "cites-official-icd11-sources",
+        "requirement": "Cites official ICD-11 sources from WHO CDDR (who.int) or pmc.ncbi.nlm.nih.gov for ICD-11 clinical descriptions",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes ICD-11-related citations from WHO’s who.int site (e.g., the WHO autism fact sheet link). It also cites ICD-11 clinical-description-related material hosted on pmc.ncbi.nlm.nih.gov (e.g., McPartland 2012 and Mahajan 2019 PMC links)."
+      },
+      {
+        "id": "cites-peer-reviewed-medical-literature",
+        "requirement": "Cites peer-reviewed medical/psychiatric journals via PubMed (pubmed.ncbi.nlm.nih.gov), PMC, BMC Medicine, Molecular Psychiatry, or similar for evidence synthesis",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites peer-reviewed sources via PMC (e.g., McPartland et al. 2012 and Mahajan et al. 2019 links to pmc.ncbi.nlm.nih.gov), which satisfies the requirement to cite journals through PubMed/PMC or similar repositories."
+      },
+      {
+        "id": "cites-who-implementation-guidance",
+        "requirement": "Cites WHO ICD-11 implementation materials or clinical guidance from who.int",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response links to a WHO fact sheet on who.int but does not cite WHO ICD-11 implementation materials or ICD-11 clinical guidance hosted on who.int (e.g., ICD-11 MMS, implementation guides, or WHO clinical descriptions/diagnostic guidelines). It therefore lacks the required WHO ICD-11 implementation/clinical guidance citation from who.int."
+      },
+      {
+        "id": "cites-clinical-guideline-organizations",
+        "requirement": "Cites at least 2 of NICE (nice.org.uk), AAP (publications.aap.org), NHS England (england.nhs.uk) for organizational positions",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites AAP via a publications.aap.org link and cites NICE via a NICE surveillance document (though hosted on ncbi.nlm.nih.gov) describing NICE guideline positions, satisfying the requirement to cite at least two of the specified organizations."
+      },
+      {
+        "id": "cites-autism-advocacy-organizations",
+        "requirement": "Cites at least 2 of ASAN (autisticadvocacy.org), National Autistic Society (autism.org.uk), Autism Speaks for advocacy perspectives",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Autistic Self Advocacy Network (autisticadvocacy.org), National Autistic Society (autism.org.uk), and Autism Speaks in its sources and advocacy section, satisfying the requirement to cite at least two of these organizations."
+      },
+      {
+        "id": "evidence-synthesis-date-compliance",
+        "requirement": "For evidence synthesis sources (systematic reviews, meta-analyses, primary studies), uses publications dated 2013 or later per query requirement",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes evidence synthesis sources dated 2013 or later (e.g., 2019, 2021, 2023, 2025), but it also includes at least one primary/evidence source dated earlier than 2013 (McPartland et al., 2012). Because the criterion requires using publications dated 2013 or later, this requirement is not satisfied."
+      },
+      {
+        "id": "patient-forum-citations",
+        "requirement": "Cites Reddit, patient forums, WebMD comments, or social media posts as sources for diagnostic criteria or clinical evidence",
+        "weight": -100,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites Autism Speaks and other organizational webpages, but it does not cite Reddit, patient forums, WebMD comments, or social media posts as sources for diagnostic criteria or clinical evidence."
+      }
+    ]
+  }
+}

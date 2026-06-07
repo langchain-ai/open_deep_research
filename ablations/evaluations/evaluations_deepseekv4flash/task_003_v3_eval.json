@@ -1,0 +1,405 @@
+{
+  "task_id": "task_003",
+  "domain": "Shopping/Product Comparison",
+  "report_file": "task_003_v3.md",
+  "summary": {
+    "total_criteria": 45,
+    "positive_criteria": 41,
+    "negative_criteria": 4,
+    "correctly_handled": 39,
+    "pass_rate": 86.67,
+    "normalized_score": 86.26,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 24,
+        "correctly_handled": 22,
+        "normalized_score": 92.0
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 6,
+        "normalized_score": 71.43
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 8,
+        "correctly_handled": 7,
+        "normalized_score": 82.98
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "addresses-impossible-hours-constraint",
+        "requirement": "States 15,000 annual production hours exceeds physical maximum of 8,760 hours/year and clarifies modeling assumptions",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that 15,000 annual hours exceeds the single-machine maximum of 8,760 hours/year and then clarifies utilization by modeling 24/6 and 24/7 scenarios with OEE to derive realistic cutting hours. It further explains what 15,000 hours could represent (multi-machine fleet hours, total planned hours including non-cutting, or multi-year lifecycle hours)."
+      },
+      {
+        "id": "ceramic-caution-for-titanium",
+        "requirement": "States ceramics are not recommended OR generally not used OR risky OR non-standard for Ti-6Al-4V machining",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that ceramic tooling is “not recommended” for Ti-6Al-4V under most machining conditions and describes it as risky due to chemical reactivity and thermal shock, while noting only niche conditional use cases."
+      },
+      {
+        "id": "coated-carbide-primary-recommendation",
+        "requirement": "Recommends coated carbide (TiAlN, AlTiN, or similar coatings) as primary or standard tool material for Ti-6Al-4V",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends specialized carbide tooling with TiAlN/AlTiN (and similar PVD coatings) as the preferred/standard approach for Ti-6Al-4V, while noting ceramics are generally not recommended. This appears in section 2.2 “Preferred Coating Systems,” including statements that TiAlN is an industry standard and AlTiN is generally preferred for titanium."
+      },
+      {
+        "id": "nlx-high-torque-capability",
+        "requirement": "States NLX 2500SY spindle torque between 800-1300 Nm or describes as high-torque turning platform",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states the DMG MORI NLX 2500SY main spindle torque as 843 Nm (10\" option) and 1,273 Nm (12\" high-torque option), which falls within the 800–1300 Nm range and explicitly frames it as the highest torque for heavy titanium roughing."
+      },
+      {
+        "id": "nlx-machine-architecture",
+        "requirement": "Identifies NLX 2500SY as box-way lathe with Y-axis OR turret-style turning center OR rigid lathe with live tooling",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly describes the DMG MORI NLX 2500SY as using a “BMT60 turret with live tooling” and also lists its guideway type as “Box ways (slideways) on X, Y, Z,” satisfying the criterion."
+      },
+      {
+        "id": "integrex-b-axis-milling-capability",
+        "requirement": "States Integrex i-400S has 12,000 rpm B-axis spindle or milling spindle capability",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes the Integrex i-400S milling spindle as 12,000 min⁻¹ (rpm) standard (up to 20,000 optional) and discusses its B-axis range, but it does not state that the i-400S has a 12,000 rpm B-axis spindle or explicitly label it as “B-axis spindle” at 12,000 rpm. The required explicit claim tying 12,000 rpm to the B-axis spindle/milling spindle capability is missing."
+      },
+      {
+        "id": "integrex-main-spindle-power",
+        "requirement": "States Integrex i-400S main spindle power between 26-30 kW or describes dual-spindle configuration",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states the Mazak Integrex i-400S main spindle motor output as 30 kW, which falls within the required 26–30 kW range."
+      },
+      {
+        "id": "multus-high-speed-milling",
+        "requirement": "States Multus U4000 has 12,000 rpm milling spindle OR H1 milling head OR high-speed B-axis capability",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the Okuma Multus U4000 has an “H1 Milling Spindle (B-Axis Head)” and repeats this in multiple sections (e.g., “H1 Milling Spindle (B-Axis Head)” and “Compact H1 Head”). This satisfies the criterion via the “H1 milling head” option."
+      },
+      {
+        "id": "multus-main-spindle-power",
+        "requirement": "States Multus U4000 main spindle power between 15-22 kW or dual power rating",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states the Okuma Multus U4000 main spindle motor power as “32/22 kW (30-minute/continuous rating),” which is a dual power rating and satisfies the criterion."
+      },
+      {
+        "id": "okuma-thermo-friendly-concept",
+        "requirement": "Identifies Okuma thermal compensation as Thermo-Friendly Concept or TFC or Thermo Active Stabilizers",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies Okuma thermal compensation as the “Thermo-Friendly Concept” and also names “TAS-S (Thermo Active Stabilizer - Spindle)” and “TAS-C (Thermo Active Stabilizer - Construction)” in the Okuma Multus U4000 thermal compensation section."
+      },
+      {
+        "id": "mazak-ai-thermal-shield",
+        "requirement": "Identifies Mazak thermal compensation as Ai Thermal Shield or AI Thermal Shield",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names Mazak’s thermal compensation feature as “Ai Thermal Shield” in the thermal compensation section and elsewhere (e.g., “Technology—Ai Thermal Shield”)."
+      },
+      {
+        "id": "dmg-thermal-management",
+        "requirement": "Mentions DMG MORI thermal displacement control or heat-controlled structure or 2nd-gen thermal improvements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly mentions DMG MORI’s “2nd Gen improvements,” including “redesigned bearings suppressing thermal displacement” and “thermal displacement reduced by 40%,” which are second-generation thermal improvements/thermal displacement control features."
+      },
+      {
+        "id": "all-machines-tolerance-capable",
+        "requirement": "States all three machines can achieve ±0.0005\" tolerance with proper coolant and environmental control",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that all three machines can hold ±0.0005\" tolerance “under controlled conditions,” and it discusses the need for controlled ambient conditions and coolant strategies (including high-pressure coolant and filtration) as part of achieving that accuracy."
+      },
+      {
+        "id": "nx-universal-post-support",
+        "requirement": "States all three machines supported in Siemens NX Post Hub OR have established NX posts and simulation",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly addresses Siemens NX CAM integration for all three machines: DMG MORI via manufacturer-certified MTSK, Mazak via established third-party posts (e.g., ICAM/NCmatic), and Okuma via established third-party posts (e.g., JANUS/NCmatic) with simulation options. This covers all three machines as supported in NX Post Hub or having established NX posts and simulation."
+      },
+      {
+        "id": "dmg-sinumerik-integration",
+        "requirement": "Identifies DMG MORI NLX 2500 2nd Generation available with CELOS X on Siemens SINUMERIK ONE control",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the DMG MORI NLX 2500SY (2nd Generation) is available with Siemens SINUMERIK ONE control and CELOS X, notably in the “Siemens NX CAM Integration” section and the control options list."
+      },
+      {
+        "id": "mtconnect-opc-ua-standard-support",
+        "requirement": "States machines support MTConnect and/or OPC UA data export to MES/QMS for AS9100D traceability",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that all three machines support MTConnect and/or OPC UA and describes exporting machine/process data via these protocols for MES/ERP integration to support AS9100D traceability (Section 6, “Supported Protocols” and “MES/ERP Integration”)."
+      },
+      {
+        "id": "okuma-mtconnect-implementation",
+        "requirement": "Identifies Okuma OSP MTConnect-ready or MTConnect agent/adapter availability",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states Okuma supports MTConnect via an “MTConnect Adapter” and discusses OPC UA availability (e.g., via CNCnetPDM/Predator) and THINC-API on OSP controls, indicating MTConnect-ready/agent/adapter availability for the Okuma OSP platform."
+      },
+      {
+        "id": "mazak-smartbox-connectivity",
+        "requirement": "Identifies Mazak SmartBox or SmartBox 2.0 for MTConnect or edge connectivity",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies Mazak “SmartBox” and “SmartBox 2.0” in the MTConnect/OPC-UA traceability/connectivity section, describing them as Mazak’s connectivity platform supporting MTConnect and edge connectivity."
+      },
+      {
+        "id": "dmg-celos-connectivity-platform",
+        "requirement": "Identifies DMG MORI CELOS supporting MTConnect, OPC-UA, or MQTT for data capture",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that DMG MORI CELOS/IoTconnector supports “MTConnect, OPC UA, and MQTT” under the “DMG MORI NLX 2500SY - CELOS + IoTconnector” section, satisfying the requirement."
+      },
+      {
+        "id": "okuma-hemaq-monterrey-service",
+        "requirement": "Identifies Okuma service via HEMAQ in Monterrey or San Nicolás de los Garza or Nuevo León region",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies Okuma service in Nuevo León as being provided via HEMAQ, citing a tech center in San Nicolás de los Garza (Monterrey metro area) and describing local parts stock and technicians."
+      },
+      {
+        "id": "mazak-apodaca-tech-center",
+        "requirement": "Identifies Mazak Mexico Technology Center in Apodaca or Mazak Apodaca location",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies “Apodaca, Nuevo León — Technology Center” for Mazak Mexico and provides the address “Spectrum 100, Parque Industrial Finsa,” which satisfies identifying the Mazak Apodaca location."
+      },
+      {
+        "id": "dmg-mori-apodaca-office",
+        "requirement": "Identifies DMG MORI México office in Apodaca or DMG MORI Mexico service location",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies a DMG MORI Mexico location in Apodaca, Nuevo León, listing it as an office (sales/service) in Apodaca under the “Service Infrastructure in Nuevo León” section."
+      },
+      {
+        "id": "states-modeling-hours-assumption",
+        "requirement": "States TCO modeled at 8,000 annual spindle hours or specifies different utilization assumption used",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that TCO was modeled at 8,000 annual spindle hours, nor does it provide an explicit alternative utilization assumption for the TCO model. It discusses utilization and calculates net available hours (e.g., 6,908 available and 3,412 cutting hours) but never ties TCO to an 8,000-hour basis or explicitly replaces it."
+      },
+      {
+        "id": "accepts-impossible-hours",
+        "requirement": "Calculates or presents costs based on 15,000 annual hours per machine without noting this exceeds 8,760 hours/year maximum",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly notes that 15,000 annual hours exceeds the 8,760-hour maximum and then bases its cost model on realistic annual hours (e.g., 6,908 available hours and 3,412 cutting hours). It does not present per-machine costs using 15,000 annual hours without that clarification."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "weighted-power-calculation-methodology",
+        "requirement": "Shows weighted average power calculation with duty-cycle formula (X kW in-cut, Y kW idle → Z kW weighted)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides cutting and idle kW values and computes annual kWh and costs, but it never shows a duty-cycle weighted-average power calculation of the form “X kW in-cut, Y kW idle → Z kW weighted.” It also does not explicitly apply a duty-cycle formula (e.g., Z = X·DC + Y·(1−DC)) to produce a single weighted kW figure."
+      },
+      {
+        "id": "energy-efficiency-feature-quantification",
+        "requirement": "Quantifies energy-efficiency feature percentage impacts (ECO Suite, GREENMODE, Smooth Coolant, etc.)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response quantifies energy-efficiency impacts with specific percentages, including DMG MORI GREENMODE (30% total reduction), Mazak Energy Saver (estimated 15% total; cites 65% standby reduction), and Okuma ECO suite plus (64% idle reduction), and explains what each applies to."
+      },
+      {
+        "id": "cost-scaling-heuristic",
+        "requirement": "Provides per-kilowatt or per-unit-difference cost scaling heuristic for user extrapolation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides explicit per-unit scaling heuristics, including tooling cost per cutting hour ($20/hour), spindle rebuild reserve per cutting hour ($25,000/15,000 = $1.667/hour), and electricity cost scaling via $/kWh ($0.127/kWh) multiplied by kWh. These allow the user to extrapolate costs by changing hours, kW, tool life minutes, or rates."
+      },
+      {
+        "id": "duty-cycle-impact-modeling",
+        "requirement": "Models in-cut vs idle time percentages and their impact on power consumption calculations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly models cutting vs. idle time by assigning idle time percentages (e.g., 40% idle) and computing idle hours, then separately calculating cutting kWh and idle kWh and applying energy-saving factors (e.g., Okuma’s 64% idle reduction) to show impact on total power cost."
+      },
+      {
+        "id": "machine-architecture-tradeoffs",
+        "requirement": "Differentiates turret-lathe vs B-axis mill-turn architecture for part geometry requirements",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly contrasts the NLX 2500SY’s turret/live-tooling (no B-axis, 4-axis max) with the Integrex and Multus B-axis mill-turn heads (240° B-axis, 5-axis simultaneous). It ties these architectures to part-geometry needs such as undercuts, angled holes, deep cavities, and free-form surfaces, including setup-count and tooling/angle-head implications."
+      },
+      {
+        "id": "ceramic-insert-nuanced-conditions",
+        "requirement": "Explains ceramic insert applicability with specific conditions when they work for Ti-6Al-4V",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a dedicated section on ceramic tooling for Ti-6Al-4V, stating ceramics are generally not recommended but outlining specific conditions where they may work (e.g., high-speed finishing, dry cutting, stable continuous cuts, avoiding interrupted cuts, and continuous coolant if used). These are explicit applicability conditions tied to titanium machining."
+      },
+      {
+        "id": "explicit-modeling-assumptions",
+        "requirement": "Lists explicit modeling assumptions (utilization hours, duty cycle, rates) before TCO figures",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly presents a “Modeling Assumptions and Data Sources” section before any annual operating cost/TCO totals, defining utilization/shift hours and OEE (duty-cycle style breakdown) plus electricity rates. These assumptions precede the cost summary tables and calculated annual operating costs."
+      },
+      {
+        "id": "tco-without-methodology",
+        "requirement": "States specific 12-year dollar figures without showing energy consumption calculations or utilization assumptions",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response includes multiple specific annual dollar figures (e.g., annual power costs of $9,972/$12,186/$11,946 and total annual operating costs of $95,599/$109,813/$105,073). However, it also provides explicit energy-consumption calculations and utilization assumptions (net available hours, OEE, kW draws, kWh totals) used to derive those figures."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "engineering-terminology-precision",
+        "requirement": "Uses precise machining terminology including spindle torque (Nm), thermal compensation, mill-turn, MTConnect, Ti-6Al-4V",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses precise machining terminology throughout, explicitly citing spindle torque in Nm, discussing thermal compensation systems, repeatedly describing the machines as mill-turn/multitasking, and covering MTConnect/OPC-UA connectivity. It also repeatedly references Ti-6Al-4V in the context of tooling and process recommendations."
+      },
+      {
+        "id": "quantitative-data-with-units",
+        "requirement": "Consistently includes units for quantitative data including kW, hours/year, $, ±tolerances, temperatures",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response consistently attaches units to quantitative values throughout (e.g., kW, kVA, Nm, min⁻¹, kg, bar/psi, µm, mm, °C, kWh, MXN/kWh, USD/year, hours/year, and ±0.0005\"/±0.0127 mm). It also includes tolerances and temperature-change units (e.g., ±8 µm over 8°C)."
+      },
+      {
+        "id": "structured-multi-machine-comparison",
+        "requirement": "Organizes comparison using tables, numbered sections, headings, or structured lists for multi-machine evaluation",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is highly structured with clear headings and numbered sections (e.g., sections 1–10) and includes multiple comparison tables summarizing machine attributes and costs."
+      },
+      {
+        "id": "recommendation-upfront",
+        "requirement": "States recommended machine choice or decision framework within opening summary before detailed analysis",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The Executive Summary includes an explicit ranked recommendation (Okuma first, Mazak second, DMG MORI third) with brief rationale before the detailed section-by-section analysis begins."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same machine specifications or recommendations multiple times using different wording without adding new analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly restates similar comparative conclusions and recommendation blocks (e.g., “Primary/Second/Third choice” and multiple “parallel statement” summaries) using different wording. These sections largely reiterate the same points about torque, B-axis capability, thermal compensation, NX integration, and service without adding materially new analysis each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "dmg-mori-official-documentation",
+        "requirement": "Cites DMG MORI official sources (en.dmgmori.com or mx.dmgmori.com) for NLX 2500SY specifications or features",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites DMG MORI official sources from en.dmgmori.com and mx.dmgmori.com in its sources list (e.g., GREENMODE and Connectivity pages on en.dmgmori.com and “Ubicaciones” on mx.dmgmori.com) while discussing NLX 2500SY specifications/features."
+      },
+      {
+        "id": "mazak-official-documentation",
+        "requirement": "Cites Mazak official sources (mazak.com) for Integrex i-400S specifications or features",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides many citations for Mazak Integrex i-400S specs, but none of the cited Mazak sources are from mazak.com. The Mazak citations are third-party sites and PDFs hosted elsewhere (e.g., mmsonline.com, lpv.se, virtual.mazakusa.com), so it does not cite official mazak.com sources."
+      },
+      {
+        "id": "okuma-official-documentation",
+        "requirement": "Cites Okuma official sources (okuma.com or okuma.co.jp) for Multus U4000 specifications or features",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Okuma official sources for MULTUS U4000 specifications and features, including the Okuma product page and Okuma PDF brochures (e.g., https://www.okuma.com/products/multus-u4000 and https://www.okuma.com/files/documents/MULTUS-U-Series.pdf). These are used to support stated specs like spindle/milling details and Thermo-Friendly Concept features."
+      },
+      {
+        "id": "siemens-nx-cam-documentation",
+        "requirement": "References Siemens NX Post Hub (plm.sw.siemens.com) or official Siemens CAM integration documentation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references official Siemens documentation, including “Siemens - DMG MORI Postprocessor for Siemens NX” with a siemens.com URL, and discusses Siemens NX integration via Siemens’ Common Simulation Engine (CSE). This satisfies the requirement to cite official Siemens CAM integration documentation."
+      },
+      {
+        "id": "nuevo-leon-service-providers",
+        "requirement": "Cites at least 2 of HEMAQ, DMG MORI México (mx.dmgmori.com), or Mazak Mexico for Nuevo León service infrastructure",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites both HEMAQ (as the Okuma distributor/tech center in Monterrey) and Mazak Mexico (Apodaca, Nuevo León Technology Center) as part of the Nuevo León service infrastructure discussion."
+      },
+      {
+        "id": "as9100d-traceability-documentation",
+        "requirement": "References AS9100D compliance sources or MTConnect/OPC UA standards documentation for traceability requirements",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses “AS9100D Traceability via MTConnect/OPC-UA” and cites multiple protocol/documentation sources (e.g., DMG MORI Connectivity/IoTconnector pages listing MTConnect and OPC UA, Mazak SmartBox 2.0 documentation, and Okuma Connect Plan/MTConnect adapter references). These references are used to support traceability requirements and connectivity claims."
+      },
+      {
+        "id": "titanium-machining-technical-sources",
+        "requirement": "References industry technical sources for Ti-6Al-4V tool material guidance (machining journals, cutting tool manufacturers, or technical articles)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites multiple industry technical sources relevant to Ti-6Al-4V machining guidance, including cutting tool manufacturers (e.g., Sandvik Coromant, Kennametal, ISCAR, Walter) and technical/white-paper style articles (e.g., Makino titanium machining white paper, MachiningDoctor datasheet). These references are listed in the Sources section and used in the tooling and machining-parameter discussion."
+      },
+      {
+        "id": "forum-sources",
+        "requirement": "Cites Reddit, machinist forums, or YouTube videos as primary sources for machine specifications or TCO figures",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites manufacturer brochures/pages, industry articles, and some general forums (e.g., Eng-Tips, Autodesk forums), but it does not cite Reddit, machinist forums, or YouTube videos as primary sources for machine specifications or TCO figures."
+      }
+    ]
+  }
+}

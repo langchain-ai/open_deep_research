@@ -1,0 +1,605 @@
+{
+  "task_id": "task_061",
+  "domain": "Finance",
+  "report_file": "task_061_v3.md",
+  "summary": {
+    "total_criteria": 70,
+    "positive_criteria": 67,
+    "negative_criteria": 3,
+    "correctly_handled": 9,
+    "pass_rate": 12.86,
+    "normalized_score": 9.15,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 53,
+        "correctly_handled": 2,
+        "normalized_score": 4.3
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 2,
+        "normalized_score": 14.29
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 50.0
+      },
+      "citation-quality": {
+        "total": 4,
+        "correctly_handled": 2,
+        "normalized_score": 4.17
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "pension-obligation-march-2024",
+        "requirement": "States pension benefit obligation as $268,025K or $268.0M at March 31, 2024 (within +/- $1M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists the March 31, 2024 projected benefit obligation (PBO) as $173,149,000 and does not state any pension benefit obligation figure of approximately $268,025K/$268.0M. Therefore, the required pension benefit obligation amount at March 31, 2024 is missing/incorrect."
+      },
+      {
+        "id": "pension-obligation-march-2025",
+        "requirement": "States pension benefit obligation as $158,629K or $158.6M at March 31, 2025 (within +/- $1M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state a pension benefit obligation of $158,629K (or ~$158.6M) at March 31, 2025. Instead, it reports a March 31, 2025 PBO of $21,010,000, which is far outside the +/- $1M tolerance. The required $158.6M figure is absent."
+      },
+      {
+        "id": "pension-assets-march-2024",
+        "requirement": "States pension plan assets as $199,592K or $199.6M at March 31, 2024 (within +/- $1M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states March 31, 2024 fair value of plan assets as $109,253,000, not $199,592K/$199.6M. It never provides pension plan assets near $199.6M for that date, so the required asset figure is missing/incorrect."
+      },
+      {
+        "id": "pension-assets-march-2025",
+        "requirement": "States pension plan assets as $94,240K or $94.2M at March 31, 2025 (within +/- $1M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states fair value of plan assets at March 31, 2025 as $22,100,000 (\"$22.1 million\"), not approximately $94,240K/$94.2M. It does not provide any pension plan asset figure near $94.2M for that date. Therefore the required asset amount is missing/contradicted."
+      },
+      {
+        "id": "funded-status-march-2024",
+        "requirement": "Calculates funded status as $(68,433)K at March 31, 2024 ($199,592K - $268,025K)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate funded status as ($68,433)K at March 31, 2024 using ($199,592K - $268,025K). Instead, it reports March 31, 2024 plan assets of $109,253,000 and PBO of $173,149,000, yielding a funded status of ($63,896,000). The specific figures $199,592K and $268,025K are not used or shown."
+      },
+      {
+        "id": "funded-status-march-2025",
+        "requirement": "Calculates funded status as $(64,389)K at March 31, 2025 ($94,240K - $158,629K)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate funded status as $(64,389)K at March 31, 2025 using ($94,240K - $158,629K). Instead, it reports March 31, 2025 plan assets of $22.1M, PBO of $21.01M, and a funded status of +$1.09M, so the specified figures and calculation are absent."
+      },
+      {
+        "id": "funded-status-improvement",
+        "requirement": "Calculates funded status improved by $4,044K from $(68,433)K to $(64,389)K",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response calculates funded status changing from ($63,896,000) at March 31, 2024 to $1,090,000 at March 31, 2025, an improvement of $65,986,000. It does not calculate an improvement of $4,044K nor does it show a change from $(68,433)K to $(64,389)K."
+      },
+      {
+        "id": "funded-ratio-march-2024",
+        "requirement": "Calculates funded ratio as 74.5% at March 31, 2024 (199,592/268,025)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate or state a funded ratio of 74.5% at March 31, 2024 using 199,592/268,025. Instead, it presents different March 31, 2024 pension figures (plan assets $109.253M and PBO $173.149M) and discusses funded status based on those numbers."
+      },
+      {
+        "id": "funded-ratio-march-2025",
+        "requirement": "Calculates funded ratio as 59.4% at March 31, 2025 (94,240/158,629)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate or state a funded ratio of 59.4% at March 31, 2025 using 94,240/158,629. Instead, it presents different pension figures (PBO $21.010M and plan assets $22.100M) and discusses funded status as a $1.09M surplus, without the specified ratio calculation."
+      },
+      {
+        "id": "fy2024-settlement-charge",
+        "requirement": "States fiscal 2024 settlement charge as $4,984K for Canadian plan terminations",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists FY2024 settlement charges as $2,402,000 and FY2025 settlement charges as $27,726,000, but it never states a fiscal 2024 settlement charge of $4,984K. It also does not mention that $4,984K relates specifically to Canadian plan terminations."
+      },
+      {
+        "id": "fy2025-settlement-charge",
+        "requirement": "States fiscal 2025 settlement charge as $23,634K for U.S. plan termination",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists FY2025 settlement charges as $27,726,000 and provides quarterly settlement charges (e.g., $17.5M and $4.525M), but it never states a fiscal 2025 settlement charge of $23,634K for U.S. plan termination. The specific $23,634K figure is absent."
+      },
+      {
+        "id": "fy2024-settlement-reduction",
+        "requirement": "States fiscal 2024 settlements reduced obligations and assets by $(20,510)K each",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses FY2025 pension settlement payments and charges, but it never states that fiscal 2024 settlements reduced obligations and assets by exactly $(20,510)K each. No table or sentence includes the $(20,510)K figure for both obligations and assets, so the required disclosure is missing."
+      },
+      {
+        "id": "fy2025-settlement-reduction",
+        "requirement": "States fiscal 2025 settlements reduced obligations and assets by $(95,080)K each",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses FY2025 pension settlements and provides settlement payments and charges, but it never states that fiscal 2025 settlements reduced obligations and assets by $(95,080)K each. No table or sentence includes the specific $(95,080)K reduction to both obligations and assets."
+      },
+      {
+        "id": "pension-surplus-amount",
+        "requirement": "States $6,974K surplus from U.S. plan termination being used for DC plan obligations",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses a $1.1 million pension surplus at March 31, 2025 but does not state that a $6,974K surplus from a U.S. plan termination is being used for DC plan obligations. It contains no mention of “$6,974K” or any surplus redeployment specifically to defined contribution plan obligations."
+      },
+      {
+        "id": "remaining-surplus",
+        "requirement": "States $6,342K remaining surplus at March 31, 2025",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states a pension funded status surplus of $1,090,000 (i.e., $1.1 million) at March 31, 2025, but it never states a remaining surplus of $6,342K. The specific figure “$6,342K remaining surplus at March 31, 2025” is not present anywhere in the response."
+      },
+      {
+        "id": "asset-allocation-2024",
+        "requirement": "States March 2024 asset mix as 92% fixed income / 8% equity",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides only approximate pension asset allocation ranges for March 31, 2024 (e.g., fixed income ~50–55% and equity ~25–30%) and does not state an asset mix of exactly 92% fixed income / 8% equity. It also does not present a March 2024 asset mix table with those specific percentages."
+      },
+      {
+        "id": "asset-allocation-2025",
+        "requirement": "States March 2025 asset mix as 89% fixed income / 11% equity",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses March 31, 2025 pension assets qualitatively and gives no explicit asset mix percentages for that date. It does not state the specific March 2025 allocation as 89% fixed income / 11% equity, instead describing remaining assets as “primarily in cash and short-term fixed income.”"
+      },
+      {
+        "id": "discount-rate-assumptions",
+        "requirement": "States discount rate as 4.82% (2024) and 4.75% (2025)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state discount rates of 4.82% for 2024 and 4.75% for 2025. Instead, it gives only approximate ranges (e.g., “approximately 5.2–5.5%” for March 31, 2024 and “approximately 5.4–5.7%” for March 31, 2025), so the exact required figures are missing."
+      },
+      {
+        "id": "expected-contributions-2026",
+        "requirement": "States expected fiscal 2026 contributions as approximately $3,778K",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state any expected fiscal 2026 contributions figure of approximately $3,778K. It mentions FY2024 contributions of $4,200,000 and FY2025 contributions of $3,173,000, and only says no significant mandatory contributions are expected in fiscal 2026 without giving $3,778K."
+      },
+      {
+        "id": "total-debt-march-2022",
+        "requirement": "States total debt as $497,135K or $497.1M at March 31, 2022 (within +/- $2M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states total debt at March 31, 2022 as $511.226 million, not as $497,135K/$497.1M. It does not provide any total debt figure within +/- $2M of $497.1M for that date. Therefore the required March 31, 2022 total debt amount is missing/incorrect."
+      },
+      {
+        "id": "total-debt-march-2023",
+        "requirement": "States total debt as $458,052K or $458.1M at March 31, 2023 (within +/- $2M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response reports total debt at March 31, 2023 as $471.592M (and elsewhere approximates ~$471M), not $458,052K/$458.1M. It never states a March 31, 2023 total debt figure within +/- $2M of $458.1M, so the required value is missing."
+      },
+      {
+        "id": "debt-reduction-amount",
+        "requirement": "Calculates debt decrease as $39,083K or 7.9% reduction from March 2022 to March 2023",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response calculates net debt falling from $395,836K (Mar 2022) to $338,416K (Mar 2023), a $57,420K reduction. It does not calculate or state a $39,083K decrease or a 7.9% reduction for that period, so the required figures are missing."
+      },
+      {
+        "id": "fy2022-principal-payments",
+        "requirement": "States fiscal 2022 principal payments as $22,440K",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions various debt repayments (e.g., $40,550,000 gross debt repayment in FY2023 and $60M repaid in FY2025) but never states fiscal 2022 principal payments as $22,440K. The specific figure “$22,440K” does not appear anywhere in the response."
+      },
+      {
+        "id": "fy2023-principal-payments",
+        "requirement": "States fiscal 2023 principal payments as $40,000K",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state fiscal 2023 principal payments as $40,000K. It mentions gross debt repayment of $40,550,000 and other debt figures, but never provides the specific $40,000K principal payments value required."
+      },
+      {
+        "id": "debt-repayment-acceleration",
+        "requirement": "Calculates 78.2% acceleration in debt paydown from FY2022 ($22,440K) to FY2023 ($40,000K)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate or mention a 78.2% acceleration in debt paydown from FY2022 ($22,440K) to FY2023 ($40,000K). It instead cites FY2023 gross debt repayment of $40,550,000 and net debt reduction of $57,420,000, without referencing the FY2022 $22,440K figure or computing the acceleration percentage."
+      },
+      {
+        "id": "revolver-status-march-2023",
+        "requirement": "States zero borrowings on revolving credit facility at March 31, 2023",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses revolver borrowings being paid off in a June 2023 refinancing, but it never states that borrowings on the revolving credit facility were zero at March 31, 2023. It provides total debt figures for March 31, 2023 without breaking out or explicitly confirming revolver borrowings were $0 on that date."
+      },
+      {
+        "id": "dorner-term-loan-amount",
+        "requirement": "States Dorner acquisition funded with $450,000K Term Loan B",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Dorner/Garvey acquisition financing and mentions Term Loan B increases and repricing, but it never states that the Dorner acquisition was funded with a $450,000K Term Loan B. The specific funding amount ($450,000K) tied to Dorner is not provided anywhere in the response."
+      },
+      {
+        "id": "garvey-term-loan-amount",
+        "requirement": "States Garvey acquisition funded with $75,000K Term Loan B accordion",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses the Dorner/Garvey acquisition period and mentions a $75 million increase in Term Loan B borrowings, but it does not state that the Garvey acquisition was funded with a “$75,000K Term Loan B accordion.” The specific phrasing and linkage of the $75,000K accordion to funding Garvey are absent."
+      },
+      {
+        "id": "fy2022-extinguishment-costs",
+        "requirement": "States fiscal 2022 debt extinguishment costs as $14,803K including $8,531K for Bridge",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention fiscal 2022 debt extinguishment costs of $14,803K or the $8,531K portion for the Bridge. It discusses debt levels, refinancing, and repayments, but provides no debt extinguishment cost figures for fiscal 2022, nor any Bridge-related extinguishment amount."
+      },
+      {
+        "id": "options-outstanding-total",
+        "requirement": "States 1,253,626 total stock options outstanding at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states stock options outstanding at March 31, 2025 as 1,104,286 (in the stock option activity table), not 1,253,626. It never provides the figure 1,253,626 for total stock options outstanding at that date. Therefore the required number is missing/contradicted."
+      },
+      {
+        "id": "options-in-the-money",
+        "requirement": "States 51,957 options in-the-money at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that the aggregate intrinsic value of options is $0 and concludes that zero options are in-the-money as of March 31, 2025. It does not state that 51,957 options are in-the-money at March 31, 2025, nor does it mention the figure 51,957 anywhere."
+      },
+      {
+        "id": "options-underwater",
+        "requirement": "States 1,201,669 options underwater at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state “1,201,669 options underwater at March 31, 2025.” Instead, it reports 1,104,286 outstanding options at March 31, 2025 and concludes all 1,104,286 are underwater, which does not match the required figure."
+      },
+      {
+        "id": "underwater-percentage",
+        "requirement": "Calculates 95.9% of options underwater (1,201,669/1,253,626)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate 95.9% underwater using 1,201,669/1,253,626. Instead, it uses different option counts (1,104,286 outstanding) and concludes 100% are underwater, so the specified ratio and percentage are absent."
+      },
+      {
+        "id": "stock-price-march-2025",
+        "requirement": "States stock price between $16.50 and $17.00 at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states the closing stock price as of March 31, 2025 was $16.70, which falls within the required $16.50–$17.00 range."
+      },
+      {
+        "id": "aggregate-intrinsic-value",
+        "requirement": "States aggregate intrinsic value of outstanding options as $80K at March 31, 2025",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states the aggregate intrinsic value of outstanding options at March 31, 2025 is \"$0\" (in $000), not $80K. It repeats that the aggregate intrinsic value is zero and that all options are underwater. Therefore, the required $80K figure is not provided."
+      },
+      {
+        "id": "options-tranche-30-40-range",
+        "requirement": "States 737,078 options in $30.01-$40.00 exercise price range",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response’s option exercise-price-range table lists 5,702 options in the $34.45–$40.00 range and does not state 737,078 options in a $30.01–$40.00 range. No other section provides the 737,078 figure for that specified range."
+      },
+      {
+        "id": "options-tranche-40-50-range",
+        "requirement": "States 178,645 options in $40.01-$50.00 exercise price range",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists the exercise price range “$40.01 - $49.67” with “468,282” options outstanding, not 178,645. It does not state 178,645 options in the $40.01-$50.00 range anywhere. Therefore the required figure is missing/incorrect."
+      },
+      {
+        "id": "exercisable-options",
+        "requirement": "States 802,964 options exercisable at March 31, 2025",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that options \"Exercisable (Vested) at March 31, 2025\" were 1,104,286, not 802,964. Nowhere in the response does it mention 802,964 options exercisable at March 31, 2025, so the required figure is missing."
+      },
+      {
+        "id": "stock-price-march-2023",
+        "requirement": "States stock price as $37.16 at March 31, 2023",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions a conversion price of $37.68 and a closing stock price of $16.70 as of March 31, 2025, but it never states a stock price of $37.16 at March 31, 2023. The specific figure \"$37.16\" and the date \"March 31, 2023\" are not provided anywhere."
+      },
+      {
+        "id": "intrinsic-value-decline",
+        "requirement": "States intrinsic value declined from $15,294K (2022) to $5,497K (2023) to $80K (2025)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that intrinsic value declined from $15,294K (2022) to $5,497K (2023) to $80K (2025). While it includes an options table with “aggregate intrinsic value ($000)” figures, it shows $0 and does not provide the required 2022/2023/2025 intrinsic value amounts or the stated decline pattern."
+      },
+      {
+        "id": "stock-comp-expense-decline",
+        "requirement": "States stock compensation expense declined 48% from $12,039K (FY2024) to $6,256K (FY2025)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives FY2025 stock-based compensation expense as $6,260,000 but does not state that it declined 48% from $12,039K (FY2024) to $6,256K (FY2025). It also does not mention the FY2024 stock compensation expense figure of $12,039K or the specific $6,256K FY2025 value and 48% decline."
+      },
+      {
+        "id": "fy2025-amortization-expense",
+        "requirement": "States fiscal 2025 intangible amortization expense as $29,946K or $30.0M",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states FY2025 amortization expense as \"$29,946,000\" in the weighted-average amortization rate calculation and again in the FY2024 vs. FY2025 amortization expense comparison table."
+      },
+      {
+        "id": "finite-lived-intangibles-march-2024",
+        "requirement": "States finite-lived net intangibles as $339,380K at March 31, 2024",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides intangible asset tables for March 31, 2024 and March 31, 2025, but it never states finite-lived net intangibles as $339,380K at March 31, 2024. No figure matching $339,380K appears anywhere in the response for that date."
+      },
+      {
+        "id": "finite-lived-intangibles-march-2025",
+        "requirement": "States finite-lived net intangibles as $310,268K at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides a detailed intangible assets table as of March 31, 2025, but it does not state “finite-lived net intangibles” as $310,268K. The only net intangible totals shown are $217,183,000 (amortizable) and $237,850,000 (total intangibles, net), so the required $310,268K figure is missing."
+      },
+      {
+        "id": "amortization-rate-calculation",
+        "requirement": "Calculates weighted-average amortization rate as 9.6% or 9.65% ($29,946K/$310,268K)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response calculates the weighted-average amortization rate as $29,946,000 ÷ $465,222,000 = 6.44%, not as 9.6% or 9.65%. It also does not use the denominator $310,268K specified in the criterion, so the required 9.6%/9.65% result is not provided."
+      },
+      {
+        "id": "future-amortization-guidance",
+        "requirement": "States guidance of approximately $30,000K per year for next five years",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state any guidance of approximately $30,000K per year for the next five years. It discusses pension settlements, debt, options, and amortization, but contains no mention of a $30 million annual guidance figure or a five-year guidance horizon."
+      },
+      {
+        "id": "customer-relationships-amount",
+        "requirement": "States customer relationships net value as $226,379K (73.0% of finite total) at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides a March 31, 2025 net carrying amount for customer relationships of $147,552,000 and does not state a customer relationships net value of $226,379K or that it equals 73.0% of the finite total. The specific figure $226,379K and the 73.0% proportion are both absent."
+      },
+      {
+        "id": "acquired-technology-amount",
+        "requirement": "States acquired technology net value as $69,927K (22.5% of finite total) at March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides intangible asset tables and values for developed technology net carrying amount ($46,444,000) and other acquisition allocations, but it never states an acquired technology net value of $69,927K (22.5% of finite total) at March 31, 2025. The specific $69,927K figure and the 22.5% proportion are absent."
+      },
+      {
+        "id": "indefinite-trademark-amount",
+        "requirement": "States indefinite-lived trademark as $46,294K at March 31, 2025",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists “Trade names (indefinite-lived) $20,667,000” as of March 31, 2025, but it never states an indefinite-lived trademark balance of $46,294K at March 31, 2025. The specific required figure ($46,294K) is absent and a different amount is provided instead."
+      },
+      {
+        "id": "customer-relationships-life",
+        "requirement": "States customer relationships weighted-average useful life as 17 years",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides useful-life information for intangible assets but only states a 6.9-year weighted-average remaining useful life and does not state that customer relationships have a weighted-average useful life of 17 years. No explicit or implicit “17 years” figure for customer relationships appears anywhere in the response."
+      },
+      {
+        "id": "acquired-technology-life",
+        "requirement": "States acquired technology weighted-average useful life as 15 years",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that acquired technology has a weighted-average useful life of 15 years. It mentions technology useful lives of 7–10 years for the montratec acquisition and discusses an implied overall intangible useful life (~15.5 years), but not a 15-year acquired technology weighted-average useful life."
+      },
+      {
+        "id": "finite-trademarks-life",
+        "requirement": "States finite-lived trademarks weighted-average useful life as 13 years",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses finite-lived trademarks but does not state that their weighted-average useful life is 13 years. It only provides a 6.9-year weighted-average remaining useful life for total amortizable intangibles and an implied ~13-year life for Kito Crosby intangibles, not finite-lived trademarks specifically."
+      },
+      {
+        "id": "total-weighted-average-life",
+        "requirement": "States total weighted-average useful life from acquisition as 16 years",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses intangible assets’ weighted-average remaining useful life (6.9 years) and implies an original life (~15.5 years) from an amortization rate, but it never states a “total weighted-average useful life from acquisition” of 16 years. The specific 16-year figure is absent."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "pension-surplus-redeployment-analysis",
+        "requirement": "Explains $6,974K surplus redirection to DC plans demonstrates capital efficiency beyond risk transfer alone",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention a $6,974K surplus redirection to DC plans, nor does it analyze how such a redirection demonstrates capital efficiency beyond risk transfer. It instead states the pension surplus was $1.1M and “was not redeployed in any meaningful sense,” failing to address the required $6,974K DC redirection point."
+      },
+      {
+        "id": "growth-then-deleverage-framework",
+        "requirement": "Identifies growth-then-deleverage pattern where $525M acquisition borrowing followed by 78% accelerated paydown",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses a general “leverage and delever” cycle and reports a $57.4M net debt reduction from March 2022 to March 2023, but it does not identify a specific $525M acquisition borrowing followed by a 78% accelerated paydown. Neither the $525M figure nor the 78% paydown pattern appears anywhere in the response."
+      },
+      {
+        "id": "asset-allocation-glide-path-strategy",
+        "requirement": "Connects 92%→89%→100% fixed income progression to volatility reduction and interest rate risk management",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses pension asset allocation only in approximate terms (e.g., fixed income ~50–55%) and does not present a 92%→89%→100% fixed income sequence. It also does not explicitly connect that specific progression to volatility reduction and interest rate risk management."
+      },
+      {
+        "id": "exercisable-options-immediate-risk",
+        "requirement": "Quantifies 93.5% of 802,964 exercisable options underwater, creating immediate retention vs unvested risk",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not quantify 93.5% of 802,964 exercisable options underwater; instead it uses different option counts (1,104,286 exercisable) and concludes 100% are underwater. It also does not frame this as “immediate retention vs unvested risk,” since it states all options are fully vested with no unvested component."
+      },
+      {
+        "id": "impairment-absence-interpretation",
+        "requirement": "Notes no intangible impairments despite stock decline validates underlying cash flow support for asset values",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses impairment risk indicators and notes no impairments were recorded in FY2025, but it does not connect the stock price decline to a conclusion that the absence of intangible impairments validates underlying cash flow support for asset values. It frames the stock decline as a potential impairment trigger rather than as validation of asset values."
+      },
+      {
+        "id": "customer-relationship-durability-analysis",
+        "requirement": "Connects 73.0% weighting in customer relationships with 17-year lives to durable positions and cross-sell potential",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses customer relationships intangibles and their durability, but it never mentions a 73.0% weighting, 17-year lives, or explicitly ties those specific figures to durable positions and cross-sell potential."
+      },
+      {
+        "id": "multi-domain-strategic-synthesis",
+        "requirement": "Integrates pension/debt de-risking with retention challenges and equity currency constraints into unified assessment",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly links pension de-risking to increased debt capacity for acquisitions and ties underwater options to retention risk during integration, while also discussing equity-related constraints (underwater options, lack of new grants) in the same cross-domain synthesis. It presents these elements together in a unified assessment of capital allocation and risk trade-offs."
+      },
+      {
+        "id": "understates-underwater-severity",
+        "requirement": "Claims fewer than 80% of options are underwater or characterizes the underwater situation as affecting only a minority of grants",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response states that 100% of the 1,104,286 outstanding options are underwater and repeatedly characterizes the situation as complete (e.g., “100% ... underwater,” “zero ... in-the-money”). It does not claim fewer than 80% are underwater or that only a minority of grants are affected."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "structured-multi-part-presentation",
+        "requirement": "Organizes analysis into clearly-labeled sections for pension, debt, options, and intangibles",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections: “A. Pension Funded Status and Risk Management,” “B. Net Debt Reduction Pattern,” “C. Underwater Stock Options and Employee Retention,” and “D. Intangible Asset Amortization and Acquisition Durability,” matching the required pension, debt, options, and intangibles categories."
+      },
+      {
+        "id": "precise-financial-terminology",
+        "requirement": "Uses precise finance terminology (funded status, principal payments, intrinsic value, amortization rate, ROIC)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses multiple precise finance terms including funded status, principal payments/debt repayment, intrinsic value (options), and amortization rate (weighted-average). However, it does not use or discuss ROIC anywhere in the analysis."
+      },
+      {
+        "id": "metrics-with-context",
+        "requirement": "Presents financial metrics with units ($ or %), time periods, and year-over-year changes",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response presents numerous financial metrics with explicit units ($ and %), clearly labeled time periods (e.g., March 31, 2024 vs. March 31, 2025; FY2024 vs. FY2025), and includes year-over-year changes such as amortization expense +$550,000 (+1.87%) and sales -5.0%. It also provides multi-year net debt figures and a March 2022 to March 2023 net debt reduction amount."
+      },
+      {
+        "id": "objective-analytical-tone",
+        "requirement": "Maintains objective analytical tone without promotional language or unsubstantiated predictions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response is largely analytical and data-focused, but it includes promotional phrasing such as “remarkable coherence,” “underlying strategy is sound,” and “transformative acquisition,” which reduces objectivity. It also makes forward-looking statements about outcomes (e.g., what “will determine” long-term value) that are not strictly evidenced in the analysis."
+      },
+      {
+        "id": "narrative-dump",
+        "requirement": "Presents financial data as prose paragraphs instead of structured tables or organized lists",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response presents extensive financial data in multiple structured tables (e.g., pension PBO/assets, net debt, option ranges, intangible assets) and also uses organized bullet lists and headings. While it includes narrative analysis, it is not primarily prose-only and does not avoid structured formatting."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-cmco-10k-march-2025",
+        "requirement": "Cites Columbus McKinnon 10-K filed for fiscal year ended March 31, 2025",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites the Columbus McKinnon Corporation FY2025 Form 10-K filed May 28, 2025 (for fiscal year ended March 31, 2025) in its Sources section, including an SEC EDGAR link."
+      },
+      {
+        "id": "cites-cmco-10k-march-2024",
+        "requirement": "Cites Columbus McKinnon 10-K filed for fiscal year ended March 31, 2024",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites the Columbus McKinnon FY2024 Form 10-K filed May 29, 2024 for the fiscal year ended March 31, 2024, including a specific SEC EDGAR link in the Sources section."
+      },
+      {
+        "id": "references-march-2023-10k",
+        "requirement": "Cites Columbus McKinnon 10-K for March 31, 2023 fiscal year for debt data",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not cite Columbus McKinnon’s FY2023 Form 10-K for the March 31, 2023 fiscal year when presenting debt data. Instead, it attributes March 31, 2022 and March 31, 2023 debt figures primarily to FY2022 and FY2023 Q4 earnings releases and other sources, without a FY2023 10-K citation for that debt data."
+      },
+      {
+        "id": "avoids-non-authoritative-sources",
+        "requirement": "Cites financial blogs, Reddit, or secondary news sources as primary evidence for calculations",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites several secondary sources as evidence, including Fiscal.ai for leverage ratios and StockTitan/StockInsights/AlphaResearch links for SEC filing content and stock price data, rather than relying solely on primary filings for calculations."
+      }
+    ]
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "task_id": "task_036",
+  "domain": "UX Design",
+  "report_file": "task_036_v2.md",
+  "summary": {
+    "total_criteria": 35,
+    "positive_criteria": 32,
+    "negative_criteria": 3,
+    "correctly_handled": 12,
+    "pass_rate": 34.29,
+    "normalized_score": 18.77,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 18,
+        "correctly_handled": 3,
+        "normalized_score": 16.67
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 3,
+        "normalized_score": 28.57
+      },
+      "presentation-quality": {
+        "total": 4,
+        "correctly_handled": 2,
+        "normalized_score": 0.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 78.26
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "diagnostic-concordance-ranges",
+        "requirement": "States telehealth diagnostic concordance 75-95% vs in-person, noting variation by condition type (higher for chronic diseases, visual conditions)",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions “>90% diagnostic concordance” for teledermatology but does not state an overall telehealth diagnostic concordance range of 75–95% versus in-person. It also does not explicitly note variation by condition type (e.g., higher for chronic diseases and visual conditions)."
+      },
+      {
+        "id": "deployment-evidence-examples",
+        "requirement": "Cites at least three named asynchronous or store-and-forward telehealth deployments from peer-reviewed or authoritative sources (e.g., MSF telemedicine network, Botswana store-and-forward teledermatology, Mashavu CHW program in Kenya, Rwanda medication-abortion pilot) and includes at least one concrete reported outcome metric for each deployment (e.g., completion rate, response time, case resolution, or diagnostic yield)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response names multiple asynchronous/store-and-forward deployments (Uganda CHW telehealth, Tanzania teleradiology, Kenya/Tanzania teledermatology, East African EHR replication), but it does not provide a concrete outcome metric for each one. Several metrics are qualitative (e.g., “improved accessibility,” “continuous operation”) and the teledermatology metrics are not clearly tied to a specific named deployment/source."
+      },
+      {
+        "id": "babyl-rwanda-ussd-sms-architecture",
+        "requirement": "Describes Babyl Rwanda using USSD booking/triage and SMS prescription codes for feature-phone access without requiring smartphone app",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly says it is “excluding Babylon Health Rwanda and mPharma” and never describes Babylon Rwanda’s USSD booking/triage or SMS prescription codes for feature-phone access. It therefore omits the required interaction pattern details about USSD and SMS that avoid needing a smartphone app."
+      },
+      {
+        "id": "babyl-rwanda-scale-metrics",
+        "requirement": "States Babyl Rwanda handled thousands of daily virtual consultations (3,000-5,000 range) or mentions ~2-2.5M registered users",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that Babylon Rwanda handled 3,000–5,000 daily virtual consultations, nor does it mention ~2–2.5M registered users. In fact, it explicitly says it is excluding Babylon Health Rwanda, so the required Babylon Rwanda usage metrics are absent."
+      },
+      {
+        "id": "babyl-rwanda-async-workflow",
+        "requirement": "Explains Babyl Rwanda asynchronous flow pattern (USSD/SMS request → queued triage → clinician call-back → SMS results/orders)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly says it is “excluding Babylon Health Rwanda,” and it never describes the Babylon Rwanda asynchronous pattern (USSD/SMS request → queued triage → clinician call-back → SMS results/orders). Instead, it discusses other Uganda/Tanzania/Kenya deployments without that specific flow."
+      },
+      {
+        "id": "babylon-sustainability-bankruptcy",
+        "requirement": "Notes Babylon filed for Chapter 7 bankruptcy liquidation in the U.S. in 2023 and ceased Rwanda operations as sustainability caution despite clinical success",
+        "weight": 7,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention Babylon filing for Chapter 7 bankruptcy liquidation in the U.S. in 2023, nor does it note that Babylon ceased Rwanda operations as a sustainability caution despite clinical success. In fact, it explicitly says it is “excluding Babylon Health Rwanda,” so the required Babylon-specific sustainability note is absent."
+      },
+      {
+        "id": "mpharma-pharmacy-hub-exam-forward",
+        "requirement": "Describes mPharma/Mutti using pharmacy/clinic hubs for staff-assisted remote exams with diagnostic devices (e.g., TytoCare) during consultations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not describe mPharma/Mutti using pharmacy or clinic hubs for staff-assisted remote exams with diagnostic devices like TytoCare. It explicitly says it is “excluding Babylon Health Rwanda and mPharma,” and contains no workflow details about hub-based assisted examinations during consultations."
+      },
+      {
+        "id": "mpharma-connection-speed-metrics",
+        "requirement": "States mPharma/Mutti achieved rapid connection times (e.g., 90% within 10 minutes) or similar access metrics",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention mPharma/Mutti at all, nor does it provide any access/connection-time metrics such as “90% within 10 minutes.” It discusses other deployments’ workflows and outcomes but omits the specific rapid connection-time/access metrics for mPharma/Mutti required by the criterion."
+      },
+      {
+        "id": "zipline-multi-channel-ordering",
+        "requirement": "States Zipline uses multi-channel ordering (SMS, WhatsApp, phone, web/API) with SMS confirmations for intermittent connectivity",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention Zipline at all, nor does it describe Zipline’s ordering channels (SMS, WhatsApp, phone, web/API) or SMS confirmations for intermittent connectivity. It instead discusses other telehealth deployments and general fallback modes like voice/SMS/paper without attributing them to Zipline."
+      },
+      {
+        "id": "zipline-supply-not-diagnostic",
+        "requirement": "Clarifies Zipline provides just-in-time supply logistics (test kits, blood products), NOT diagnostic tools or clinical decision support",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not clarify Zipline’s role as just-in-time supply logistics (e.g., delivering test kits and blood products) and does not explicitly state that Zipline is not a diagnostic tool or clinical decision support provider. It also never corrects the query’s framing of “Zipline’s clinical decision tools,” leaving the misconception unaddressed."
+      },
+      {
+        "id": "offline-first-architecture-components",
+        "requirement": "Explicitly lists at least three offline-first implementation components used in low-connectivity systems, such as local persistence as the source of truth, queued uploads, visible sync state indicators, manual retry controls, or background sync via service workers.",
+        "weight": 12,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses asynchronous/store-and-forward workflows and mentions that data were “queued locally and transmitted in background sessions,” but it does not explicitly list offline-first implementation components like local persistence as source of truth, queued uploads, sync state indicators, manual retry controls, or service-worker background sync. It lacks an explicit list of at least three such components."
+      },
+      {
+        "id": "sync-strategy-intervals",
+        "requirement": "Mentions at least one documented synchronization approach suitable for low-connectivity settings, such as delta synchronization, queued store-and-forward uploads, or device-to-device synchronization, without asserting a fixed sync interval unless explicitly cited.",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes store-and-forward workflows with locally queued data and background transmission (e.g., teleradiology images stored and forwarded; EHR offline work with later synchronization). It does not assert any fixed synchronization interval, only mentioning general turnaround windows for teledermatology responses."
+      },
+      {
+        "id": "quality-gate-mechanisms",
+        "requirement": "Describes at least two on-device media quality checks applied before upload in telehealth workflows (e.g., blur detection, lighting or exposure checks, orientation prompts, framing guides), with optional mention of AI-based feedback if specified as implementation-dependent",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses asynchronous workflows and store-and-forward diagnostics but does not describe any on-device media quality checks before upload (e.g., blur detection, lighting/exposure checks, orientation prompts, or framing guides). It mentions capturing “high-quality photos” without specifying concrete on-device checks or feedback mechanisms. No AI-based capture feedback is described either."
+      },
+      {
+        "id": "task-shifting-chw-nurse-model",
+        "requirement": "Explains task-shifting pattern where CHW/nurse captures data offline and clinician provides asynchronous review as proven low-connectivity approach",
+        "weight": 12,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes a CHW telehealth workflow in Uganda where CHWs submit cases asynchronously (including store-and-forward and offline/low-connectivity mechanisms) and remote clinicians/supervisors review and respond later, matching the task-shifting pattern requested."
+      },
+      {
+        "id": "fhir-health-data-standards",
+        "requirement": "References health data standards or interoperability (FHIR Bundles, OpenSRP/CHT, Open Health Stack) for offline-capable systems",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a section on “Health Data Standards, Interoperability” and explicitly references HL7 FHIR along with interoperable health platforms (OpenMRS, Bahmni, DHIS2) in the context of low-connectivity systems."
+      },
+      {
+        "id": "cognitive-load-design-principles",
+        "requirement": "Explicitly lists at least three of the following cognitive load reduction techniques in the context of telehealth UX: progressive disclosure, recognition over recall, inline validation, task chunking, or resumability after interruption.",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses asynchronous workflows and offline/store-and-forward architectures but does not explicitly list any of the named cognitive load reduction techniques. None of the terms progressive disclosure, recognition over recall, inline validation, task chunking, or resumability after interruption are mentioned in the telehealth UX context."
+      },
+      {
+        "id": "loop-closure-follow-up-challenge",
+        "requirement": "States that incomplete diagnostic loop closure or follow-up completion is a common telehealth failure mode and explicitly names at least one mitigation strategy (examples: staged reminders, follow-up dashboards, or logistics coordination)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses escalation protocols and follow-up timing, but it does not explicitly identify incomplete diagnostic loop closure or follow-up completion as a common telehealth failure mode. It also does not explicitly name a mitigation strategy like staged reminders, follow-up dashboards, or logistics coordination to address loop-closure failures."
+      },
+      {
+        "id": "who-async-endorsement",
+        "requirement": "Notes WHO endorsement of asynchronous telemedicine for client-to-provider and provider-to-provider use with appropriate safeguards (such as data security, quality assurance, and referral integration)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions WHO and ITU guidelines generally but does not note a WHO endorsement specifically of asynchronous telemedicine for client-to-provider and provider-to-provider use, nor does it explicitly tie that endorsement to safeguards like data security, quality assurance, and referral integration."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "sustainability-business-model-paradox",
+        "requirement": "Analyzes Babylon bankruptcy paradox (clinical success + business failure) and recommends embedding in existing revenue/reimbursement streams",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses a general “clinical-business paradox” but does not analyze Babylon’s specific bankruptcy paradox (clinical success alongside business failure). It also does not recommend embedding the product into existing revenue/reimbursement streams (e.g., payer contracts, government reimbursement, capitation), focusing instead on interoperability and donor/government alignment."
+      },
+      {
+        "id": "architecture-quality-causality",
+        "requirement": "States that offline-first or asynchronous telehealth architectures reduce data loss or incomplete case records in low-connectivity settings",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly describes offline-first and store-and-forward/asynchronous workflows that queue data locally and sync later, and it explicitly notes improvements like “improvement in data completeness” and “ensuring minimal delays even during network interruptions,” implying reduced incomplete records/data loss in low-connectivity settings."
+      },
+      {
+        "id": "condition-specific-concordance-variation",
+        "requirement": "Notes that diagnostic concordance varies by condition and clinical setting (e.g., primary care concordance ranges 74-81% depending on population and study design), not just overall average",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions diagnostic concordance only in the teledermatology section (e.g., “>90% diagnostic concordance”) and does not note that concordance varies by condition and clinical setting, nor does it provide a primary-care-specific range such as 74–81% depending on population/study design."
+      },
+      {
+        "id": "cross-platform-pattern-synthesis",
+        "requirement": "Synthesizes transferable design patterns across platforms (e.g., USSD from Babyl, exam-and-forward from mPharma, multi-channel from Zipline)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not synthesize transferable design patterns across platforms like Babylon’s USSD approach, mPharma’s exam-and-forward workflow, or Zipline’s multi-channel tools. It explicitly says it is excluding Babylon Health Rwanda and mPharma, and it does not discuss Zipline at all, so the requested cross-platform pattern synthesis is missing."
+      },
+      {
+        "id": "deployment-failure-modes-mitigation",
+        "requirement": "Identifies at least one documented adoption failure pattern in low-connectivity telehealth deployments (such as perceived workflow slowness versus paper, double documentation burden, delayed feedback) and specifies a concrete mitigation at the workflow or training level (e.g., task reordering, reduced mandatory fields, targeted onboarding)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes adoption problems like “initial user reluctance and public skepticism” and mentions failures when systems “did not match user needs” or lacked engagement. However, it does not identify a specific documented low-connectivity adoption failure pattern (e.g., double documentation, perceived slowness, delayed feedback) paired with a concrete workflow/training mitigation such as task reordering, reducing mandatory fields, or targeted onboarding."
+      },
+      {
+        "id": "evidence-source-qualification",
+        "requirement": "Explicitly distinguishes at least one claim supported by randomized or controlled study evidence from a claim supported only by vendor or program reports, OR explicitly qualifies a claim by noting study design, sample size, or recency limitations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites a “mixed-method study” for the Uganda CHW telehealth program and references other academic sources, but it does not explicitly distinguish randomized/controlled evidence from vendor/program reports, nor does it qualify key claims by noting study design limits, sample size constraints, or recency limitations in a comparative way."
+      },
+      {
+        "id": "staged-intervention-escalation-design",
+        "requirement": "Prescribes specific escalation timing/channels (e.g., SMS day 0/3, phone day 7) or quality gates with rationale for staged approach",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes escalation timing and channels, e.g., “Immediate for emergency… within hours… within 24h” and specifies backup channels like voice call, SMS, supervisor dispatch, and paper/in-person fallback, with rationales tied to patient safety and mitigating connectivity interruptions."
+      },
+      {
+        "id": "sync-video-primary-2g",
+        "requirement": "Recommends synchronous video consultation as the primary or default approach for 2G/3G networks without acknowledging bandwidth constraints",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response consistently emphasizes asynchronous, store-and-forward, offline-first approaches for 2G/3G settings and describes fallback modes like SMS/voice/paper. It does not recommend synchronous video consultation as the primary/default approach for low-bandwidth networks."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "ux-health-tech-terminology",
+        "requirement": "Uses precise UX/health-tech terminology (store-and-forward, offline-first, task-shifting, progressive disclosure, loop closure)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses several relevant terms like “asynchronous” and “store-and-forward,” and mentions “offline-first architecture.” However, it does not use the specific UX/health-tech terminology listed—e.g., it never mentions task-shifting, progressive disclosure, or loop closure—so the criterion is not satisfied."
+      },
+      {
+        "id": "structured-comparative-format",
+        "requirement": "Uses clear structural organization (headings, bullets, tables) for platform comparisons and design pattern recommendations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized with clear headings and subheadings, and it uses bullet lists to structure workflows, metrics, and protocols. It also includes a comparative synthesis section that groups design/workflow lessons in a structured way."
+      },
+      {
+        "id": "evidence-based-objective-tone",
+        "requirement": "Maintains objective evidence-based tone without marketing language, citing specific deployments or research studies",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response maintains an objective, evidence-based tone and includes multiple specific citations to studies and reports (e.g., Uganda CHW telehealth mixed-method study, Tanzania teleradiology case study, EHR implementation paper) with links in the Sources section."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same information or conclusion multiple times using different wording without adding new analysis",
+        "weight": -30,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeats several conclusions multiple times with rephrasing, such as emphasizing that asynchronous/store-and-forward works in low connectivity and that escalation protocols and interoperability are essential, without adding materially new analysis in later sections (e.g., “Comparative Synthesis” reiterating earlier points)."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "multiple-deployment-references",
+        "requirement": "References at least 4 specific real-world deployments or programs (e.g., Babyl Rwanda, mPharma/Mutti, Zipline, MSF telemedicine, Botswana teledermatology, Kenya Mashavu CHW, Rwanda medication-abortion pilot, Addis Clinic)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references at least four real-world deployments/programs: Uganda CHW telehealth support, Tanzania ATM teleradiology, Kenya/Tanzania teledermatology networks (EpIC/iPath), and a regional EHR/HIV clinic store-and-forward system across Kenya/Tanzania/Uganda."
+      },
+      {
+        "id": "research-evidence-attribution",
+        "requirement": "References research studies or trials demonstrating concordance/completion outcomes (e.g., Kenya Mashavu study, India/Nigeria randomized trials, teledermatology concordance studies)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites teledermatology networks and explicitly reports “>90% diagnostic concordance” and discusses consultation volumes/usage metrics from a Uganda telehealth study, referencing research sources to support concordance/completion-related outcomes."
+      },
+      {
+        "id": "authoritative-frameworks",
+        "requirement": "References health informatics standards or guidelines (WHO telemedicine recommendations, Open Health Stack, FHIR standards, OpenSRP/CHT platforms)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references health informatics standards and guidelines, including HL7 FHIR, WHO/ITU guidelines, and interoperability standards (HL7, IHE), in its “Health Data Standards, Interoperability” section."
+      },
+      {
+        "id": "corporate-sustainability-evidence",
+        "requirement": "References verifiable business/corporate information for sustainability analysis (e.g., Babylon Health bankruptcy filing 2023, operational status updates)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not reference verifiable corporate/business information about the named companies (e.g., Babylon Health’s Rwanda deployment details, operational status updates, or its 2023 bankruptcy filing). It explicitly says it is “excluding Babylon Health Rwanda and mPharma” and provides only academic/program sources, not corporate status or filings."
+      },
+      {
+        "id": "informal-sources-primary",
+        "requirement": "Cites Reddit posts, YouTube influencers, or social media discussions as primary evidence for clinical or design recommendations",
+        "weight": -60,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites academic articles, government reports, and organizational publications as sources and does not reference Reddit, YouTube influencers, or social media discussions as primary evidence for recommendations."
+      }
+    ]
+  }
+}

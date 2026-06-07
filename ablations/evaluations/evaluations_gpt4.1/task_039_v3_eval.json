@@ -1,0 +1,397 @@
+{
+  "task_id": "task_039",
+  "domain": "Law",
+  "report_file": "task_039_v3.md",
+  "summary": {
+    "total_criteria": 44,
+    "positive_criteria": 39,
+    "negative_criteria": 5,
+    "correctly_handled": 28,
+    "pass_rate": 63.64,
+    "normalized_score": 57.83,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 24,
+        "correctly_handled": 15,
+        "normalized_score": 62.62
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 10,
+        "correctly_handled": 6,
+        "normalized_score": 55.88
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 16.67
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 75.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "nasdaq-rule-definition",
+        "requirement": "States independent director is person who is not executive officer/employee and has no relationship interfering with independent judgment",
+        "weight": 12,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response quotes NASDAQ Rule 5605(a)(2) defining an independent director as someone other than an executive officer or employee and without a relationship that would interfere with independent judgment."
+      },
+      {
+        "id": "board-affirmative-determination",
+        "requirement": "States board must make affirmative determination of each director's independence based on all relevant facts",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that independence depends on relationships that, in the board’s opinion, would interfere with independent judgment, and it describes the board making an independence determination annually. However, it does not explicitly say the board must make an affirmative determination of each director’s independence based on all relevant facts."
+      },
+      {
+        "id": "family-member-definition",
+        "requirement": "Defines Family Member as spouse, parents, children, siblings, in-laws (mothers/fathers/sons/daughters/brothers/sisters-in-law), and anyone sharing director''s home (excluding domestic employees)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly defines “Family Member” to include spouse, parents, children, siblings, in-laws (mothers/fathers/sons/daughters/brothers/sisters-in-law), and anyone sharing the director’s home other than domestic employees."
+      },
+      {
+        "id": "employment-three-year-lookback",
+        "requirement": "States director cannot be currently employed by company or have been employed within past 3 years",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that a director is not independent if they are an employee or have been an employee within the last three years, explicitly describing the three-year lookback employment disqualifier."
+      },
+      {
+        "id": "family-executive-officer-disqualification",
+        "requirement": "States director's Family Member cannot be or have been executive officer of company within past 3 years",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states under “Family Member Employment as Executive” that a director is not independent if an immediate family member is, or was within the past three years, employed as an executive officer by the company (or its parent/subsidiary)."
+      },
+      {
+        "id": "compensation-threshold-120k",
+        "requirement": "States $120,000 direct compensation threshold for any 12-month period within last 3 years disqualifies independence",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that receiving more than $120,000 in direct compensation during any twelve-month period within the last three years disqualifies a director from being independent."
+      },
+      {
+        "id": "compensation-exclusions-specified",
+        "requirement": "States board/committee fees, pension benefits under tax-qualified plans, and non-discretionary compensation excluded from $120K threshold",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that director/committee fees and fixed retirement benefits are excluded from the $120,000 compensation threshold, but it does not specify that the retirement benefits must be under tax-qualified plans or that the excluded compensation is “non-discretionary.” Those exact exclusions are not stated."
+      },
+      {
+        "id": "business-relationship-greater-of-test",
+        "requirement": "States business relationship disqualification threshold is greater of 5% of recipient company's consolidated gross revenues OR $200,000",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that a director is not independent if payments for property or services exceed “the greater of $200,000 or 5% of the recipient’s consolidated gross revenues” in the relevant period, matching the specified business relationship disqualification threshold."
+      },
+      {
+        "id": "business-relationship-three-fiscal-years",
+        "requirement": "States business relationship threshold applies to payments in current or any of past 3 fiscal years",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes the interlocking directorate/business relationship test as applying to payments “in the most recent three fiscal years,” which covers the current fiscal year and the prior three fiscal years. It does not state that the threshold applies to payments in the current or any of the past three fiscal years (a four-year window)."
+      },
+      {
+        "id": "auditor-current-partner-disqualification",
+        "requirement": "States director or Family Member cannot be current partner of company's outside auditor",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that a director or Family Member is disqualified if they are a partner or employee of the company’s outside auditor and worked on the issuer’s audit. It does not state that a director or Family Member cannot be a current partner of the outside auditor regardless of audit involvement, so the specific “current partner” prohibition is not addressed."
+      },
+      {
+        "id": "auditor-past-three-year-disqualification",
+        "requirement": "States director or Family Member cannot have been partner/employee of outside auditor who worked on company's audit within past 3 years",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes an “Outside Auditor Affiliation” disqualifier stating that the director or a Family Member is or was within the last three years a partner or employee of the company’s outside auditor and personally worked on the issuer’s audit."
+      },
+      {
+        "id": "interlocking-compensation-committee",
+        "requirement": "States director or Family Member cannot be/have been executive officer of entity where company's executives serve on that entity's compensation committee (current or within past 3 years)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state the NASDAQ “compensation committee interlock” disqualification that a director or family member cannot be/have been an executive officer of another entity where the company’s executives serve on that entity’s compensation committee within the past three years. It instead describes an unrelated payments-for-property/services threshold under the heading “Interlocking Directorate.” The required interlock criterion is not addressed correctly."
+      },
+      {
+        "id": "investment-company-interested-person",
+        "requirement": "States for investment companies under Investment Company Act of 1940, interested person (other than solely due to board service) is not independent",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses investment companies needing to comply with SEC “interested person” standards, but it does not state that under the Investment Company Act of 1940 an “interested person” (other than solely due to board service) is not independent. It never explicitly links “interested person” status to a non-independence conclusion outside board service."
+      },
+      {
+        "id": "majority-independent-board-requirement",
+        "requirement": "States majority independent board required for listed companies, subject to Rule 5615 exemptions (controlled companies, investment companies, asset-backed issuers)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that NASDAQ generally requires a majority independent board and explicitly notes Rule 5615 exemptions, including controlled companies, foreign private issuers, and investment companies. It also describes controlled company exemptions under Rule 5615(c) and discusses investment company treatment under Rule 5615."
+      },
+      {
+        "id": "committee-full-independence-requirement",
+        "requirement": "States audit, compensation, and nominating committees must be composed entirely of independent directors (with limited exemptions)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that controlled companies are exempt from “fully independent compensation and nominating committees” and discusses an “exceptional and limited circumstances” exception allowing one non-independent director on audit/comp committees. However, it does not explicitly state that the audit, compensation, and nominating committees must be composed entirely of independent directors as the baseline rule (with limited exemptions)."
+      },
+      {
+        "id": "controlled-company-fifty-percent-definition",
+        "requirement": "Defines controlled company as one where more than 50% of voting power held by individual, group, or another company",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly defines a “controlled company” as one where more than 50% of the voting power is held by an individual, group, or another company in Section 5.1.1."
+      },
+      {
+        "id": "controlled-company-exemption-scope",
+        "requirement": "States controlled companies exempt from majority independent board and independent compensation/nominating committee requirements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that controlled companies are exempt from the majority independent board requirement and from having fully independent compensation and nominating committees, citing Nasdaq Rule 5615(c) and referencing Rules 5605(b), (d), and (e)."
+      },
+      {
+        "id": "controlled-company-audit-still-required",
+        "requirement": "States controlled companies still must maintain audit committee meeting SEC Rule 10A-3 independence requirements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that controlled companies are exempt from certain independence requirements but must maintain an independent audit committee meeting both NASDAQ and SEC Rule 10A-3 standards, explicitly tying controlled companies to Rule 10A-3 independence requirements."
+      },
+      {
+        "id": "controlled-company-phase-in-ninety-days",
+        "requirement": "States upon ceasing controlled status, majority of independent committee members required within 90 days",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses a transition period after losing controlled company status, but it states compliance is required within six months, not that a majority of independent committee members is required within 90 days. It also does not specifically mention “majority of independent committee members” as a 90-day requirement upon ceasing controlled status."
+      },
+      {
+        "id": "controlled-company-phase-in-one-year",
+        "requirement": "States all independent committee members required within one year and majority independent board within twelve months of ceasing controlled status",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses a controlled company transition but states compliance is required within six months after losing controlled status. It does not state that all independent committee members are required within one year and that a majority independent board is required within twelve months of ceasing controlled status."
+      },
+      {
+        "id": "foreign-private-issuer-home-country",
+        "requirement": "States foreign private issuers may follow home country practices but must have audit committee meeting NASDAQ and SEC requirements",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that foreign private issuers may follow home-country governance practices but that audit committee requirements under SEC Rule 10A-3 must always be met, and it also describes NASDAQ Rule 5605(c) audit committee standards incorporating SEC requirements."
+      },
+      {
+        "id": "sec-10a-3-compensatory-fee-prohibition",
+        "requirement": "States audit committee members are prohibited from accepting consulting, advisory, or other compensatory fees beyond board/committee fees",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that under SEC Rule 10A-3, audit committee members may not accept any consulting, advisory, or other compensatory fee from the company or its subsidiaries except for board/committee fees (see Section 6.1 and 6.2). This matches the criterion’s prohibition beyond standard board/committee compensation."
+      },
+      {
+        "id": "stock-ownership-independence-clarification",
+        "requirement": "States stock ownership alone does not preclude independence",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states in the quoted NASDAQ Rule 5605(a)(2) definition that “Ownership of company stock, by itself, does not preclude a finding of independence.”"
+      },
+      {
+        "id": "conflates-nyse-nasdaq",
+        "requirement": "Presents NYSE independence thresholds or rules as NASDAQ requirements without distinguishing between the two exchanges",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response consistently frames the independence definition and thresholds (e.g., $120,000 compensation test, lookback periods, audit committee rules) as NASDAQ Rule 5605/SEC Rule 10A-3 requirements and includes a separate section distinguishing NASDAQ from NYSE. It does not present NYSE thresholds as NASDAQ requirements without distinguishing the exchanges."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "exemption-dual-structure-clarity",
+        "requirement": "For at least 3 exemption types, states both what requirements are exempt AND what requirements still apply",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes multiple exemption/exception types and, for at least three of them (controlled company, foreign private issuer, and IPO/new listing phase-in), it specifies both what independence requirements are waived and what requirements still apply (notably audit committee/SEC Rule 10A-3 and disclosure obligations)."
+      },
+      {
+        "id": "bdc-investment-company-distinction",
+        "requirement": "Notes BDCs must comply with Rule 5600 Series as they are not exempt like registered management investment companies under 1940 Act",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that BDCs are subject to all NASDAQ governance rules and contrasts this with investment companies that are exempt under the 1940 Act, implying BDCs must comply with the Rule 5600 Series rather than being exempt like registered management investment companies."
+      },
+      {
+        "id": "threshold-exclusion-specifications",
+        "requirement": "Explicitly distinguishes compensation test exclusions (board fees, pension, non-discretionary) from business relationship exclusions (securities investments, charitable matching)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses compensation exclusions (e.g., board/committee fees, fixed retirement benefits) but does not explicitly distinguish these from business relationship exclusions like securities investments or charitable matching. It mentions charitable contributions only in passing and does not address securities investments or charitable matching as separate business-relationship exclusions. The required explicit distinction is missing."
+      },
+      {
+        "id": "controlled-company-complete-timeline",
+        "requirement": "States all 3 controlled company phase-in timelines (immediate requirement, 90-day requirement, one-year requirement)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives phase-in timelines for newly listed companies (at listing, within 90 days, within one year) but does not state all three controlled company phase-in timelines. For controlled companies it mentions a six-month transition after losing controlled status and “immediate” audit committee compliance, but it does not include a 90-day and one-year controlled-company requirement set."
+      },
+      {
+        "id": "audit-enhanced-independence-explicit",
+        "requirement": "Explicitly states audit committee has additional/enhanced independence tests beyond standard board-level criteria",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly describes “enhanced independence standards” for audit committee members under SEC Rule 10A-3 as incorporated into Nasdaq Rule 5605(c), distinguishing them from the general board independence definition and bright-line tests."
+      },
+      {
+        "id": "comprehensive-exemption-taxonomy",
+        "requirement": "Identifies at least 6 distinct exemption categories with substantive explanation for each",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies at least six exemption/exception categories and explains each, including controlled company exemption, IPO/spin-off/new listing phase-ins, exceptional and limited circumstances exception, legacy/contractual rights carve-outs, foreign private issuer home-country practice exemption, and investment company/BDC exemptions, with conditions and scope described for each."
+      },
+      {
+        "id": "lookback-timing-mechanics",
+        "requirement": "Explains three-year lookback runs from relationship end and notes brief interim executive service exception",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions a three-year lookback generally but does not explain that the lookback runs from the end of the relationship. It also does not note any exception for brief interim executive service within the lookback period."
+      },
+      {
+        "id": "nominating-committee-contractual-exemption",
+        "requirement": "Notes binding obligations pre-dating November 2003 may exempt companies from independent nominating committee requirements",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions “Legacy/Contractual Rights Carve-Outs” but does not note that binding obligations pre-dating November 2003 may exempt companies from independent nominating committee requirements. It provides no date-specific pre-November 2003 exemption tied to nominating committee independence. The required pre-2003 binding obligation point is absent."
+      },
+      {
+        "id": "auditor-relationship-type-distinction",
+        "requirement": "Distinguishes between current auditor partner disqualification and former partner/employee who worked on company audit",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response’s auditor disqualification bullet states that a director or family member is disqualified if they are or were within three years a partner/employee of the outside auditor and personally worked on the issuer’s audit, which distinguishes current disqualification from former partner/employee status tied to audit work."
+      },
+      {
+        "id": "undifferentiated-exemptions",
+        "requirement": "Treats controlled companies, foreign private issuers, and investment companies as having identical exemption scopes without distinguishing their different retained requirements",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response distinguishes the exemption scopes for controlled companies, foreign private issuers, and investment companies by describing different carve-outs and retained requirements (notably audit committee/Rule 10A-3) for each. It does not treat these issuer types as having identical exemptions."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "formal-legal-terminology",
+        "requirement": "Uses formal legal terminology (executive officer, affiliated person, compensatory fees, disqualification criteria)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses formal legal terminology including “Executive Officer,” “affiliated person,” “compensatory fee,” and discusses bright-line “disqualifying” relationships/criteria under NASDAQ and SEC Rule 10A-3."
+      },
+      {
+        "id": "structured-regulatory-sections",
+        "requirement": "Organizes content with clear sections for definition, disqualifications, eligibility, and company requirements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections covering the definition (Section 2), disqualifications (Section 3), eligibility (Section 4), and company requirements/exemptions by issuer type (Sections 5 and 8). These headings and content divisions directly match the requested structure."
+      },
+      {
+        "id": "objective-compliance-tone",
+        "requirement": "Maintains objective regulatory tone appropriate for compliance documentation without advisory recommendations beyond rule requirements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses formal, compliance-oriented language (e.g., “mandate,” “codified,” “must,” “disclose,” “notify NASDAQ”) and focuses on describing rule requirements and exemptions. It does not provide strategic or business advice beyond stating what the rules require and how compliance is documented/disclosed."
+      },
+      {
+        "id": "informal-casual-language",
+        "requirement": "Uses casual expressions such as \"basically\", \"get a pass\", \"who's in/out\", contractions, or colloquial phrasing",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response uses contractions such as “NASDAQ’s” and “company’s” throughout, which are explicitly included in the criterion’s examples of casual expressions."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same disqualification criterion or exemption multiple times using different wording without adding new regulatory detail",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeats the same exemption/disqualification ideas multiple times with different wording, especially around audit committee independence having “no phase-in,” “must always be met,” and “no exceptions,” and around controlled company exemptions and transition timing. These restatements largely reiterate prior points rather than adding new regulatory detail each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-nasdaq-5605a2-definition",
+        "requirement": "Cites NASDAQ Listing Rule 5605(a)(2) for independent director definition and disqualification criteria",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites “NASDAQ Rule 5605(a)(2)” as the source for the independent director definition and then lists multiple bright-line disqualifying relationships under that same rule section."
+      },
+      {
+        "id": "cites-nasdaq-5605b1-majority",
+        "requirement": "Cites NASDAQ Listing Rule 5605(b)(1) for majority independent board requirement",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses the majority independent board requirement generally (e.g., “Rule 5605(b)”) but never specifically cites NASDAQ Listing Rule 5605(b)(1). It references Rule 5605(b) without the (b)(1) subsection, so the required citation is missing."
+      },
+      {
+        "id": "cites-sec-rule-10a-3",
+        "requirement": "Cites SEC Rule 10A-3 for audit committee independence requirements",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references SEC Rule 10A-3 multiple times in connection with audit committee independence requirements (e.g., Sections 1, 5.1.2, and 6), including citing 17 CFR § 240.10A-3 in the sources."
+      },
+      {
+        "id": "cites-nasdaq-exemptions",
+        "requirement": "Cites NASDAQ Listing Rule 5615 or IM-5605 for exemptions or interpretive guidance",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites NASDAQ Listing Rule 5615(c) multiple times when discussing exemptions and transitional provisions (e.g., the controlled company exemption and phase-in rules). It does not cite IM-5605, but citing Rule 5615 satisfies the criterion."
+      },
+      {
+        "id": "informal-sources-only",
+        "requirement": "Relies exclusively on legal blogs, law firm marketing materials, or Wikipedia without citing primary NASDAQ rules or SEC regulations",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites primary NASDAQ rules (e.g., Rule 5605, 5615 via Nasdaq Listing Center) and SEC regulations/orders (e.g., 17 CFR 240.10A-3 and SEC approval orders/Federal Register). Although it also references blogs and law firm materials, it does not rely on them exclusively."
+      }
+    ]
+  }
+}

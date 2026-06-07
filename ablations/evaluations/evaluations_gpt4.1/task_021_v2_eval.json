@@ -1,0 +1,325 @@
+{
+  "task_id": "task_021",
+  "domain": "Technology",
+  "report_file": "task_021_v2.md",
+  "summary": {
+    "total_criteria": 35,
+    "positive_criteria": 31,
+    "negative_criteria": 4,
+    "correctly_handled": 29,
+    "pass_rate": 82.86,
+    "normalized_score": 78.99,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 12,
+        "correctly_handled": 9,
+        "normalized_score": 72.34
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 12,
+        "correctly_handled": 10,
+        "normalized_score": 82.05
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 5,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 5,
+        "normalized_score": 100.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "eu-ai-act-with-details",
+        "requirement": "States EU AI Act (Regulation (EU) 2024/1689) with Article 50 transparency/labeling obligations and August 2026 compliance date",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names the EU AI Act as Regulation (EU) 2024/1689 and states that Article 50 imposes transparency/labeling obligations for AI-generated or manipulated content, with compliance/enforceability on August 2, 2026."
+      },
+      {
+        "id": "us-take-it-down-act-with-details",
+        "requirement": "States U.S. TAKE IT DOWN Act (Public Law 119-12) signed May 2025 with 48-hour platform removal requirement",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions a “TAKE IT DOWN Act (2025)” and a 48-hour takedown system, but it does not state that it is the “U.S. TAKE IT DOWN Act (Public Law 119-12)” nor that it was signed in May 2025. The specific public law number and signing date are missing."
+      },
+      {
+        "id": "voice-likeness-or-state-election-laws",
+        "requirement": "Names NO FAKES Act (pending 2025) for digital replica rights OR Tennessee ELVIS Act (July 2024) for voice rights OR state election AI disclosure laws",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references Tennessee’s ELVIS Act in the U.S. state laws section, satisfying the requirement to name one of the specified legal frameworks."
+      },
+      {
+        "id": "generalization-methods-named",
+        "requirement": "Names at least 2 generalization methods from UCF (ICCV 2023), LSDA (CVPR 2024), or LAA-Net (CVPR 2024) for cross-dataset performance",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses cross-dataset generalization in general (e.g., CrossDF, HF-FFD, SBI) but does not name any generalization methods specifically from UCF (ICCV 2023), LSDA (CVPR 2024), or LAA-Net (CVPR 2024). None of those three works are mentioned, so it cannot list two methods from them."
+      },
+      {
+        "id": "transformer-video-detection-named",
+        "requirement": "Names DFDT (2022) or similar Vision Transformer approach for spatiotemporal video deepfake detection",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses transformer-based video detectors (e.g., ViT, TimeSformer) but does not name DFDT (2022) or any clearly similar specifically titled Vision Transformer approach for spatiotemporal video deepfake detection. No mention of “DFDT” appears anywhere in the methods section or sources."
+      },
+      {
+        "id": "multimodal-audio-visual-detection-named",
+        "requirement": "Names specific multimodal audio-visual detection method such as ART-AVDF (CVIU 2024) that exploits lip-sync or A/V coherence",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names the multimodal audio-visual method ART-AVDF and describes it as fusing audio and lip encoders via cross-modal attention, i.e., exploiting A/V coherence/lip-sync cues."
+      },
+      {
+        "id": "foundation-audio-detection-named",
+        "requirement": "Names wav2vec2, WavLM, or XLS-R combined with AASIST or similar anti-spoof backend for audio deepfake detection",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly mentions “SSL-AASIST” alongside “XLS-R-SLS” in the audio detection methods section, indicating use of an SSL model (XLS-R) combined with an AASIST anti-spoof backend or similar."
+      },
+      {
+        "id": "privacy-preserving-audio-named",
+        "requirement": "Names privacy-preserving audio detection method such as SafeEar (CCS 2024) that decouples semantics from acoustics",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names SafeEar as a privacy-preserving audio deepfake detection method and describes how it separates semantic content from acoustic tokens so detection operates on acoustics while shielding semantics."
+      },
+      {
+        "id": "states-high-accuracy-video-metrics",
+        "requirement": "States video detection accuracy between 95-99% or AUROC >0.95 on standard benchmarks (FF++, Celeb-DF, WildDeepfake, or DFDC)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response reports controlled-benchmark video detection results exceeding the required threshold, e.g., TSFF-Net achieving 97.7–98.9% accuracy and also mentions benchmark contexts like FaceForensics++/Celeb-DF/DFDC. These values fall within 95–99% accuracy as required."
+      },
+      {
+        "id": "states-audio-detection-eer",
+        "requirement": "States audio detection EER <3% or low single-digit EER (0.5-3%) on ASVspoof 2021 or 2024",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response reports an audio detection EER of 2.02% for SafeEar and explicitly ties it to ASVspoof (“on ASVspoof and CVoiceFake”), which is within the <3% / 0.5–3% low single-digit range required."
+      },
+      {
+        "id": "states-in-the-wild-performance-drop",
+        "requirement": "States that detectors with AUROC >0.95 on benchmarks like FaceForensics++ or DFDC can drop to near-chance performance on in-the-wild or cross-dataset evaluations.",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that models can exceed 95% on controlled benchmarks like FaceForensics++/DFDC but then suffer large drops on in-the-wild evaluations, including “up to a 50% AUC drop” and performance “near or below chance” for humans. This captures the benchmark-to-real-world near-chance degradation described in the criterion."
+      },
+      {
+        "id": "states-human-detection-limitations",
+        "requirement": "States human deepfake detection accuracy around 55-65% or mean accuracy ~60%, or identifies humans as unreliable detectors",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a “Human Performance” section citing a meta-analysis and reports unaided human deepfake detection accuracy averaging 55.54% with a range of 48.87–62.10%, explicitly characterizing humans as near chance and unreliable without interventions."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "quantifies-lab-to-deployment-gap-with-causes",
+        "requirement": "Quantifies 45-50% AUC drop from lab to field AND explains causes (new generators/codecs/compression/post-processing)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly quantifies a 45–50% AUC drop from controlled benchmarks to in-the-wild (Deepfake-Eval-2024) and provides an explanation for the gap, including overfitting to benchmark artifacts and degradation under compression/post-processing plus mismatch to new generation methods."
+      },
+      {
+        "id": "quantifies-human-detection-with-precision",
+        "requirement": "States specific human detection metrics (mean ~60%, sensitivity ~55%, CIs overlapping chance) from meta-analysis or systematic review",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes a meta-analysis of human deepfake detection with a specific mean accuracy of 55.54% and a confidence interval range (48.87–62.10%) indicating near-chance performance. However, it does not state the requested mean ~60% nor a sensitivity ~55% metric, and it does not explicitly note CIs overlapping chance for those specific values."
+      },
+      {
+        "id": "articulates-provenance-vs-detection-strategy",
+        "requirement": "Recommends C2PA/cryptographic provenance or watermarking as complement to detection or explains post-hoc detection limitations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends layering provenance solutions—C2PA and watermarking—alongside AI detection, describing them as necessary complements to post-hoc detection and noting detection struggles with new attacks and real-world performance drops."
+      },
+      {
+        "id": "connects-detector-failures-to-operational-harms",
+        "requirement": "Links technical brittleness to wrongful flags, due-process risks, evidentiary concerns, or deployment fairness implications",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly connects real-world performance drops and residual error to fairness and governance concerns, noting risks like demographic bias/fairness, the need for explainability for legal defensibility, and platform moderation obligations. These points link technical brittleness in deployment to fairness and due-process/evidentiary implications."
+      },
+      {
+        "id": "details-regulatory-staging-and-complexity",
+        "requirement": "Provides staged compliance dates, exemptions, enforcement mechanisms, or implementation delays for at least one regulation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides staged compliance/implementation timing for regulations, e.g., stating the EU AI Act Article 50 is enforceable August 2, 2026 and describing a Draft Code of Practice finalization by June 2026, plus enforcement via penalties."
+      },
+      {
+        "id": "includes-international-regulatory-context",
+        "requirement": "Discusses China's deep synthesis measures, South Korea's election/deepfake laws, or other non-EU/US regulatory frameworks",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses a non-EU/US regulatory framework by covering China’s “Provisions on the Administration of Deep Synthesis Internet Information Services (2023)” and summarizes key requirements like labeling and real-identity verification."
+      },
+      {
+        "id": "identifies-liars-dividend",
+        "requirement": "Identifies liar's dividend, erosion of evidentiary value of real media, or undermining trust in authentic recordings as ethical concern",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies erosion of trust in authentic recordings as an ethical concern, noting that deepfakes “erode trust” and “complicate digital verification” for journalism and other domains."
+      },
+      {
+        "id": "identifies-algorithmic-bias",
+        "requirement": "Identifies algorithmic bias, fairness disparities, or demographic performance gaps (e.g., error-rate differences across race/gender) as ethical concern",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly lists “Demographic Bias and Fairness” as an ethical concern and notes that datasets/models can favor certain demographics, referencing ethnicity/gender/age bias studies and warning of latent risks."
+      },
+      {
+        "id": "identifies-privacy-consent-concerns",
+        "requirement": "Identifies privacy concerns, consent issues, or data minimization challenges in detection systems as ethical concern",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly identifies privacy and consent as ethical concerns (e.g., “Privacy and Consent” section) and discusses privacy-preserving detection and data minimization challenges (e.g., SafeEar shielding speech content; federated learning avoiding centralizing raw video data)."
+      },
+      {
+        "id": "identifies-sexual-deepfakes-harm",
+        "requirement": "Identifies non-consensual sexual deepfakes or gender-based harm as ethical concern with 96% pornographic statistic or targeting of women",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response identifies non-consensual intimate imagery as a key ethical concern and notes disproportionate harm to women (“most acutely for women”). However, it does not include the specific “96% pornographic” statistic or an equivalent quantified claim about pornographic deepfakes targeting women."
+      },
+      {
+        "id": "identifies-misinformation-brittleness",
+        "requirement": "Identifies misinformation/election/democracy concerns, operational brittleness of detectors, or due-process risks as ethical concern",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly flags misinformation/disinformation risks to elections and democracy as an ethical concern in the “Technical and Ethical Concerns” section, noting threats to elections, justice, and democratic trust."
+      },
+      {
+        "id": "detection-as-solved",
+        "requirement": "Presents deepfake detection as reliable or practically solved without acknowledging major real-world performance degradation",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly emphasizes large lab-to-field performance drops (e.g., 45–50% AUC decreases and EER rising to 30–60% in the wild) and frames detection as needing layered defenses and provenance, not as solved. It explicitly contrasts controlled benchmark success with real-world degradation, so it does not present detection as reliably solved."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "scholarly-academic-tone",
+        "requirement": "Presents information in scholarly tone appropriate for academic research synthesis without informal language",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a formal, academic register with structured sections, technical terminology, and citation-style references. It avoids slang, conversational phrasing, and other informal language throughout."
+      },
+      {
+        "id": "technical-terminology-precision",
+        "requirement": "Uses precise technical terminology such as AUROC, EER, cross-dataset metrics, transformer models, benchmark names",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses technical terms and metrics such as AUC/AUROC, EER, cross-dataset/cross-domain generalization, and names multiple transformer architectures (ViT, TimeSformer) and benchmarks/datasets (FaceForensics++, Celeb-DF, DFDC, ASVspoof). These satisfy the requirement for precise technical terminology and benchmark references."
+      },
+      {
+        "id": "structured-multi-category-organization",
+        "requirement": "Organizes response with clear sections separating technical advances, ethical concerns, and regulatory actions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections, including “Recent and Prominent Technical Methods,” “Technical and Ethical Concerns,” and “Regulatory Frameworks and Requirements,” which separate technical advances, ethical issues, and regulatory actions."
+      },
+      {
+        "id": "cites-arxiv-technical-preprints",
+        "requirement": "Formats arxiv.org preprints with specific paper identifiers (e.g., arXiv:XXXX.XXXXX) or titles for recent technical advances",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes arXiv preprints formatted with explicit identifiers, e.g., “arXiv:2507.05996,” and also references arXiv papers by title with arxiv.org links (e.g., SafeEar and DeepFake-Eval-2024)."
+      },
+      {
+        "id": "conversational-informal-markers",
+        "requirement": "Uses conversational phrases such as \"here's the thing\", \"kind of\", \"pretty much\", \"got better\", or casual contractions",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response is written in a formal report style and does not use conversational phrases like \"here's the thing,\" \"kind of,\" \"pretty much,\" or \"got better,\" nor does it use casual contractions (e.g., \"it's,\" \"don't\")."
+      },
+      {
+        "id": "repetitive-claims",
+        "requirement": "Restates the same finding or conclusion multiple times using different wording without adding new technical details",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly states the same lab-to-real-world performance gap (e.g., “performance gaps between lab benchmarks and real-world deployment,” “Lab-to-Field Performance Gaps,” and multiple bullets reiterating 10–15% drops and up to 50% AUC drops) with only minor rewording and limited new technical detail each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-peer-reviewed-ml-cv-venues",
+        "requirement": "Cites peer-reviewed ML/CV venues: CVPR, ICCV, NeurIPS, CVIU, CCS, Odyssey, or similar top-tier conference/journal proceedings for technical methods",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites multiple peer-reviewed venues and proceedings relevant to ML/CV methods, including Scientific Reports, ICT Express, IEEE TDSC, and ACM (via an ACM DOI link), alongside other technical papers and benchmarks."
+      },
+      {
+        "id": "cites-official-government-regulatory-sources",
+        "requirement": "Cites official government regulatory sources: commission.europa.eu for EU, congress.gov or senate.gov for US federal, state.gov domains, or equivalent official policy sites for enacted regulations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites official EU regulatory text via eur-lex.europa.eu and a European Commission policy page via digital-strategy.ec.europa.eu, and it cites a US federal legislative source via congress.gov (H.R. 1734 text). These satisfy the requirement to cite official government regulatory sources for enacted/proposed regulations."
+      },
+      {
+        "id": "cites-benchmark-datasets-and-results",
+        "requirement": "Cites official benchmark datasets or published evaluation results: ASVspoof 2021/2024, DFDC, FF++, Celeb-DF, WildDeepfake, or documented leaderboard/challenge results",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references official benchmark datasets including ASVspoof 2021, DFDC, FaceForensics++ (FF++), and Celeb-DF, and it also cites published benchmark/challenge-style evaluation results such as “DeepFake-Eval-2024” with reported AUC drops."
+      },
+      {
+        "id": "cites-ethical-policy-analysis-sources",
+        "requirement": "Cites ethical or policy analysis sources: IEEE Spectrum, law reviews (e.g., californialawreview.org), academic meta-analyses, or established research outlets for ethical concerns",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites established research outlets and academic sources for ethical concerns, including a ScienceDirect meta-analysis on human deepfake detection and multiple peer-reviewed journal/conference papers discussing societal harms, bias, and privacy. However, it does not cite IEEE Spectrum or a law review specifically."
+      },
+      {
+        "id": "unsourced-performance-claims",
+        "requirement": "States specific numerical performance metrics (accuracy percentages, AUC values, EER scores) without any accompanying citations",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response includes many specific performance numbers (e.g., “97.7–98.9% accuracy,” “AUC 77.1%,” “EER 2.02%,” “55.54%”) and presents them alongside bracketed references and a sources list. Because these metrics are accompanied by citations, it does not state them without any accompanying citations."
+      }
+    ]
+  }
+}

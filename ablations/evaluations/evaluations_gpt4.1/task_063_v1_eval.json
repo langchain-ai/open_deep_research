@@ -1,0 +1,293 @@
+{
+  "task_id": "task_063",
+  "domain": "Medicine",
+  "report_file": "task_063_v1.md",
+  "summary": {
+    "total_criteria": 31,
+    "positive_criteria": 27,
+    "negative_criteria": 4,
+    "correctly_handled": 15,
+    "pass_rate": 48.39,
+    "normalized_score": 36.6,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 24,
+        "correctly_handled": 11,
+        "normalized_score": 30.6
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 3,
+        "correctly_handled": 3,
+        "normalized_score": 100.0
+      },
+      "presentation-quality": {
+        "total": 3,
+        "correctly_handled": 1,
+        "normalized_score": 28.57
+      },
+      "citation-quality": {
+        "total": 1,
+        "correctly_handled": 0,
+        "normalized_score": 0.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "stop-metoprolol",
+        "requirement": "States to hold or reduce dose of metoprolol and all AV-nodal blockers immediately (unless a cardiologist or electrophysiologist explicitly recommends otherwise)",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses AV nodal blockers generally and notes conduction deterioration while on a beta-blocker, but it never explicitly instructs to immediately hold or reduce metoprolol and all AV-nodal blockers, nor does it include the exception clause about cardiology/electrophysiology recommendation."
+      },
+      {
+        "id": "replacement-antihypertensive",
+        "requirement": "Recommends a specific replacement non-rate-slowing antihypertensive agent not affecting AV node (amlodipine, thiazide, or ARB) as an alternative to a AV-nodal blocker",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses AV nodal blocker effects (metoprolol) but does not recommend a specific alternative antihypertensive such as amlodipine, a thiazide diuretic, or an ARB. It therefore fails to provide a concrete replacement non–rate-slowing agent not affecting the AV node."
+      },
+      {
+        "id": "driving-restriction",
+        "requirement": "Implements immediate driving restriction until symptoms are controlled, physician-approved, or diagnosis established",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses monitoring options and thresholds for urgent pacemaker evaluation but does not advise an immediate driving restriction or explicitly state to avoid driving until symptoms are controlled, physician-approved, or a diagnosis is established. It mentions social isolation and safety generally, yet provides no concrete driving limitation instruction. The required immediate driving restriction element is absent."
+      },
+      {
+        "id": "return-precautions",
+        "requirement": "Provides specific 911/emergency return precautions listing at least 2 of syncope, presyncope, HR <40, chest pain",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists emergency/urgent thresholds including syncope/presyncope and bradycardia-related triggers such as symptomatic bradycardia and pauses, which function as return precautions. However, it does not explicitly provide 911/ER return precautions that include HR <40 or chest pain as specific items."
+      },
+      {
+        "id": "home-monitoring",
+        "requirement": "Recommends maintaining a home pulse or symptom diary or BP/HR log, and to bring in these items or knowledge atthe  next medical visit",
+        "weight": 3,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends ambulatory monitoring devices and documentation strategies but does not advise the patient to keep a home pulse/symptom diary or BP/HR log, nor does it instruct bringing those records or knowledge to the next medical visit."
+      },
+      {
+        "id": "mcot-or-extended",
+        "requirement": "Specifies MCOT or auto-triggered extended event monitor for 14-30 days",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends MCOT for up to 30 days and also recommends a patch monitor for up to 14 days, aligning with an auto-triggered extended event monitoring strategy in the 14–30 day range."
+      },
+      {
+        "id": "placement-timeline",
+        "requirement": "States monitor placement within 24-72 hours",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends initiating a 14-day patch monitor or up to 30-day MCOT but does not specify that monitor placement should occur within 24–72 hours. No explicit timeframe for placement is provided anywhere in the response."
+      },
+      {
+        "id": "backup-plan",
+        "requirement": "Provides at least one backup option if MCOT delayed or denied (short admission telemetry stay, patch monitor, or direct EP referral)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides backup monitoring options beyond MCOT, specifically recommending a 14-day patch monitor and discussing event/loop recorders as alternatives if MCOT is not available or feasible."
+      },
+      {
+        "id": "real-time-alerts",
+        "requirement": "States real-time provider notification, alerts, or 24/7 monitoring capability",
+        "weight": 3,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly describes Mobile Cardiac Outpatient Telemetry (MCOT) as providing continuous real-time rhythm analysis with immediate clinical alerts and notes it is preferred due to real-time alerting for a socially isolated patient."
+      },
+      {
+        "id": "echo-ordered",
+        "requirement": "Orders transthoracic echocardiogram within 1-2 weeks",
+        "weight": 2,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends initiating a 14-day patch monitor or MCOT but does not mention ordering a transthoracic echocardiogram or specify a 1–2 week timeframe. There is no explicit plan to obtain a TTE at all, nor any scheduling window. Thus the required TTE order within 1–2 weeks is missing."
+      },
+      {
+        "id": "medical-necessity",
+        "requirement": "Provides medical necessity language mentioning progressive conduction disease, recurrent symptoms, or PR prolongation",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes medical-necessity language citing “progressive conduction disease” (progressive PR prolongation from 200 to 240 ms) and emphasizes recurrent symptomatic episodes (multiple ED visits for lightheadedness/fatigue) as justification for monitoring and escalation."
+      },
+      {
+        "id": "safety-justification",
+        "requirement": "States real-time monitoring needed for safety due to living alone, driving, or intermittent events",
+        "weight": 4,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends MCOT with real-time alerts and notes it is preferred “given real-time alerting” because the patient is “socially isolated,” and also lists living alone as a factor lowering the threshold for urgent evaluation, indicating real-time monitoring is needed for safety."
+      },
+      {
+        "id": "escalation-process",
+        "requirement": "Mentions peer-to-peer review, out-of-network request, or admission if authorization delays persist",
+        "weight": 3,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses prior authorization, denials, and appeals, but it does not mention peer-to-peer review, an out-of-network request, or arranging admission specifically if authorization delays persist. It only generally advises not delaying inpatient observation if symptoms worsen or high-grade block is captured, without tying this to authorization delays. The required escalation options are absent."
+      },
+      {
+        "id": "pause-criteria",
+        "requirement": "States specific pause duration requiring urgent EP (pause ≥3 seconds symptomatic or ≥5 seconds asymptomatic)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response specifies a pause threshold of “pauses (>3 seconds)” but does not distinguish symptomatic vs asymptomatic pause durations or include the ≥5 seconds asymptomatic threshold. It therefore fails to state the required specific criteria of ≥3 seconds if symptomatic or ≥5 seconds if asymptomatic."
+      },
+      {
+        "id": "bradycardia-threshold",
+        "requirement": "States HR <40 bpm with symptoms requires emergent evaluation",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses symptomatic bradycardia and urgent pacing indications but never states the specific threshold of HR <40 bpm with symptoms requiring emergent evaluation. It does not mention “<40 bpm” anywhere, so the required clinical cutoff is missing."
+      },
+      {
+        "id": "block-types",
+        "requirement": "Lists at least 2 specific block types requiring same-day or urgent EP (Mobitz II, 2:1 block, high-grade AV block, or complete heart block)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response lists multiple urgent pacing block types, explicitly naming Mobitz II AV block and third-degree (complete) AV block as indications for urgent inpatient assessment/pacing."
+      },
+      {
+        "id": "syncope-urgency",
+        "requirement": "States syncope or true loss of consciousness requires emergent same-day evaluation (go to emergency room or call 911)",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions syncope as a reason for urgent inpatient assessment and pacing consideration, but it does not explicitly state that syncope/true loss of consciousness requires emergent same-day evaluation such as going to the ER or calling 911. It lacks the specific instruction to seek emergency care immediately (ER/911) for syncope."
+      },
+      {
+        "id": "ep-consultation",
+        "requirement": "Specifies EP or cardiology consultation within 72 hours or states urgent timeline",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses urgent escalation for inpatient pacing evaluation but does not specify an EP/cardiology consultation within 72 hours or give an explicit urgent consultation timeline (e.g., “within 24–72 hours”). It uses general language like “urgent” and “immediate assessment” without anchoring it to a 72-hour consult window. The required 72-hour/urgent consult timing element is therefore not clearly stated."
+      },
+      {
+        "id": "continues-metoprolol",
+        "requirement": "Continues metoprolol or recommends dose reduction by the patient without stopping",
+        "weight": -75,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not advise continuing metoprolol or having the patient reduce the dose without stopping. It only mentions beta-blockers as AV nodal blockers that may exacerbate conduction disease, without giving a continuation or dose-reduction recommendation."
+      },
+      {
+        "id": "allows-driving",
+        "requirement": "Allows continued driving without restriction despite progressive conduction disease and recurrent presyncope",
+        "weight": -50,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response emphasizes maintaining safety with a low threshold for expedited evaluation and states that if symptoms worsen or high-grade block is captured, inpatient observation and pacing evaluation should not be delayed. It does not advise the patient to continue driving without restriction; instead it highlights urgent escalation for safety."
+      },
+      {
+        "id": "dismisses-severity",
+        "requirement": "Dismisses progressive AV block as benign, stable, age-related, or not concerning",
+        "weight": -200,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response treats progressive AV block and intermittent dropped beats as potentially high-risk, recommending low thresholds for expedited evaluation and listing urgent pacemaker indications (e.g., Mobitz II/complete block, symptomatic bradycardia, pauses). It explicitly warns against delaying pacing evaluation if high-grade block is captured or symptoms worsen."
+      },
+      {
+        "id": "delays-monitoring",
+        "requirement": "Delays monitoring to 4 or more weeks without urgent interim plan or advising to follow-up in a clinic",
+        "weight": -100,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response recommends initiating near-term ambulatory monitoring (14-day patch or 30-day MCOT) and emphasizes not delaying inpatient observation/pacing evaluation if symptoms worsen or high-grade block is captured. It does not suggest waiting 4+ weeks without an interim safety plan or clinic follow-up."
+      },
+      {
+        "id": "mcot",
+        "requirement": "States for intermittent symptoms occurring over weeks, of all non-invasive remote monitoring options mobile cardiac outpatient telemetry (up to 30 days) offers the highest diagnostic yield with real-time arrhythmia detection and immediate clinician notification",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes MCOT as providing continuous real-time rhythm analysis with immediate clinical alerts and notes it can be used for intermittent symptoms over days to weeks, with up to 30 days of monitoring. It also characterizes MCOT as having the highest sensitivity/diagnostic yield compared with event recorders or Holter, aligning with the criterion."
+      },
+      {
+        "id": "lbbb",
+        "requirement": "States that the presence of left bundle branch block on electrocardiogram markedly increases the likelihood of underlying structural heart disease and of diagnosing left ventricular systolic dysfunction, which warrants urgent echocardiography in this setting of lightheadedness and fatigue",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response focuses on AV block monitoring and pacemaker thresholds but never mentions left bundle branch block, its association with structural heart disease/left ventricular systolic dysfunction, or that LBBB in this setting warrants urgent echocardiography. The required linkage between LBBB and urgent echo is absent."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "identifies-av-block",
+        "requirement": "Identifies progressive AV block, high-grade block, or degenerative conduction disease as primary concern",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly frames the case as “progressive first-degree AV block” with “intermittent dropped beats” and repeatedly emphasizes risk of progression to “high-grade AV block,” “Mobitz II,” or “third-degree AV block,” treating degenerative/progressive conduction disease as the central concern."
+      },
+      {
+        "id": "metoprolol-role",
+        "requirement": "Recognizes metoprolol as a contributing factor",
+        "weight": 4,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes the patient is on metoprolol and references “AV nodal blockers (e.g., beta-blocker)” as a factor in conduction deterioration and bradyarrhythmia risk, thereby recognizing metoprolol as a contributing factor."
+      },
+      {
+        "id": "authorization-pathway",
+        "requirement": "States that to maximize authorization success, documentation should emphasize all of the following: (1) recurrent ED visits with symptoms potentially attributable to bradycardia, (2) progressive ECG changes (PR prolongation, dropped beats), (3) inability to capture arrhythmia during brief ED monitoring, and (4) high-risk features (elderly, lives alone, drives daily).",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response advises emphasizing recurrent ED visits, progressive ECG changes (PR prolongation and dropped beats), prior non-diagnostic brief ED monitoring, and high-risk social features including living alone. It also explicitly notes the patient drives daily as part of the high-risk context, satisfying all four documentation points."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "clinical-decision-format",
+        "requirement": "Organizes response into distinct sections for assessment, immediate management, monitoring strategy, and escalation thresholds",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response is organized into sections like “Clinical Background,” “Ambulatory Cardiac Monitoring Strategies,” “Clinical Thresholds…,” and “Administrative…,” but it does not present distinct sections specifically labeled or structured as assessment, immediate management, monitoring strategy, and escalation thresholds. Immediate management and monitoring/escalation content are mixed across multiple headings rather than separated into the four required categories."
+      },
+      {
+        "id": "precise-medical-terminology",
+        "requirement": "Uses clinical terminology such as drug names, PR intervals in ms, HR thresholds in bpm, and block type classifications",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses clinical terminology including drug names (metoprolol), PR interval values in milliseconds (e.g., PR 240 ms, PR ≥ 300 ms), heart rate concepts in bpm (symptomatic bradycardia/slow ventricular rates), and AV block classifications (first-degree, Mobitz II, third-degree/high-grade block)."
+      },
+      {
+        "id": "immediate-actions-prominent",
+        "requirement": "Places immediate safety actions (medication holds, driving restrictions, emergency precautions) in opening or clearly labeled immediate section",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not place immediate safety actions in the opening or in a clearly labeled “Immediate” section. It focuses first on background and monitoring options, with only a brief general safety note near the end and no explicit early medication hold, driving restriction, or emergency precautions section."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-clinical-guidelines",
+        "requirement": "References the \"2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients with Bradycardia and Cardiac Conduction Delay\" as definitive authority: https://www.ahajournals.org/doi/10.1161/CIR.0000000000000628 ",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites “ACC/AHA/HRS” guidelines generically but never explicitly references or links to the specific 2018 ACC/AHA/HRS Bradycardia and Cardiac Conduction Delay guideline at https://www.ahajournals.org/doi/10.1161/CIR.0000000000000628. It also does not present that document as the definitive authority."
+      }
+    ]
+  }
+}

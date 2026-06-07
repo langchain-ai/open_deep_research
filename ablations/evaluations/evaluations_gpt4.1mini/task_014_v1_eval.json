@@ -1,0 +1,325 @@
+{
+  "task_id": "task_014",
+  "domain": "Finance",
+  "report_file": "task_014_v1.md",
+  "summary": {
+    "total_criteria": 35,
+    "positive_criteria": 30,
+    "negative_criteria": 5,
+    "correctly_handled": 14,
+    "pass_rate": 40.0,
+    "normalized_score": 17.24,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 15,
+        "correctly_handled": 5,
+        "normalized_score": 15.67
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 3,
+        "normalized_score": 28.57
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 2,
+        "normalized_score": 0.0
+      },
+      "citation-quality": {
+        "total": 6,
+        "correctly_handled": 4,
+        "normalized_score": 58.06
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "efsl-rating-and-category",
+        "requirement": "States EFSL rating as A+/Stable from CRISIL with investment grade classification",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response lists “Edelweiss Financial Services | A+/Stable” under the CRISIL Rating column and treats it as investment-grade by describing BBB and above as investment-grade. It does not explicitly label the Edelweiss A+/Stable rating as “from CRISIL with investment grade classification” in one statement, but it conveys both elements."
+      },
+      {
+        "id": "efsl-leverage",
+        "requirement": "States EFSL gearing or debt-to-equity between 3.0-4.5x",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states a gearing figure of 3.67x for Capri Global Capital, but it does not state EFSL (Edelweiss Financial Services) gearing or EFSL debt-to-equity in the 3.0–4.5x range; EFSL is instead shown at ~0.54–0.56."
+      },
+      {
+        "id": "muthoot-rating-and-category",
+        "requirement": "States Muthoot Mercantile rating as IND BBB/Stable from India Ratings or IND with investment grade classification",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists “Muthoot Mercantile Ltd.” with a “BBB/Stable (India Ratings)” rating, but it does not state the required “IND BBB/Stable” format nor explicitly confirm it as an IND investment-grade classification."
+      },
+      {
+        "id": "muthoot-yield-range",
+        "requirement": "States Muthoot Mercantile effective yield as 11.73% in the latest issue",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state Muthoot Mercantile’s effective yield as 11.73% anywhere. It mentions Muthoot Mercantile coupon rates (9.50%–10.75%) and qualitative risk, but provides no “effective yield” figure, and specifically not 11.73% for the latest issue."
+      },
+      {
+        "id": "muthoot-leverage",
+        "requirement": "States Muthoot Mercantile D/E between 4.3-5.3x or rising post-issue",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions Muthoot Mercantile’s debt-to-equity only as “Moderate (not explicit)” and later says explicit D/E figures are unavailable. It does not state a D/E between 4.3–5.3x nor indicate that D/E is rising post-issue for Muthoot Mercantile."
+      },
+      {
+        "id": "klm-rating-and-category",
+        "requirement": "States KLM Axiva rating as BBB/Stable from ACUITE with investment grade classification",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response lists “KLM Axiva Finvest Ltd.” with a “BBB/Stable (Acuité)” rating and describes BBB as investment-grade (lowest tier), thereby providing the requested rating and investment-grade classification."
+      },
+      {
+        "id": "klm-yield-range",
+        "requirement": "States KLM Axiva effective yield range with maximum of 11.30% in the latest issue",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists KLM Axiva Finvest Ltd. with a coupon/effective yield range of 9.50%–11.00%, but it never states a maximum of 11.30% for the latest issue. The required maximum effective yield figure (11.30%) is absent."
+      },
+      {
+        "id": "klm-leverage-high",
+        "requirement": "States KLM Axiva D/E above 5.5x or between 5.7-6.6x",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions KLM Axiva’s debt-to-equity only as “Moderate (implied)” and does not provide any explicit D/E figure. It never states KLM Axiva D/E is above 5.5x or within the 5.7–6.6x range, so the required leverage flag is missing."
+      },
+      {
+        "id": "senior-citizen-ncd-tax-treatment",
+        "requirement": "Clarifies 80TTB exemption does NOT apply to NCD interest (only applies to bank/post-office deposits)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says senior citizens can claim Section 80TTB deductions on “interest income” and uses it in senior-citizen post-tax yield assumptions, but it never clarifies that 80TTB applies only to bank/post-office deposits and does not apply to NCD interest."
+      },
+      {
+        "id": "tds-applies-to-listed-ncds",
+        "requirement": "States TDS (section 193) applies to listed NCD interest or similar withholding provisions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses TDS on NCD interest generally (10% above ₹10,000) but does not state that TDS under Section 193 applies to listed NCD interest or mention the listed-security exemption/withholding provisions specific to Section 193."
+      },
+      {
+        "id": "post-tax-yield-calculations",
+        "requirement": "Provides post-tax yield calculations for at least 2 different tax slabs showing specific numerical examples",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a post-tax yield table with numerical net yields for multiple issuers under different tax assumptions, explicitly showing generic investor (31.2%) versus senior citizen (20–24%) outcomes. This provides specific numerical examples for at least two different tax slabs."
+      },
+      {
+        "id": "gsec-benchmark-context",
+        "requirement": "States 10-year G-Sec benchmark between 6.0-7.0% for market context",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides market context by stating that India’s 10-year government securities yield hovered between 6.63% and 7.0%, which lies within the required 6.0–7.0% benchmark range."
+      },
+      {
+        "id": "spread-analysis",
+        "requirement": "Quantifies spreads to G-Sec showing A+ issuer around +300-400 bps and BBB issuers around +400-550 bps",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses coupons, post-tax yields, and mentions the 10-year G-Sec yield range, but it never quantifies NCD spreads to G-Sec in basis points for A+ (around +300–400 bps) or BBB (around +400–550 bps). No explicit spread-to-G-Sec table or bps figures by rating are provided."
+      },
+      {
+        "id": "leverage-risk-flags",
+        "requirement": "Explicitly identifies at least 2 issuers as having elevated leverage requiring caution in portfolio construction",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly flags at least two issuers as needing caution due to elevated leverage, including Capri Global Capital (gearing 3.67x) and the BBB/BBB- issuers Prachay Capital and KLM Axiva/Muthoot as “higher leverage/coupon” requiring “cautious allocation” and conservative sizing."
+      },
+      {
+        "id": "claims-80ttb-applies-to-ncd",
+        "requirement": "Claims Section 80TTB exemption or senior citizen interest deductions apply to NCD interest income",
+        "weight": -25,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that “Senior citizens can claim deductions on interest income up to ₹1,00,000 under Section 80TTB” in the NCD post-tax yield section and repeats that tax efficiency favors seniors due to Section 80TTB. This directly claims 80TTB applies to NCD interest income."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "reconciles-data-inconsistencies",
+        "requirement": "Reconciles conflicting data points with corporate actions or measurement-date explanations for at least one issuer",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not reconcile any conflicting data points for an issuer using corporate actions or measurement-date explanations. It presents figures (e.g., debt-to-equity, PAT, gearing, yields) without identifying discrepancies between sources or periods and then resolving them. No issuer-specific conflict-resolution narrative is provided."
+      },
+      {
+        "id": "quantifies-portfolio-allocation-discipline",
+        "requirement": "Quantifies core vs satellite allocation percentages (e.g., 50-70% vs ≤15%) tied to credit differentiation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives qualitative allocation guidance (e.g., “primary/moderate/cautious allocation” and “small portfolio weight”) but does not quantify core vs satellite percentages (such as 50–70% core and ≤15% satellite) explicitly tied to credit differentiation."
+      },
+      {
+        "id": "benchmarks-against-comparable-issues",
+        "requirement": "Benchmarks current issues against other 2025 issuers or comparable credit categories for relative positioning",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides competitive positioning across issuer types (AAA PSU/corporates vs A/BBB NBFCs) and discusses relative value via yield vs rating tradeoffs, but it does not benchmark the issuers specifically against other 2025 issuers or comparable credit-category peers with explicit peer comparisons/spreads. There is no clear peer set or relative positioning versus contemporaneous 2025 NCD issuers beyond generic category statements."
+      },
+      {
+        "id": "explains-tenor-laddering-rationale",
+        "requirement": "Explains tenor-laddering rationale explicitly linking it to rate-cycle or reinvestment-risk considerations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses diversification across tenors and mentions managing interest-rate risk, but it does not explicitly explain tenor-laddering as a strategy tied to the rate cycle or reinvestment-risk mitigation. There is no clear rationale like “ladder to reduce reinvestment risk as rates change” or “position maturities across the cycle.”"
+      },
+      {
+        "id": "interprets-spread-differential-meaning",
+        "requirement": "Interprets what spread differential compensates for in qualitative risk terms (not just stating bps)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response qualitatively explains that higher coupons/yield premiums “compensate for higher credit and liquidity risks” and ties spread pick-up to leverage, downgrade/default vulnerability, and thinner secondary-market liquidity, not just basis-point differences."
+      },
+      {
+        "id": "notes-security-enforcement-reality",
+        "requirement": "Notes practical enforcement limits of secured status or pari-passu considerations affecting recovery",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that NCDs can be secured or unsecured and recommends allocating to “secured, well-rated NCDs,” but it does not discuss practical enforcement limits (e.g., asset coverage shortfalls, trustee actions, insolvency timelines) or pari-passu/intercreditor ranking effects on recovery. There is no explicit treatment of how secured status may fail to improve recoveries in stress."
+      },
+      {
+        "id": "traces-asset-quality-or-profitability-trends",
+        "requirement": "Traces direction of asset-quality or profitability trends informing credit trajectory for at least one issuer",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response traces credit trajectory using asset-quality/profitability direction for at least one issuer, e.g., it notes Capri Global’s “improving asset quality” and Edelweiss’s profitability with “PAT increased to ₹535.82 million in 2025,” linking these trends to leverage and credit risk."
+      },
+      {
+        "id": "conflates-credit-categories",
+        "requirement": "Treats A+ rated EFSL and BBB rated gold-loan NBFCs as equivalent risk without distinguishing their materially different credit profiles",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response differentiates credit risk across rating tiers, explicitly describing AAA as “highest safety,” A/A+ as “moderate credit risk,” and BBB/BBB- as “higher credit and liquidity risks” with only cautious allocation. It does not treat A+ rated EFSL and BBB rated gold-loan NBFCs as equivalent risk."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "institutional-research-structure",
+        "requirement": "Structures as institutional research with executive summary, numbered sections, and actionable investment thesis",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is formatted like institutional research with an explicit Executive Summary, clearly numbered sections (1–10), and it culminates in an actionable investment thesis and recommendations table suitable for investment decision-making."
+      },
+      {
+        "id": "quantitative-data-precision",
+        "requirement": "Presents all financial metrics with units (₹, %, bps), time periods, and measurement dates specified",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "Many metrics include units and time references (e.g., coupon rates in %, investment amount in ₹, “as of December 8, 2025,” and “FY25/FY 2025-26”), but several key figures lack full measurement dates/periods and/or units (e.g., PAT ₹535.82 million in 2025 without a specific FY/quarter, debt-to-equity shown as “Low/Moderate-High,” and some ranges without explicit as-of dates). Therefore not all financial metrics are consistently presented with units, time periods, and measurement dates."
+      },
+      {
+        "id": "professional-disclaimers",
+        "requirement": "Includes compliance-appropriate disclaimers and risk caveats for institutional research standards",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes multiple risk caveats (credit, interest-rate, liquidity, regulatory, tail risks) and notes that yields are illustrative and depend on individual tax situations. However, it does not provide explicit institutional-research compliance disclaimers (e.g., not investment advice, suitability/solicitation limits, conflicts, methodology/limitations, data as-of/verification, forward-looking statement caution)."
+      },
+      {
+        "id": "issuer-comparison-structured",
+        "requirement": "Presents issuer comparison in tabular or structured side-by-side format showing ratings, yields, and leverage for each issuer",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes structured tables that compare issuers side-by-side and explicitly list credit ratings (CRISIL/ICRA where available), yield/coupon figures with post-tax yield columns, and debt-to-equity (leverage) metrics for each issuer."
+      },
+      {
+        "id": "narrative-financial-dump",
+        "requirement": "Presents all three issuers' financial metrics in continuous paragraph form without tables, bullets, or section breaks separating each issuer",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response uses multiple section breaks (e.g., Executive Summary, numbered sections) and includes several tables comparing issuers’ metrics. It does not present all three issuers’ financial metrics in one continuous paragraph, and it clearly separates issuers via tables and headings."
+      },
+      {
+        "id": "verbose-filler",
+        "requirement": "Uses excessive wordiness, filler phrases, or unnecessary elaboration that extends length without adding substantive financial data or analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response is highly verbose, with long executive-summary and overview sections that restate general NCD concepts and broad market context without adding proportional, verifiable issuer-specific metrics. It also includes extensive narrative on regulation, history, and macro indicators that is largely generic relative to the requested Dec 8, 2025 open-IPO dataset, inflating length with filler-like elaboration."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "references-issuer-offering-documents",
+        "requirement": "References prospectus, information memorandum, or term sheets for all 3 issuers (EFSL, Muthoot Mercantile, KLM Axiva)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites issuer-specific NCD review/disclosure sources for EFSL and KLM Axiva, but it does not reference a prospectus, information memorandum, or term sheet for Muthoot Mercantile. Therefore, the required prospectus/IM/term-sheet references are not provided for all three issuers."
+      },
+      {
+        "id": "references-rating-agency-rationales",
+        "requirement": "References rating rationales or classifications from CRISIL, ICRA, India Ratings, or ACUITE for credit assessment",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly references credit ratings and related credit-quality classifications from CRISIL, ICRA, India Ratings, and Acuité (e.g., “A+/Stable,” “AAA/Stable,” “BBB/Stable”) and cites CRISIL/India Ratings default and transition studies as part of the credit assessment rationale."
+      },
+      {
+        "id": "references-tax-regulatory-provisions",
+        "requirement": "References Finance Act 2023, Section 80TTB, or Section 193 for tax treatment claims",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response mentions Section 80TTB multiple times when discussing senior citizen tax deductions and tax efficiency for NCD interest income."
+      },
+      {
+        "id": "references-exchange-or-sebi-filings",
+        "requirement": "References BSE listing documents, SEBI NCS framework, or official exchange disclosures",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references official exchange disclosures/listing documents, including a Samvardhana Motherson “Disclosure_Regulation_55_Credit_Rating” PDF and discusses NCDs being traded/listed on BSE/NSE with disclosure requirements."
+      },
+      {
+        "id": "references-rbi-regulatory-actions",
+        "requirement": "References RBI circulars, directions, or regulatory actions when discussing issuer-specific restrictions",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses regulatory landscape generally (SEBI rules, tax reforms, RBI allowing foreign participation) but does not cite any specific RBI circular numbers, RBI Master Directions, or concrete RBI regulatory actions tied to issuer-specific restrictions. It also does not connect any issuer restriction (e.g., NBFC deposit-taking/issuance limits) to an RBI circular or direction."
+      },
+      {
+        "id": "informal-sources",
+        "requirement": "Cites Reddit, Quora, retail investor forums, or social media posts as sources for financial metrics, yields, or tax treatment",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not cite Reddit, Quora, retail investor forums, or social media posts for any financial metrics, yields, or tax treatment. Its sources list includes websites, rating-agency reports, and a LinkedIn article, but no Reddit/Quora/forum/social-post citations."
+      }
+    ]
+  }
+}

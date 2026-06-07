@@ -1,0 +1,333 @@
+{
+  "task_id": "task_071",
+  "domain": "Shopping/Product Comparison",
+  "report_file": "task_071_v2.md",
+  "summary": {
+    "total_criteria": 36,
+    "positive_criteria": 33,
+    "negative_criteria": 3,
+    "correctly_handled": 17,
+    "pass_rate": 47.22,
+    "normalized_score": 37.86,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 18,
+        "correctly_handled": 5,
+        "normalized_score": 26.32
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 4,
+        "normalized_score": 42.86
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 56.52
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "nttl-steiger-test-data",
+        "requirement": "States Steiger 540 NTTL Test 2096 drawbar efficiency between 15.5-17.0 hp-hr/gal at max load and 15.0-16.5 at 75% pull",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response references Nebraska Test 2096 for the Case IH Steiger 540 wheeled tractor but does not state the drawbar efficiency values in hp-hr/gal at max load or at 75% pull, nor does it provide the required ranges (15.5–17.0 and 15.0–16.5). It only gives drawbar power and gal/hr figures without converting to hp-hr/gal."
+      },
+      {
+        "id": "nttl-deere-comparable-test-data",
+        "requirement": "States 9620RX (Test 2174) or comparable 9RX model NTTL drawbar efficiency between 15.0-16.0 hp-hr/gal at max and 14.8-15.8 at 75% pull",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites Nebraska Test 2252 for the John Deere 9RX 540 and discusses drawbar fuel consumption in lb/hp-hr and gal/hr, but it never states NTTL drawbar efficiency in hp-hr/gal for a 9620RX (Test 2174) or any comparable 9RX model. It also does not provide the required hp-hr/gal ranges at max drawbar or at 75% pull."
+      },
+      {
+        "id": "mentions-9rx-540-test-restricted",
+        "requirement": "Notes 9RX 540 (Test 2252) NTTL data exists but results are restricted, indexed, or not fully published",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses Nebraska Tractor Test Lab data for John Deere 9RX 540 Test 2252 and explicitly notes that for Case IH Steiger 540 Quadtrac Test 2188 the detailed tables were “not fully extractable” and require accessing the full PDF, indicating results are not fully published/available in the response."
+      },
+      {
+        "id": "acknowledges-test-data-conflict",
+        "requirement": "Notes standardized NTTL tests and field trials show conflicting results or favor different brands depending on methodology and conditions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses standardized Nebraska Tractor Test Lab data and repeatedly notes limitations and uncertainty in applying controlled test results to real-world field conditions. However, it does not state that standardized NTTL tests and field trials conflict or that different methodologies/conditions favor different brands; it mainly contrasts test limitations and data completeness."
+      },
+      {
+        "id": "track-belt-systems",
+        "requirement": "States both tractors use Camso belts, positive-drive track systems, or similar manufacturer for undercarriage components",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly states that the John Deere 9RX uses Camso tracks (“Camso (exclusive manufacturer for 9RX replacement tracks)”). However, it does not state that the Case IH Steiger 540 Quadtrac also uses Camso belts or a similar named undercarriage manufacturer, so it does not cover both tractors."
+      },
+      {
+        "id": "belt-life-expectation",
+        "requirement": "Acknowledges belt/track life varies based on conditions (roading, soil type, slip, ballast, turning, alignment) and expects at least one full belt set replacement over 10 years with 180+ day/year usage",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that track life “varies significantly with soil conditions and maintenance practices” and discusses factors like slip, turning, and alignment/undercarriage checks. It also projects multiple track replacements over 10 years at high annual use (e.g., 10,000 hours), which implies at least one full belt set replacement within 10 years for 180+ days/year usage."
+      },
+      {
+        "id": "clay-loam-wear-factors",
+        "requirement": "Identifies clay-loam creates wear from slip spikes, heat generation, or localized pressure on mid-rollers at high speeds (12-15 mph)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses track performance on clay-loam and mentions slip-related soil damage and heat dissipation generally, but it does not identify clay-loam wear specifically from slip spikes, heat generation, or localized pressure on mid-rollers at 12–15 mph. It also does not tie those mechanisms to mid-roller wear at high speeds. The required causal statement is missing."
+      },
+      {
+        "id": "undercarriage-technology-updates",
+        "requirement": "Mentions Deere sealed/lubed mid-rollers or in-cab tension monitoring AND Case suspended undercarriage as manufacturer improvements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response mentions Deere’s sealed mid-roller design with a 1,500-hour check interval and contrasts it with Case IH Quadtrac’s daily undercarriage checks, describing these as manufacturer design/maintenance differences."
+      },
+      {
+        "id": "case-telematics-native-receivers",
+        "requirement": "States Case AFS Connect/FieldOps natively integrates with Case IH receivers (e.g., AFS 392, Vector Pro) and supports multi-brand equipment compatibility for fleet monitoring",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Case IH AFS receivers (AFS 372 and Vector Pro) accepting RTCM and having a Trimble relationship, but it does not state that AFS Connect/FieldOps natively integrates with Case IH receivers (e.g., AFS 392, Vector Pro) nor that it supports multi-brand equipment compatibility for fleet monitoring."
+      },
+      {
+        "id": "case-telematics-remote-features",
+        "requirement": "States AFS Connect/FieldOps includes remote display view, remote service support, or OTA updates",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Case IH AFS Connect (including AFS Connect 2.0) in the telematics section but does not state that AFS Connect/FieldOps includes remote display view, remote service support, or over-the-air (OTA) updates. It focuses on RTK correction compatibility and data exchange rather than those specific remote/OTA capabilities."
+      },
+      {
+        "id": "deere-telematics-guidance-options",
+        "requirement": "States 9RX requires switching to StarFire/JDLink OR adding Trimble GFX/NAV-900/NAV-960 platform kit for dual-stack operation with existing Trimble RTK",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explains that John Deere uses proprietary StarFire corrections and therefore cannot natively use standard Trimble RTK, requiring a bridge/aftermarket receiver (e.g., Agra-GPS CRG+) or a full Trimble guidance system. However, it does not state that 9RX specifically requires switching to StarFire/JDLink or adding a Trimble GFX/NAV-900/NAV-960 platform kit for dual-stack operation with existing Trimble RTK."
+      },
+      {
+        "id": "deere-remote-support-features",
+        "requirement": "States 9RX includes JDLink Connected Support features such as Expert Alerts, Service Advisor Remote, or Remote Display Access",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses John Deere telematics and guidance integration (e.g., StarFire/RTK bridging) but does not mention JDLink Connected Support or any specific Connected Support features such as Expert Alerts, Service Advisor Remote, or Remote Display Access."
+      },
+      {
+        "id": "deere-dealers-regina-locations",
+        "requirement": "Names South Country Equipment and lists at least 2 specific locations (e.g., Emerald Park, Southey, Raymore) or mentions Brandt as Deere dealer",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names South Country Equipment and references its Emerald Park location (and also mentions Brandt as a Deere dealer). This satisfies the criterion via the “mentions Brandt as Deere dealer” option, even though it does not list two South Country locations."
+      },
+      {
+        "id": "case-dealers-regina-coverage",
+        "requirement": "Names Young's Equipment as largest Case IH dealer in Saskatchewan with Regina branch or multiple store locations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response identifies Young's Equipment as the Case IH dealer serving the Regina area and lists multiple Saskatchewan locations, including Regina. However, it does not explicitly state that Young's Equipment is the largest Case IH dealer in Saskatchewan, which is a required element of the criterion."
+      },
+      {
+        "id": "saskatchewan-pst-exemption",
+        "requirement": "States farm tractors are PST-exempt in Saskatchewan or mentions 2022 provincial clarification/expansion of farm equipment exemptions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that Saskatchewan PST (6%) is exempt for farmers purchasing tractors for direct use in primary farming activities and cites Government of Saskatchewan PST-016."
+      },
+      {
+        "id": "cca-class-and-rate",
+        "requirement": "States tractors qualify as CCA Class 10 at 30% declining balance rate",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses CCA treatment generally and states “Purchased Equipment: CCA Class 10 (30% declining balance)” but does not specifically state that tractors qualify as CCA Class 10 at a 30% declining balance rate. It also does not explicitly tie that class/rate to the tractors being compared (9RX 540 and Steiger 540 Quadtrac)."
+      },
+      {
+        "id": "cca-accelerated-first-year",
+        "requirement": "States accelerated CCA provides 3x first-year deduction (~45% Class 10) before 2024, phasing to 2x (~30% Class 10) for 2024-2027 acquisitions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states accelerated CCA/AII provides a 150% first-year deduction (45% for Class 10) for a 2024 purchase, but it does not state that this was “3x” before 2024 nor that it phases to “2x” (≈30% Class 10) for 2024–2027 acquisitions. The required 3x-to-2x phase-down framing and the 2024–2027 2x rate are missing."
+      },
+      {
+        "id": "recommendation-deere-for-starfire",
+        "requirement": "Recommends John Deere 9RX 540 if switching to StarFire/JDLink ecosystem or if valuing Deere Connected Support, but notes guidance transition costs",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not recommend the John Deere 9RX 540 specifically in the context of switching to the StarFire/JDLink ecosystem or valuing Deere Connected Support. It also does not note guidance transition costs in that Deere-ecosystem framing; instead it emphasizes Deere’s proprietary RTK issue and recommends Case IH overall, with a third-party bridge cost for Trimble RTK."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "demonstrates-transparent-calculation",
+        "requirement": "Shows worked math for field capacity (width×mph/8.25×efficiency) → ac/hr, then applies hp-hr/gal data to derive gal/ac with example numbers",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes a brief field-capacity calculation example using (45 ft × 7 mph × 0.85) ÷ 8.25 to estimate acres/hour. However, it does not show the requested worked math at 12–15 mph nor does it apply hp-hr/gal data to explicitly derive gal/acre with example numbers (it mainly uses gal/hr assumptions and totals)."
+      },
+      {
+        "id": "contextualizes-against-variability",
+        "requirement": "States brand differences (2-4%) are smaller than operational variability from soil moisture, ballast, slip management, or operator practices",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that real-world fuel consumption varies with soil moisture and operator technique, and it discusses slip management effects on soil damage. However, it does not explicitly state that brand differences (2–4%) are smaller than operational variability from soil moisture, ballast, slip management, or operator practices, nor does it quantify brand differences as 2–4%."
+      },
+      {
+        "id": "conditional-decision-framework",
+        "requirement": "Structures recommendation as IF-THEN scenario logic (e.g., IF keeping Trimble RTK THEN Case; IF switching to StarFire THEN Deere)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides recommendations and contingencies (e.g., “if 540 hp is required” then choose Case IH; otherwise downsize), but it does not structure the recommendation as explicit IF-THEN scenario logic tied to keeping Trimble RTK vs switching to StarFire (or equivalent paired scenarios). The required IF-THEN framing example is not directly mirrored."
+      },
+      {
+        "id": "interprets-cumulative-materiality",
+        "requirement": "Characterizes whether percentage differences are \"small per unit, meaningful at scale\" OR quantifies cumulative impact ($/season)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly frames small per-acre fuel differences as becoming meaningful over time by quantifying cumulative impact, including ~$160/year and ~$1,600 over 10 years on the core 200 acres and a $50,000 10-year fuel difference at 1,000 hours/year."
+      },
+      {
+        "id": "requests-operation-specific-parameters",
+        "requirement": "Asks customer for specific operational data (annual hours, implement widths, timeline) to enable more precise TCO or $/ha analysis",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies missing inputs and suggests obtaining them (e.g., “annual operating hours,” implement working widths, and “timeline” items like 1–2 week trials and maintenance windows). It also explicitly recommends running scenarios by inputting “annual hours” and field capacity to produce cost-per-acre outputs."
+      },
+      {
+        "id": "explains-integration-architecture",
+        "requirement": "Describes dual-stack architecture implications (parallel data ecosystems, dual hardware maintenance) beyond just integration kit cost",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses John Deere’s proprietary RTK format and the need for bridge hardware (e.g., Agra GPS CRG+) to use Trimble corrections, implying added hardware and integration complexity. However, it does not describe dual-stack architecture implications like parallel data ecosystems, duplicated workflows/data stores, or ongoing dual hardware/software maintenance beyond the integration kit cost."
+      },
+      {
+        "id": "provides-robust-guidance-under-uncertainty",
+        "requirement": "When presenting conflicting data (NTTL vs field trial), gives planning advice that works regardless of which proves more representative",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly treats Nebraska Tractor Test data as controlled and forum/field reports as anecdotal, then provides planning steps that are robust to either being more representative (e.g., sensitivity analysis ranges, budgeting track life as a range, and recommending obtaining dealer demos/quotes and local operator interviews before committing). This constitutes advice designed to hold under conflicting data sources."
+      },
+      {
+        "id": "false-fuel-certainty",
+        "requirement": "Asserts one tractor is definitively more fuel efficient without acknowledging that NTTL tests and field trials favor different brands",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not claim one tractor is definitively more fuel efficient without nuance; it explicitly rates Nebraska test comparisons as only “MODERATE” confidence and notes missing Case IH NTTL tables and that real-world field consumption varies. It gives a slight estimated fuel advantage to Case IH but frames it as an estimate with caveats rather than a definitive conclusion."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "agricultural-equipment-terminology",
+        "requirement": "Uses specialized precision agriculture terminology (drawbar hp, hp-hr/gal, RTK, undercarriage, CCA, field capacity)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses multiple specialized precision agriculture terms, including “drawbar power,” “RTK,” “undercarriage,” and “field capacity,” and discusses RTK correction formats and integration details."
+      },
+      {
+        "id": "structured-equipment-comparison",
+        "requirement": "Organizes as structured multi-dimensional comparison (fuel, durability, telematics, service, cost) with clear sections or headers",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections (e.g., fuel consumption, track durability/maintenance, telematics integration, dealer service response times, and 10-year total cost of ownership), and it compares the two tractors across those dimensions using tables and headers."
+      },
+      {
+        "id": "professional-advisory-tone",
+        "requirement": "Maintains professional agricultural advisory tone balancing technical detail with practical decision guidance",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a professional, farm-advisory tone and provides extensive technical detail (fuel use, tracks, telematics, depreciation/CCA) while also giving practical decision guidance via an executive summary, decision matrix, and clear recommendations tailored to the Saskatchewan operation."
+      },
+      {
+        "id": "quantified-metrics-with-units",
+        "requirement": "Presents performance data with specific units such as hp-hr/gal, gal/ac, L/ha, hours, or CAD rather than vague qualifiers",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes multiple quantified performance metrics with explicit units, such as fuel consumption in gal/hr and gal/acre, specific fuel consumption in lb/hp-hr, costs in CAD, operating time in hours, and cost per hectare (CAD/ha). These are specific units rather than vague qualifiers."
+      },
+      {
+        "id": "repetitive",
+        "requirement": "Restates the same information or conclusion multiple times using different wording without adding new analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly restates the same overarching conclusions—especially that both tractors are oversized for 200 acres and that the Case IH has lower 10-year cost—across the Executive Summary, Scale Mismatch section, and Final Recommendation with largely reworded phrasing and limited new analysis each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-nttl-standardized-testing",
+        "requirement": "Cites Nebraska Tractor Test Lab (NTTL) or University of Nebraska-Lincoln tractor testing with specific test numbers (e.g., Test 2096, Test 2174, Test 2252)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites Nebraska Tractor Test Lab/University of Nebraska-Lincoln tractor testing and includes specific test numbers, including John Deere 9RX 540 Test 2252 and Case IH Steiger 540 Quadtrac Test 2188, and also references Test 2096."
+      },
+      {
+        "id": "references-manufacturer-technical-documentation",
+        "requirement": "References manufacturer specifications, technical documentation, operator manuals, or official product pages for tractor capabilities and features",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly cites official sources such as Nebraska Tractor Test Lab reports, John Deere and Case IH official product pages/campaign pages, and manufacturer/service-interval PDFs to support claims about capabilities and features."
+      },
+      {
+        "id": "cites-track-system-manufacturer-guidance",
+        "requirement": "References Camso, track/belt manufacturer guidance, or industry standards for undercarriage durability and maintenance expectations",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references Camso multiple times in the track replacement and warranty sections, including noting Camso as the exclusive replacement track manufacturer for the 9RX and citing Camso warranty guidance (e.g., 4-year/2,000-hour warranty and cost-per-hour claims). These references function as manufacturer guidance/industry expectations for undercarriage durability and maintenance."
+      },
+      {
+        "id": "references-canadian-tax-and-regulatory-sources",
+        "requirement": "References Saskatchewan PST exemptions, federal CCA regulations, or Canadian farm equipment tax policies for ownership cost calculations",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response references Saskatchewan PST exemptions for farmers (PST-016) and discusses Canadian capital cost allowance/accelerated investment incentive rules and CCA tax savings calculations as part of ownership cost."
+      },
+      {
+        "id": "forum-anecdotes",
+        "requirement": "Cites farmer forums, Reddit, or social media posts as authoritative evidence for performance or durability claims",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites Facebook discussions and AgTalk/Red Power Magazine forum threads as sources for figures like track costs and DEF consumption. Although it labels these as low reliability and “supplementary context,” it still uses them to support performance/durability-related claims and calculations."
+      }
+    ]
+  }
+}

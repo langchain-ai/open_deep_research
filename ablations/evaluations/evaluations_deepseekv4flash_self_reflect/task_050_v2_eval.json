@@ -1,0 +1,405 @@
+{
+  "task_id": "task_050",
+  "domain": "Shopping/Product Comparison",
+  "report_file": "task_050_v2.md",
+  "summary": {
+    "total_criteria": 45,
+    "positive_criteria": 41,
+    "negative_criteria": 4,
+    "correctly_handled": 28,
+    "pass_rate": 62.22,
+    "normalized_score": 58.51,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 25,
+        "correctly_handled": 13,
+        "normalized_score": 52.0
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 6,
+        "normalized_score": 71.43
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 50.0
+      },
+      "citation-quality": {
+        "total": 7,
+        "correctly_handled": 6,
+        "normalized_score": 88.1
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "recommends-p400-p630-counter",
+        "requirement": "Recommends Verifone P400 or P630 pinpads for counter/fixed lanes with Oracle Simphony",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not recommend Verifone P400 or P630 pinpads anywhere. It instead recommends PAX A920 Pro/A920MAX and discusses Verifone Victa Portable, with no mention of P400/P630 for counter/fixed lanes with Oracle Simphony."
+      },
+      {
+        "id": "recommends-a920-mobile",
+        "requirement": "Recommends PAX A920 Pro handhelds for mobile/table service/drive-thru operations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends a tiered deployment centered on the PAX A920 Pro as the primary recommendation and discusses its suitability for QSR use cases including pay-at-table/table service and high-volume scenarios (with A920MAX for top-volume sites). This constitutes recommending the A920 Pro for mobile/table service/drive-thru operations."
+      },
+      {
+        "id": "specifies-opi-integration-method",
+        "requirement": "Specifies Verifone terminals connect via Oracle Payment Interface (OPI) for Simphony integration",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not specify that Verifone terminals connect via Oracle Payment Interface (OPI) for Simphony integration. Instead, it states OPI support ended on Oct 31, 2025 and that Simphony integration must use SPI or a certified plugin, which contradicts the required OPI-connection statement."
+      },
+      {
+        "id": "specifies-moneris-plugin-integration",
+        "requirement": "References Moneris Payment Plugin or Canadian acquirer plugin for Oracle Simphony to drive PAX A920 devices",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references the “Moneris Payment Plugin for Oracle Simphony” and states it connects Oracle Simphony to Moneris payment terminals, including PAX devices deployed through Moneris Go."
+      },
+      {
+        "id": "rejects-carbon-8",
+        "requirement": "Explicitly rejects or advises against Verifone Carbon 8 for new Simphony deployments",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response removes Verifone Carbon 8 from consideration and states it has been removed due to end-of-life and expiring PCI approval, effectively advising against using it for new Simphony deployments."
+      },
+      {
+        "id": "carbon-8-legacy-reason",
+        "requirement": "States Carbon 8 has frozen/discontinued ADK support or is not in current Oracle EFTLink documentation",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says the Verifone Carbon 8 was removed from consideration as end-of-life, but it does not state that Carbon 8 has frozen/discontinued ADK support or that it is not in current Oracle EFTLink documentation. It also does not mention Oracle EFTLink documentation status for Carbon 8 at all."
+      },
+      {
+        "id": "rejects-clover-station-pro",
+        "requirement": "Explicitly rejects or advises against Clover Station Pro with existing Simphony infrastructure",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly advises against Clover Station Pro, stating it is “Not Recommended” due to lacking certified Oracle MICROS Simphony integration and being a competing POS rather than a payment peripheral for an existing MICROS setup."
+      },
+      {
+        "id": "clover-not-oracle-certified",
+        "requirement": "States Clover is not Oracle-certified or not listed in EFTLink/OPI documentation as certified pinpad",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says Clover is “not recommended” and that “no certified direct integration…was found,” but it does not state that Clover is not Oracle-certified or that it is not listed in Oracle EFTLink/OPI documentation as a certified pinpad. It also does not mention EFTLink certification status for Clover at all."
+      },
+      {
+        "id": "clover-canadian-restrictions",
+        "requirement": "States Clover Canadian SDK does not support offline payments, auth/pre-auth, or tip adjustment",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that Clover offline payments are not supported for Canadian merchants, but it does not state that the Clover Canadian SDK does not support offline payments, auth/pre-auth, or tip adjustment. It also does not mention the Canadian SDK’s lack of auth/pre-auth or tip adjustment support; instead it describes tipMode and offline features generally."
+      },
+      {
+        "id": "interac-online-only",
+        "requirement": "States Interac debit must authorize online and cannot be processed offline or via store-and-forward in Canada",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that Interac debit transactions are not supported offline in Canada, noting that Interac debit requires authorization and is excluded from store-and-forward/offline processing (e.g., “Interac debit transactions are not supported offline” and “Excluded transactions: Interac debit”)."
+      },
+      {
+        "id": "credit-offline-optional",
+        "requirement": "States credit-only offline or store-and-forward is available on supported terminals with chargeback risk",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly describes store-and-forward/offline payments for Verifone and PAX as processor-enabled and notes the merchant bears liability for offline transactions, including risk of failed captures/declines (i.e., chargeback/authorization risk). It also discusses Clover offline payments but notes they are not supported for Canadian merchants."
+      },
+      {
+        "id": "a920-lte-capability",
+        "requirement": "States PAX A920 Pro has LTE or cellular connectivity for network redundancy",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly lists the PAX A920 Pro connectivity as including “4G LTE” and “dual SIM,” which indicates cellular connectivity that can be used for network redundancy."
+      },
+      {
+        "id": "network-failover-recommendation",
+        "requirement": "Recommends dual-WAN, LTE failover, or network redundancy to minimize offline scenarios",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response recommends network redundancy measures, explicitly citing Clover’s guidance to use Ethernet for reliability and “4G/LTE failover as critical backup during network disruptions,” and it also highlights LTE/5G connectivity on PAX/Verifone as reducing offline needs."
+      },
+      {
+        "id": "contactless-limit-250",
+        "requirement": "States contactless tap limit in Canada is $250 CAD for Visa, Mastercard, and Interac",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response’s “Contactless Payment Limits in Canada” section states Visa is $250, Mastercard is $250, and Interac Debit is up to $500. Because it does not state Interac is $250 CAD (and instead gives $500), it fails to state a $250 CAD tap limit for Visa, Mastercard, and Interac together."
+      },
+      {
+        "id": "transaction-speed-tap",
+        "requirement": "States tap/contactless transactions complete in approximately 0.5 seconds or sub-second",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states contactless transactions take “1-2 seconds” and compares this to chip + PIN times, but it never claims tap/contactless completes in approximately 0.5 seconds or sub-second. No terminal section provides a 0.5s or sub-second tap completion figure."
+      },
+      {
+        "id": "network-latency-bottleneck",
+        "requirement": "Identifies network or acquirer latency as primary transaction speed bottleneck, not device CPU",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response attributes peak-hour transaction speed differences mainly to terminal hardware (CPU/RAM, Wi‑Fi 6/5G) and workflow design, and it does not identify network/acquirer latency as the primary bottleneck. It also does not explicitly contrast this with device CPU being non-primary. Therefore the required bottleneck identification is missing."
+      },
+      {
+        "id": "bill-96-french-receipts",
+        "requirement": "States Bill 96 or Quebec language law requires French for customer-facing receipts and software availability in French",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly describes Bill 96 requirements for payment terminals, stating that customer-facing screens and receipts must be in French and that employee-used software interfaces must be available in French."
+      },
+      {
+        "id": "bill-96-enforcement-date",
+        "requirement": "Mentions June 1, 2025 as enforcement date or tightening deadline for Bill 96 compliance",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that major Bill 96 provisions are effective June 1, 2025 and references “June 1, 2025” in the Bill 96 requirements overview section as the key compliance/enforcement deadline."
+      },
+      {
+        "id": "tip-adjust-offline-limitation",
+        "requirement": "States tip adjustment cannot be done on offline transactions or post-batch in Canada",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that tips are “only adjustable before batch settlement” and that “all tips must be adjusted prior to batch settlement,” but it does not state that tip adjustment cannot be done on offline transactions or that it cannot be done post-batch in Canada. It also does not explicitly tie any such restriction to Canadian processing rules."
+      },
+      {
+        "id": "clover-no-tip-adjust",
+        "requirement": "States Clover Canadian SDK lacks tipAdjustAuth or post-transaction tip adjustment capability",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Clover tip workflows via the Clover SDK and describes tip adjustment workflows for Verifone and PAX, but it never states that the Clover Canadian SDK lacks tipAdjustAuth or that post-transaction tip adjustment is unavailable. In fact, it implies Clover supports after-payment tipping, which does not satisfy the required statement about lacking capability."
+      },
+      {
+        "id": "kds-integration-simphony-driven",
+        "requirement": "States KDS compatibility maintained through Oracle Simphony integration, not affected by terminal choice",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that KDS compatibility is largely decoupled from the payment terminal choice because Simphony handles order routing, and emphasizes that the critical integration is with Oracle Simphony (via SPI/middleware) rather than the terminal. This implies KDS compatibility is maintained through Oracle Simphony integration and not affected by terminal choice."
+      },
+      {
+        "id": "p400-pricing-range",
+        "requirement": "Provides Verifone P400 unit pricing between $300-$400 CAD",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides pricing for the PAX A920 Pro, Clover Station Duo, and Verifone Victa, but it does not mention the Verifone P400 at all. As a result, it does not provide any Verifone P400 unit price, nor a $300–$400 CAD range."
+      },
+      {
+        "id": "p630-pricing-range",
+        "requirement": "Acknowledges Verifone P630 pricing is higher than P400 at approximately $400-$500 CAD or above",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention Verifone P630 or Verifone P400 pricing at all, nor does it compare their relative costs. It provides pricing for other devices (e.g., PAX A920 Pro, Verifone Victa) but never acknowledges that P630 pricing is higher than P400 at approximately $400–$500 CAD or above."
+      },
+      {
+        "id": "a920-pricing-or-rental",
+        "requirement": "Provides PAX A920 Pro pricing between $400-$600 CAD or mentions rental/acquirer program options",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides Canadian pricing for the PAX A920 Pro as $506.99 CAD, which falls within the required $400–$600 CAD range."
+      },
+      {
+        "id": "interac-offline-claim",
+        "requirement": "Claims or implies Interac debit transactions can be processed offline or stored-and-forwarded in Canada",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly states multiple times that Interac debit is not supported offline (e.g., “Interac debit transactions are not supported offline” and “Excluded transactions: Interac debit”). It discusses store-and-forward for credit/chip transactions but does not claim Interac debit can be processed offline or stored-and-forwarded in Canada."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "addresses-industry-misconceptions",
+        "requirement": "Dedicates section to identifying and correcting specific incorrect industry claims about platform capabilities",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes multiple dedicated sections that identify and correct incorrect or outdated industry claims, such as removing the end-of-life Verifone Carbon 8 and highlighting Oracle OPI end-of-support with the required shift to SPI. It also flags and corrects assumptions about offline payments in Canada for Clover and clarifies KDS vs terminal responsibilities."
+      },
+      {
+        "id": "integration-architecture-explanation",
+        "requirement": "Explains middleware architecture layer (EFTLink/OPI, certified endpoints) beyond stating compatibility status",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response goes beyond compatibility claims by describing the Oracle payments middleware stack (OPI end-of-life, migration to SPI) and naming specific certified/partner integration paths (e.g., Touché middleware, Moneris Simphony payment plugin, Global Payments/Adyen/Shift4 certifications). It also distinguishes EFTLink/OPI connectors as Oracle Retail-focused versus Simphony, showing architectural layering and endpoint certification considerations."
+      },
+      {
+        "id": "deployment-benefit-analysis",
+        "requirement": "Analyzes benefits of recommended architecture per use-case (French UI, Interac compliance, KDS continuity)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response recommends a PAX A920 Pro/A920MAX architecture and explicitly analyzes benefits tied to the use-cases: French UI/Bill 96 compliance (French localization and French support), Interac compliance in offline mode (Interac not supported offline and implications), and KDS continuity (advises maintaining existing MICROS KDS and notes Quebec limitations of Moneris KDS)."
+      },
+      {
+        "id": "roi-model-specification",
+        "requirement": "Proposes specific ROI or cost-benefit model for trade-offs (LTE failover vs offline risk, network vs device cost)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides a concrete 5-year TCO framework with per-location and 25-location totals, and it explicitly discusses the trade-off between LTE/5G connectivity reducing the need for offline store-and-forward versus the merchant liability/risk of offline approvals. It also contrasts network reliability features (LTE/5G failover) against device/platform costs (rental vs purchase, A920 Pro vs A920MAX premium)."
+      },
+      {
+        "id": "tco-deliverable-structure",
+        "requirement": "Specifies TCO deliverable format (per-location, chain-wide, line-item) with required input list for modeling",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides TCO estimates (per-location and 25-location totals) but does not specify a TCO deliverable format (per-location vs chain-wide vs line-item) as a defined output template, nor does it list the required modeling inputs (e.g., volumes, ticket size, mix, interchange assumptions, support SLAs, replacement rates) needed to build the TCO model."
+      },
+      {
+        "id": "platform-lifecycle-evidence",
+        "requirement": "Provides evidence for platform lifecycle status including ADK roadmap or multi-partner end-of-support notices",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides lifecycle-status evidence by stating the Verifone Carbon 8 is end-of-life with PCI approval expiring April 2027 and noting Oracle Payment Interface (OPI) support ended Oct 31, 2025 with a cited Oracle compatibility matrix. It also cites Clover Gen 1 devices reaching End-of-App-Update on March 30, 2026, which functions as an end-of-support notice."
+      },
+      {
+        "id": "compliance-validation-workflow",
+        "requirement": "Specifies pre-go-live validation steps for compliance (French UI string checks, receipt validation in UAT)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes compliance-oriented pre-go-live steps such as piloting in Quebec and New Brunswick, and explicitly calls to “Audit all customer-facing screens and receipts for complete French coverage per Bill 96 requirements” during the short-term plan. However, it does not explicitly specify receipt validation in UAT as a distinct step."
+      },
+      {
+        "id": "recommends-deprecated-without-disclosure",
+        "requirement": "Recommends Carbon 8 or Clover Station Pro as viable primary choices without acknowledging end-of-life or deprecated status",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not recommend Verifone Carbon 8 as a primary choice; it explicitly removes it from consideration due to end-of-life status. It also does not recommend Clover Station Pro/Duo as a viable primary choice; it labels Clover “Not Recommended” and cites integration and cost issues while noting only Gen 1 devices have end-of-app-update."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "implementation-focused-tone",
+        "requirement": "Maintains objective implementation-focused tone without marketing language or vendor promotional bias",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response is largely implementation-focused (integration paths, offline limits, Bill 96 configuration steps, TCO breakdowns) and avoids overt marketing slogans. However, it includes vendor-promotional bias such as citing PayFacto “serving chains like St-Hubert and Benny & Co.” and repeatedly positioning PayFacto/PAX as the “strongest” option in a sales-like way."
+      },
+      {
+        "id": "structured-comparison-format",
+        "requirement": "Organizes multi-platform comparison with clear headings, numbered sections, bullets, or tables",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is structured with clear headings and numbered sections (e.g., sections 1–13) and includes multiple comparison tables and bullet lists to organize the multi-platform comparison."
+      },
+      {
+        "id": "technical-terminology-precision",
+        "requirement": "Uses precise technical terminology (EFTLink, OPI, ADK, acquirer plugins, store-and-forward)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses precise technical terminology including “Oracle Payment Interface (OPI)”, “Simphony Payment Interface (SPI)”, and explicitly discusses “store-and-forward (SAF)”. It also references “EFTLink” in the context of Oracle Retail and mentions “payment plugin”/“processor plugin” integration paths."
+      },
+      {
+        "id": "recommendation-upfront",
+        "requirement": "States the recommended terminal solution in the opening section before detailed analysis",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response’s opening “Executive Summary” includes a clear “Primary Recommendation: PAX A920 Pro + PAX A920MAX” before the subsequent detailed section-by-section analysis."
+      },
+      {
+        "id": "basic-concept-explanation",
+        "requirement": "Explains what EMV, NFC, contactless payments, or POS systems are rather than assuming procurement-level knowledge",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response includes explanatory sections about contactless payments and related concepts (e.g., defining store-and-forward offline payments and describing contactless limits and tap transactions) rather than assuming procurement-level knowledge throughout."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "oracle-eftlink-documentation",
+        "requirement": "Cites Oracle EFTLink/OPI documentation (docs.oracle.com) for Simphony integration specifications",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Oracle documentation hosted on docs.oracle.com related to Oracle EFTLink/OPI, specifically linking to “Oracle Help Center - Verifone FIPay OPI” under the retail-eftlink documentation. It also cites other Oracle docs.oracle.com pages for Simphony SPI/compatibility, supporting integration specifications."
+      },
+      {
+        "id": "moneris-technical-sources",
+        "requirement": "Cites Moneris documentation or support resources (moneris.com, moneris.helpjuice.com, api-developer.moneris.com) for plugin and offline capabilities",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Moneris resources on moneris.com and support.moneris.com/help for offline payments and the Moneris payment plugin for Oracle Simphony, directly addressing plugin and offline capabilities."
+      },
+      {
+        "id": "verifone-developer-docs",
+        "requirement": "Cites Verifone technical documentation (verifone.cloud) for ADK support status and terminal lifecycle",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Verifone technical documentation hosted on verifone.cloud, including a Store-and-Forward (SAF) PDF link and a tipping PDF link. These citations are used to support claims about offline support status and terminal/payment feature lifecycle-related behavior."
+      },
+      {
+        "id": "clover-developer-docs",
+        "requirement": "Cites Clover developer documentation (docs.clover.com) for Canadian SDK feature limitations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites Clover developer documentation from docs.clover.com about Canadian merchant limitations, specifically linking to “Clover Developer Docs - Canadian Merchants” (https://docs.clover.com/dev/docs/canadian-merchants) when discussing offline payment support restrictions in Canada."
+      },
+      {
+        "id": "payment-network-sources",
+        "requirement": "Cites Visa, Mastercard, or Interac official sources (visa.ca or similar) for contactless limits and transaction speeds",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites Interac’s official FAQ page for contactless limits and includes official Visa/Mastercard sources only indirectly via third-party summaries, but it does not cite any official Visa or Mastercard pages (e.g., visa.ca or mastercard.ca) for limits or transaction speeds."
+      },
+      {
+        "id": "bill-96-legal-sources",
+        "requirement": "Cites Quebec language law, Bill 96, or legal analysis sources for French interface compliance requirements",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses Quebec Bill 96 requirements and cites legal/compliance analysis sources, including a McCarthy Tétrault Bill 96 analysis link and references to OQLF enforcement findings, to support French interface compliance requirements."
+      },
+      {
+        "id": "retail-sources-for-integration",
+        "requirement": "Cites retail shopping sites or product marketing pages as primary evidence for Oracle MICROS integration capabilities",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites Oracle documentation, processor/developer docs (Moneris, Global Payments, Adyen), and vendor partnership posts (PAX/Touché) when discussing Oracle MICROS/Simphony integration. It does not rely on retail shopping sites or product marketing pages as the primary evidence for Oracle MICROS integration capabilities."
+      }
+    ]
+  }
+}

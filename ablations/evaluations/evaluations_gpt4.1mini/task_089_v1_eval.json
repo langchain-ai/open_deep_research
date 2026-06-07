@@ -1,0 +1,373 @@
+{
+  "task_id": "task_089",
+  "domain": "Finance",
+  "report_file": "task_089_v1.md",
+  "summary": {
+    "total_criteria": 41,
+    "positive_criteria": 37,
+    "negative_criteria": 4,
+    "correctly_handled": 11,
+    "pass_rate": 26.83,
+    "normalized_score": 12.97,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 23,
+        "correctly_handled": 2,
+        "normalized_score": 8.16
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 5,
+        "normalized_score": 53.57
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 4,
+        "normalized_score": 50.0
+      },
+      "citation-quality": {
+        "total": 4,
+        "correctly_handled": 0,
+        "normalized_score": 0.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "ios-q2-2025-margin-calculation",
+        "requirement": "Calculates IOS Q2 2025 margin as 24.7% using $166.7M profit / $675.7M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives IOS Q2 2025 revenue as $697M and margin as 24.5% (operating income ~$170.8M), not the required calculation of 24.7% from $166.7M profit divided by $675.7M sales. It also does not show the $166.7M/$675.7M inputs or compute 24.7% within ±0.2pp."
+      },
+      {
+        "id": "ios-fy2024-margin-calculation",
+        "requirement": "Calculates IOS FY2024 margin as 26.0% using $704.6M profit / $2,714.7M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not calculate IOS FY2024 margin using $704.6M profit divided by $2,714.7M sales, nor does it state the resulting ~26.0% figure. It only gives a vague statement that IOS 2024 margins were “around 25%” without the specified inputs or calculation."
+      },
+      {
+        "id": "ios-revenue-growth-2023-2024",
+        "requirement": "States IOS revenue growth 2023-2024 as +3.9% from $2,612.2M to $2,714.7M (within +/- 0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state IOS revenue growth from 2023 to 2024 as +3.9% nor does it provide the specific IOS revenue figures of $2,612.2M and $2,714.7M. It only gives a vague estimate that IOS growth was “between 4% and 5%,” without the required dollar amounts."
+      },
+      {
+        "id": "pt-q2-2025-margin-calculation",
+        "requirement": "Calculates PT Q2 2025 margin as 17.8% using $93.2M profit / $523.6M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response never calculates Precision Technologies (PT) Q2 2025 margin using $93.2M profit divided by $523.6M sales, nor does it state a 17.8% margin (±0.2pp). It instead discusses only IOS and AHS margins and provides no PT Q2 2025 profit/sales-based computation."
+      },
+      {
+        "id": "pt-fy2024-margin-calculation",
+        "requirement": "Calculates PT FY2024 margin as 22.4% using $500.0M profit / $2,229.4M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response never calculates Precision Technologies (PT) FY2024 margin using $500.0M profit divided by $2,229.4M sales, nor does it state a resulting margin near 22.4%. It also does not present those PT FY2024 profit and sales figures anywhere."
+      },
+      {
+        "id": "pt-separation-date",
+        "requirement": "States PT separation completed June 28, 2025 or began Q3 2025 as discontinued operation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states the Precision Technologies spin-off occurred on June 28, 2025 and also notes it is classified as discontinued operations from Q3 2025 onward."
+      },
+      {
+        "id": "pt-revenue-growth-2023-2024",
+        "requirement": "States PT revenue growth 2023-2024 as +0.3% from $2,223.7M to $2,229.4M (within +/- 0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state Precision Technologies (PT) revenue growth from 2023 to 2024 as +0.3% nor does it provide the specific figures $2,223.7M and $2,229.4M. It only gives a qualitative description of PT performance and mentions “double-digit order growth” without the required revenue numbers or growth rate."
+      },
+      {
+        "id": "pt-h1-2025-margin-compression",
+        "requirement": "Notes PT H1 2025 margins fell to 17.6% vs 23.8% prior year (within +/- 0.5pp for either figure)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention Precision Technologies (PT) H1 2025 margins being 17.6% versus 23.8% in the prior year. It also does not provide any H1 2025 PT margin figures at all, so the required comparison (within +/-0.5pp) is missing."
+      },
+      {
+        "id": "pt-capex-2024",
+        "requirement": "States PT segment FY2024 capex as $34.3M or $34M-35M annually (within +/- $1M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not mention PT segment FY2024 capex at all, nor does it provide a figure of $34.3M or an annual range of $34M–$35M. It discusses margins, revenue growth, and the separation, but omits any capex data for the Precision Technologies segment."
+      },
+      {
+        "id": "pt-geographic-weakness",
+        "requirement": "Notes PT driven Q2 2025 core decline in Western Europe with softness in China and North America",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Precision Technologies’ performance and mentions geographic factors like tariff headwinds, but it does not note a Q2 2025 PT-driven core decline in Western Europe nor explicitly cite softness in China and North America as drivers. Those specific regional dynamics are absent from the segment discussion."
+      },
+      {
+        "id": "ahs-q2-2025-margin-calculation",
+        "requirement": "Calculates AHS Q2 2025 margin as 12.2% using $39.1M profit / $319.5M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives AHS Q2 2025 operating margin as 11.2% (with $320M revenue and ~$35.8M operating income) and does not compute 12.2% from $39.1M profit divided by $319.5M sales. The specific inputs ($39.1M and $319.5M) and resulting ~12.2% margin are absent."
+      },
+      {
+        "id": "ahs-fy2024-margin-calculation",
+        "requirement": "Calculates AHS FY2024 margin as 12.1% using $155.6M profit / $1,287.7M sales (within +/- 0.2pp)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response never computes AHS FY2024 margin using $155.6M profit divided by $1,287.7M sales, nor does it state a 12.1% result. It only gives vague AHS full-year 2024 margins (\"approximately 11%\") without the specified inputs or calculation."
+      },
+      {
+        "id": "ahs-revenue-growth-2023-2024",
+        "requirement": "States AHS revenue growth 2023-2024 as +4.7% from $1,229.4M to $1,287.7M (within +/- 0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state AHS revenue growth from 2023 to 2024 as +4.7% nor does it provide the specific figures $1,229.4M and $1,287.7M. Instead, it only describes AHS revenue as “flat or slightly declining” without the required calculation and numbers."
+      },
+      {
+        "id": "combined-ios-ahs-fy2024-margin",
+        "requirement": "Calculates combined IOS+AHS FY2024 margin as 21.5% using $860.2M profit / $4,002.4M sales (within +/- 0.2pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not compute a combined IOS+AHS FY2024 margin using $860.2M profit divided by $4,002.4M sales, nor does it state the resulting ~21.5% figure. It only gives approximate separate segment margins (e.g., IOS ~25%, AHS ~11%) without the required combined calculation and value."
+      },
+      {
+        "id": "combined-ios-ahs-q2-2025-margin",
+        "requirement": "Calculates combined IOS+AHS Q2 2025 margin as 20.7% using $205.8M profit / $995.2M sales (within +/- 0.2pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides separate IOS and AHS Q2 2025 margins and operating incomes, but it never calculates or states the combined IOS+AHS margin using $205.8M profit divided by $995.2M sales (≈20.7%). It also uses different revenue totals (e.g., $697M and $320M) and does not present the required 20.7% combined figure within ±0.2pp."
+      },
+      {
+        "id": "q1-2025-company-margin",
+        "requirement": "States Q1 2025 GAAP operating margin as 15.8% or adjusted operating margin as 25.3% (within +/- 0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions only that Q1 2025 adjusted operating margin increased about 20 bps versus Q1 2024, but it does not state Q1 2025 GAAP operating margin as 15.8% or adjusted operating margin as 25.3% (±0.3pp). Neither the 15.8% nor 25.3% figure appears anywhere in the response."
+      },
+      {
+        "id": "q1-2024-company-margin",
+        "requirement": "States Q1 2024 GAAP operating margin as 19.8% or adjusted operating margin as 25.1% (within +/- 0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Q1 2025 vs Q1 2024 margin changes only in basis points and never states Q1 2024 GAAP operating margin of 19.8% or adjusted operating margin of 25.1% (±0.3pp). The specific Q1 2024 margin figures required by the criterion are absent."
+      },
+      {
+        "id": "q2-2025-pricing-improvement",
+        "requirement": "States Q2 2025 favorable pricing contribution included tariff-related countermeasures and surcharges",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions tariff-related cost pressures being mitigated via price adjustments, but it does not state that Q2 2025 favorable pricing contribution specifically included tariff-related countermeasures and surcharges. The required phrasing about “favorable pricing contribution” and “countermeasures and surcharges” is absent."
+      },
+      {
+        "id": "h1-2025-separation-costs",
+        "requirement": "States H1 2025 separation costs as $64M in Unallocated Corporate Costs (within +/- $2M)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response never mentions H1 2025 separation costs or Unallocated Corporate Costs, and it does not state a $64M figure (or any separation-cost amount). Therefore the required $64M (+/- $2M) disclosure is missing."
+      },
+      {
+        "id": "strongest-segment-identification",
+        "requirement": "Explicitly identifies IOS as the segment with strongest unit economics citing its 24.7% Q2 2025 margin vs PT 17.8% and AHS 12.2%",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says IOS has the strongest unit economics, but it cites IOS margin as 24.5% and AHS as 11.2% and does not provide PT at 17.8% or the specific comparison of 24.7% vs 17.8% vs 12.2%. It therefore fails to explicitly identify IOS using the required Q2 2025 margin figures across all three segments."
+      },
+      {
+        "id": "q2-vs-fy2024-margin-comparison",
+        "requirement": "States Q2 2025 vs FY2024 margin change for each segment (IOS -1.3pp, PT -4.6pp, AHS +0.1pp within +/-0.3pp)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state the Q2 2025 vs FY2024 margin change in percentage points for each of the three segments, and it omits PT entirely as a continuing segment. It provides only approximate 2024 margins for IOS and AHS and gives no explicit pp deltas matching IOS -1.3pp, PT -4.6pp, and AHS +0.1pp (±0.3pp)."
+      },
+      {
+        "id": "q1-yoy-margin-interpretation",
+        "requirement": "States Q1 2025 vs Q1 2024 GAAP margin declined ~400bps due to prior-year $63M PT property gain, or adjusted margin improved +20bps",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that Q1 2025 adjusted operating margin increased about 20 bps versus Q1 2024, but it does not state that GAAP margin declined ~400 bps due to a prior-year $63M PT property gain. The required linkage to the $63M gain and the ~400 bps GAAP decline is missing."
+      },
+      {
+        "id": "portfolio-prioritization-conclusion",
+        "requirement": "States Fortive prioritizes higher-margin IOS and/or growth-oriented AHS segments post-separation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly says Fortive now focuses on “higher-margin, recurring revenue businesses” within IOS and AHS and highlights IOS as having the strongest unit economics post-separation, indicating prioritization of higher-margin IOS and growth/recurring-oriented AHS segments."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "strategic-portfolio-role-characterization",
+        "requirement": "Assigns explicit strategic roles (profitability anchor, cash generator, growth engine) to at least 2 segments",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly positions IOS as the “principal growth engine” and emphasizes its strong unit economics, while describing AHS as being in a transition phase toward higher-margin recurring revenue. However, it does not explicitly label any segment as a “profitability anchor” or “cash generator.”"
+      },
+      {
+        "id": "investment-narrative-articulation",
+        "requirement": "States coherent investment narrative (fund and grow, cash cow + growth kicker) showing IOS/AHS complementarity",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response frames IOS as the high-margin growth engine and AHS as a recurring-revenue, improving-margin business, and argues the separation refocuses Fortive on higher-quality, cash-generative units. This provides a coherent “cash cow + growth kicker” style narrative and explicitly discusses IOS/AHS complementarity within the post-spin portfolio strategy."
+      },
+      {
+        "id": "portfolio-mix-quality-analysis",
+        "requirement": "Explains how PT divestiture improves portfolio composition, margin mix, or quality of remaining business",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that divesting Precision Technologies streamlined the portfolio by removing a more cyclical, capital-intensive segment and shifting Fortive toward higher-margin, more recurring-revenue IOS/AHS businesses, thereby improving portfolio quality and margin stability."
+      },
+      {
+        "id": "geographic-risk-mitigation-framing",
+        "requirement": "Identifies reduced exposure to underperforming regions (Europe/China/North America) as strategic separation benefit",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses benefits of the separation in terms of removing cyclical volatility and focusing on higher-margin, recurring-revenue businesses, but it does not identify reduced exposure to underperforming regions (Europe/China/North America) as a strategic benefit. There is no mention of geographic exposure changes or regional underperformance. Thus the specific regional-exposure benefit is missing."
+      },
+      {
+        "id": "essential-workflow-positioning",
+        "requirement": "Connects retained segments to mission-critical, essential, or specialized workflows in respective end markets",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses segment profitability and recurring revenue but does not explicitly connect the retained segments (IOS, AHS) to mission-critical, essential, or specialized workflows in their end markets. It mentions industrial software/automation and healthcare cycles at a high level without framing them as essential workflows. This specific linkage is missing."
+      },
+      {
+        "id": "multi-dimensional-analytical-framework",
+        "requirement": "Analyzes through 4+ distinct lenses (unit economics, trajectory, capital allocation, geography, competitive positioning)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response analyzes Fortive through multiple distinct lenses: unit economics (segment operating margins), trajectory/momentum (2023–2024 revenue growth and Q1 2025 vs Q1 2024 margin trend), capital allocation (share repurchases and focus on recurring revenue/cash flow), and competitive positioning (post-separation portfolio quality and resilience)."
+      },
+      {
+        "id": "strategic-validation-synthesis",
+        "requirement": "Provides holistic conclusion integrating segment metrics, separation rationale, and post-separation positioning",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response ends with a summary/conclusions section that ties together segment margin and growth comparisons, explains the rationale for separating Precision Technologies (streamlining/removing cyclicality), and states how the remaining IOS/AHS are positioned post-separation (higher-margin, recurring revenue, stronger competitive positioning)."
+      },
+      {
+        "id": "unbenchmarked-performance-claims",
+        "requirement": "Labels segment performance as \"strong\", \"weak\", or \"promising\" without comparison to prior periods, benchmarks, or other segments' figures",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response uses qualitative labels like “strong and stable unit economics,” “principal growth engine,” and “strongest unit economics” for IOS without explicitly benchmarking these claims to prior periods or other segments’ figures at the point of labeling."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "precise-financial-terminology",
+        "requirement": "Uses precise financial terms (operating margin, unit economics, operating leverage, mix quality)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses precise financial terminology, explicitly discussing operating margin multiple times and also referencing unit economics, operating leverage, and portfolio/mix improvements (e.g., software and service mix, recurring revenue mix)."
+      },
+      {
+        "id": "structured-data-presentation",
+        "requirement": "Organizes segment metrics with clear structure (tables, bullets, or systematic comparison format)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a clear structured format with headings and bullet lists to present segment metrics (revenues, operating margins, operating income) and comparisons across periods."
+      },
+      {
+        "id": "calculation-methodology-shown",
+        "requirement": "Shows calculation methodology for at least 3 margin computations with numerator/denominator",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides operating margin percentages and approximate operating income for IOS and AHS, but it does not show explicit numerator/denominator calculations (e.g., operating income ÷ revenue) for at least three margin computations. It also does not compute a third segment margin with a shown formula, so the required 3 calculation methodologies are missing."
+      },
+      {
+        "id": "objective-analytical-tone",
+        "requirement": "Maintains objective analytical tone without promotional language or unsupported opinions",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response largely uses an objective, analytical tone focused on margins, growth, and strategic implications, without overtly promotional phrasing. While it includes some positive-sounding conclusions (e.g., “bode well,” “strong confidence”), these are framed as analytical interpretations rather than marketing claims."
+      },
+      {
+        "id": "repetitive-conclusions",
+        "requirement": "Restates the same strategic conclusion about the separation multiple times without adding new supporting data",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeats the same strategic conclusion that the Precision Technologies separation “streamlined/simplified” the portfolio and “strengthened/improved” the remaining business quality in multiple sections (e.g., “Impact of…Separation,” “Unit Economics…,” and “Summary and Conclusions”) without introducing new supporting data each time."
+      },
+      {
+        "id": "financial-data-as-prose",
+        "requirement": "Presents segment financials as flowing paragraphs rather than structured tables, bullets, or comparison formats",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response presents segment financials in structured bullet lists with labeled revenue, operating margin, and operating income, plus section headings and comparisons. It does not present the segment financials as flowing paragraphs."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-fortive-10k-fy2024",
+        "requirement": "Cites Fortive 10-K for fiscal year 2024 filed February 25, 2025 as a source",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The sources list mentions a “10-K Filing” generally but does not cite Fortive’s fiscal year 2024 Form 10-K filed on February 25, 2025, nor does it include that filing date anywhere in the response."
+      },
+      {
+        "id": "cites-fortive-10q-q1-2025",
+        "requirement": "Cites Fortive 10-Q for Q1 2025 filed May 1, 2025 as a source",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists sources including a “Fortive Q1 2025 Earnings Release and 10-Q Filing” link, but it does not cite the specific Fortive Q1 2025 Form 10-Q filed May 1, 2025, nor does it mention that filing date anywhere."
+      },
+      {
+        "id": "cites-fortive-10q-q2-2025",
+        "requirement": "Cites Fortive 10-Q for Q2 2025 filed July 30, 2025 as a source",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists “Fortive Corporation Q2 2025 10-Q SEC Filing” as a source, but it does not cite a Fortive 10-Q for Q2 2025 filed on July 30, 2025; the provided link shows a different filing date in the URL (20250926) and no July 30 filing date is stated."
+      },
+      {
+        "id": "cites-non-authoritative-sources",
+        "requirement": "Cites non-authoritative sources such as social media, blogs, news articles, or analyst opinions as primary data sources",
+        "weight": -25,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites non-authoritative sources in its Sources section, including a Motley Fool earnings call transcript link and multiple Investing.com and MacroTrends links, treating them as supporting/primary data sources alongside SEC filings."
+      }
+    ]
+  }
+}

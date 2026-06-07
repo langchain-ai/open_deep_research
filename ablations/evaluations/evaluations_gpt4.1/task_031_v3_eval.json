@@ -1,0 +1,245 @@
+{
+  "task_id": "task_031",
+  "domain": "Medicine",
+  "report_file": "task_031_v3.md",
+  "summary": {
+    "total_criteria": 25,
+    "positive_criteria": 22,
+    "negative_criteria": 3,
+    "correctly_handled": 21,
+    "pass_rate": 84.0,
+    "normalized_score": 55.76,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 15,
+        "correctly_handled": 13,
+        "normalized_score": 84.48
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 73.68
+      },
+      "presentation-quality": {
+        "total": 4,
+        "correctly_handled": 3,
+        "normalized_score": 0.0
+      },
+      "citation-quality": {
+        "total": 1,
+        "correctly_handled": 1,
+        "normalized_score": 100.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "stop-metoprolol",
+        "requirement": "Recommends holding or significantly reducing metoprolol given symptomatic bradycardia and variable PR interval suggesting intermittent AV conduction delay",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends holding/discontinuing AV-nodal blockers, including beta-blockers, stating they should be immediately held in symptomatic bradycardia/conduction abnormality, which applies to metoprolol in this case."
+      },
+      {
+        "id": "default-admission",
+        "requirement": "Strongly recommends inpatient admission with continuous telemetry and further evaluation given concerning history of symptomatic bradycardia with recurrent presyncope and inability to secure close outpatient followup",
+        "weight": 15,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes an inpatient admission pathway recommending admission to a monitored bed with continuous telemetry and same-day/24h cardiology/EP consultation for recurrent near-syncope with conduction abnormality. It also notes admission criteria including persistent/recurrent near-syncope/syncope plus conduction abnormality, aligning with the concerning symptomatic bradycardia history and limited outpatient follow-up."
+      },
+      {
+        "id": "symptomatic-av-block",
+        "requirement": "Identifies symptomatic second-degree AV block (Mobitz I or Wenckebach) as the most likely primary diagnosis, but must rule out Type 2 Mobitz and other arrhythmias",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies Mobitz I (Wenckebach) second-degree AV block as most likely based on variable PR with dropped beats, and it explicitly contrasts this with Mobitz II and other rhythms (e.g., 2:1 AV block, sinus bradycardia), emphasizing the need to differentiate/rule out higher-grade block and other arrhythmias."
+      },
+      {
+        "id": "high-grade-block-risk",
+        "requirement": "Recognizes risk of intermittent high-grade or complete heart block, given witnessed episodes of unresponsiveness",
+        "weight": 7,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response highlights risk of progression to “high-grade block or complete heart block” and sets urgent escalation thresholds for “new or evolving high-grade AV block… or complete heart block,” in the context of recurrent near-syncope and witnessed unresponsiveness episodes."
+      },
+      {
+        "id": "drug-unmasking",
+        "requirement": "States that use of metoprolol may be unmasking or contributing to conduction disease",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses medication effects and explicitly recommends holding AV-nodal blockers like beta-blockers (metoprolol), implying it may be contributing to the bradycardia/AV block pattern."
+      },
+      {
+        "id": "admission-triggers",
+        "requirement": "Lists at least 3 admission triggers including Mobitz II, 2:1 AV block, high-grade block, awake HR <40 bpm, pauses ≥3 seconds, or any syncope or transient unresponsiveness",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response lists multiple admission/urgent escalation triggers, including pauses >3 seconds, symptomatic/profound bradycardia with HR <40 bpm, progression to Mobitz II, 2:1 AV block, and high-grade/complete AV block, and it also references syncope/near-syncope as high-risk."
+      },
+      {
+        "id": "risk-stratified-monitoring-required",
+        "requirement": "If discharge considered, requires cardiac monitoring system appropriate to risk stratification (MCOT for high-risk patients requiring real-time monitoring; external patch recorder or ILR for intermediate-risk patients) before departure",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response specifies ambulatory monitoring options before discharge, explicitly recommending MCOT for real-time alerting in higher-risk situations and patch/loop recorders as alternatives for lower/moderate risk, aligning monitoring modality with risk level prior to discharge."
+      },
+      {
+        "id": "avoid-av-nodal-blockers",
+        "requirement": "States to avoid all AV-nodal blocking agents until a specialist deems it safe or approves of its use",
+        "weight": 4,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that all AV-nodal blockers should be immediately held/discontinued until specialist review, which implies avoiding these agents until a specialist deems them safe."
+      },
+      {
+        "id": "continuous-telemetry-duration",
+        "requirement": "Orders continuous inpatient telemetry for at least 24-48 hours",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends inpatient admission with “continuous telemetry” but does not specify a duration of at least 24–48 hours. It also focuses heavily on outpatient ambulatory monitoring (e.g., 14-day patch/MCOT) rather than explicitly ordering 24–48 hours of inpatient telemetry."
+      },
+      {
+        "id": "telemetry-alert-thresholds",
+        "requirement": "Specifies at least 2 alert thresholds from HR <40 awake, pauses ≥3 seconds, Mobitz II, 2:1 block, or high-grade AV block",
+        "weight": 7,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response specifies multiple alert thresholds, including pauses >3.0 seconds, HR <40 bpm, and escalation for high-grade AV block (e.g., Mobitz II or 2:1 block). This satisfies the requirement to name at least two thresholds from the provided list."
+      },
+      {
+        "id": "real-time-monitoring-system",
+        "requirement": "Orders MCOT, real-time ECG patch, or implantable loop recorder for at least 14 days (potentially more if recommended by a specialist) with automatic arrhythmia detection",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response recommends ambulatory ECG monitoring for at least 14 days and explicitly includes patch monitors, MCOT (real-time with automated alerts), and external/implantable loop recorders, noting automated arrhythmia detection and alert thresholds (e.g., pauses >3 seconds)."
+      },
+      {
+        "id": "monitoring-alert-configuration",
+        "requirement": "Specifies monitoring system alert for at least 2 of high-grade block, Mobitz II, 2:1 block, pauses ≥3s, or sustained HR <40",
+        "weight": 4,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response specifies monitoring system alert thresholds for pauses >3 seconds and for profound bradycardia with HR <40 bpm, and also mentions alerts for new/evolving high-grade AV block (including Mobitz II and 2:1 block). This covers at least two of the required alert categories."
+      },
+      {
+        "id": "urgent-cardiology-consult",
+        "requirement": "Orders cardiology or electrophysiology consultation same-day or within 24 hours if admitted",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends arranging a cardiology/electrophysiology consultation “same-day or within 24 hours” in the inpatient admission pathway."
+      },
+      {
+        "id": "inadequate-monitoring",
+        "requirement": "Recommends discharge home with standard Holter only (not real-time monitoring system)",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response recommends ambulatory monitoring such as patch monitoring for ≥14 days and specifically prefers mobile cardiac outpatient telemetry (real-time alerting), rather than discharge with only a standard Holter. It also outlines admission criteria and expedited follow-up, not a simple Holter-only discharge plan."
+      },
+      {
+        "id": "presyncope-vs-syncope",
+        "requirement": "Mentions that presyncope carries a nearly identical risk profile as syncope",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses near-syncope/presyncope repeatedly but does not state that presyncope carries a nearly identical risk profile as syncope. It provides monitoring and admission thresholds without making that explicit risk-equivalence comparison."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "expedited-outpatient-followup",
+        "requirement": "If hospital admission is absolutely not feasible, schedules cardiology or EP follow-up within a few days (ideally 48–72 hours and no later than 7 days)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes an outpatient discharge pathway stating that if admission is not feasible, a cardiology/electrophysiology appointment should be arranged within 48–72 hours and no later than 7 days."
+      },
+      {
+        "id": "driving-restriction",
+        "requirement": "Explicitly restricts driving until a definitive diagnosis or management is established",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states “No driving or operation of heavy machinery until definitive diagnosis and specialist clearance,” which restricts driving until diagnosis/management is established."
+      },
+      {
+        "id": "return-precautions",
+        "requirement": "Provides specific return precautions for at least 2 of syncope, pre-syncope, symptomatic bradycardia, HR <40, chest pain, or monitor alerts",
+        "weight": 4,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives explicit return precautions for multiple listed categories, including recurrence/worsening of syncope/presyncope, sustained bradycardia/HR <40 (via “profound bradycardia HR <40” and “sustained bradycardia”), chest pain, and device/monitor alerts prompting immediate ED care."
+      },
+      {
+        "id": "dismisses-presyncope-urgency",
+        "requirement": "States near-syncope or presyncope does not warrant urgent return, or requires full syncope/loss of consciousness before seeking emergency care",
+        "weight": -100,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly advises urgent escalation for presyncope/near-syncope, including “seek immediate emergency care” for recurrence or worsening of presyncope and lists presyncope among ED return precautions. It does not state that presyncope is safe to ignore or that full syncope/LOC is required before seeking emergency care."
+      },
+      {
+        "id": "ed-observation",
+        "requirement": "States that if hospital admission is absolutely not feasible, a structured ED observation protocol represents an acceptable alternative. ",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses an outpatient discharge pathway “if admission not feasible,” but it does not state that a structured ED observation protocol is an acceptable alternative to admission. It only contrasts inpatient admission with outpatient discharge plus ambulatory monitoring and follow-up. The specific element of ED observation as an alternative is missing."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "clinical-terminology",
+        "requirement": "Uses precise clinical terminology for cardiac conduction abnormalities, monitoring modalities, and specific threshold values",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses specific conduction terminology (e.g., Mobitz I/Wenckebach, Mobitz II, high-grade/complete AV block), names monitoring modalities (patch monitor/Zio, MCOT, Holter, external loop recorder, telemetry), and provides explicit numeric thresholds (PR 180–240 ms, pauses >3.0 s, HR <40 bpm, follow-up within 48–72 h)."
+      },
+      {
+        "id": "structured-recommendations",
+        "requirement": "Organizes recommendations with distinct sections for disposition, monitoring, admission criteria, and safety",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized into clearly labeled sections that cover disposition (inpatient vs outpatient pathways), monitoring strategies, admission criteria (inpatient admission criteria), and safety/return precautions (safety and return precautions section)."
+      },
+      {
+        "id": "decision-criteria-format",
+        "requirement": "Presents admission criteria, alert thresholds, and return precautions as explicit lists or formatted criteria rather than only narrative prose",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides explicit, formatted criteria in multiple sections, including a bulleted list of “Actionable Alert Thresholds,” a labeled “Inpatient Admission—Criteria” list, “Strict Discharge Criteria,” and a “Return to ED/Seek Emergency Care Immediately for” list, plus a summary table outlining escalation criteria."
+      },
+      {
+        "id": "casual-clinical-tone",
+        "requirement": "Uses colloquial or dismissive phrasing (e.g., \"just\", \"probably fine\", \"usually benign\"), given this patient presents with a very high-risk complaint ",
+        "weight": -50,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response uses colloquial/dismissive phrasing such as “typically intranodal” and “usually benign”-type minimization, e.g., stating Mobitz I is “most consistent” and implying a less urgent prognosis compared with Mobitz II. This downplays risk in a high-risk recurrent near-syncope presentation."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "guidelines-reference",
+        "requirement": "References the 2018 ACC/AHA/HRS guidelines for evaluation and management of patients with bradycardia and cardiac conduction delay: https://www.jacc.org/doi/10.1016/j.jacc.2018.10.044",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites the 2018 ACC/AHA/HRS bradycardia guideline in its Sources section and references it throughout, including links to the guideline full text and executive summary."
+      }
+    ]
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "task_id": "task_023",
+  "domain": "Personalized Assistant",
+  "report_file": "task_023_v2.md",
+  "summary": {
+    "total_criteria": 30,
+    "positive_criteria": 23,
+    "negative_criteria": 7,
+    "correctly_handled": 25,
+    "pass_rate": 83.33,
+    "normalized_score": 77.11,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 10,
+        "correctly_handled": 8,
+        "normalized_score": 77.78
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 9,
+        "correctly_handled": 7,
+        "normalized_score": 71.43
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 6,
+        "normalized_score": 100.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 33.33
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "identifies-all-three-carriers",
+        "requirement": "Names all three carriers - Chubb, Coalition, and Cowbell Cyber",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names all three carriers—Chubb, Coalition, and Cowbell Cyber—throughout the comparison sections and in the title and conclusion."
+      },
+      {
+        "id": "coalition-response-time-metrics",
+        "requirement": "States Coalition provides acknowledgment within 1 hour or urgent response within ~1 hour",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "In the Cowbell Cyber incident response section, the response states that acknowledgment is generally within one hour and urgent cases are triaged more quickly, which satisfies the requirement of ~1 hour acknowledgment/urgent response."
+      },
+      {
+        "id": "cowbell-response-time-metrics",
+        "requirement": "States Cowbell provides acknowledgment within 1 hour or first contact within 24 hours",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "In the Cowbell Cyber incident response section, the response states that acknowledgment is generally within one hour. However, it does not mention “first contact within 24 hours,” so the full requirement is only partially addressed."
+      },
+      {
+        "id": "chubb-response-mechanism",
+        "requirement": "States Chubb provides IR manager connection within ~1 hour via Cyber Alert or similar process",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "In the Incident Response section for Chubb, the response states that Chubb provides “rapid triage,” typically within one hour or less from notification, via Chubb Cyber Alert® and connection to triage managers."
+      },
+      {
+        "id": "baseline-premium-range",
+        "requirement": "States premium range $1.2K-3.5K or approximately $1.5K-3.5K for $1M limits with strong controls",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states a premium range of “$1,500–$3,500/year for $1M limit” for PCI/HIPAA-exposed $2–$5M revenue e-commerce businesses, which matches the required approximately $1.5K–$3.5K range for $1M limits with strong controls."
+      },
+      {
+        "id": "credit-monitoring-coverage-confirmed",
+        "requirement": "Confirms all three carriers cover credit monitoring costs as part of breach response",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that Chubb, Coalition, and Cowbell each include credit monitoring as part of breach response (e.g., “Credit Monitoring: Covered/Included/Provided” under each carrier and in the conclusion noting all three provide credit monitoring)."
+      },
+      {
+        "id": "legal-defense-coverage-confirmed",
+        "requirement": "Confirms all three carriers cover breach counsel or legal defense fees",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that Chubb includes legal defense costs, Coalition covers “all defense costs,” and Cowbell covers regulatory and civil defense costs, indicating each carrier covers breach counsel/legal defense fees."
+      },
+      {
+        "id": "ecommerce-exclusions-identified",
+        "requirement": "Identifies at least 3 exclusions - PCI betterment/system upgrades, continued non-compliance fines, OFAC/sanctions prohibited payments, or panel vendor/consent requirements",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response identifies multiple relevant exclusions, including system upgrades/improvements, known/unpatched vulnerabilities, and contractual liability. However, it does not explicitly identify continued non-compliance fines, OFAC/sanctions prohibited payments, or panel vendor/consent requirements as exclusions. Thus it does not meet the requirement of at least three from the specified list."
+      },
+      {
+        "id": "business-profile-context",
+        "requirement": "References $2-5M revenue bracket, 15 employees, Austin/Texas location, or 500+ monthly transactions in analysis",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references the $2–$5M revenue bracket multiple times (e.g., in the overview and premium drivers section) and also references Texas law impact, aligning with the Austin/Texas location element."
+      },
+      {
+        "id": "overstates-fine-coverage",
+        "requirement": "Claims regulatory fines are covered without sub-limits or up to full aggregate policy limits",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly states regulatory fines are subject to sublimits (e.g., Chubb fines may have a $250k–$2M sublimit; Coalition fines are “always subject to sublimits”; Cowbell has sublimits). It does not claim fines are covered without sub-limits or up to full aggregate limits."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "policy-architecture-analysis",
+        "requirement": "Explains how breach-response or regulatory limits interact with aggregate limits or preserve capacity through separate/endorsed structures",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses how regulatory fines are subject to sublimits within the overall policy aggregate and notes that defense costs can erode those sublimits. However, it does not explain how breach-response/regulatory limits can be structured separately (e.g., separate aggregates, reinstatements, or endorsed “outside the limit” coverage) to preserve capacity for other losses."
+      },
+      {
+        "id": "historical-case-context",
+        "requirement": "References specific litigation, breach incidents, or policy evolution examples that explain why certain coverage features exist",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites specific examples such as a court case about Cowbell’s $250,000 sublimit and discusses Chubb’s “Neglected Software Exploit Endorsement” (45-day patch window) as a policy evolution explaining coverage/exclusion structure. It also references broader litigation/class action and regulatory investigation trends as context for why regulatory defense and response features exist."
+      },
+      {
+        "id": "service-model-structural-differentiation",
+        "requirement": "Explains service delivery models - in-house teams vs panel coordination, vendor relationships, or IR provider management approaches",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains incident response service delivery models for each carrier, including hybrid/panel-based coordination (Chubb), primarily in-house IR with third-party vendors (Coalition), and in-house claims managers with a preferred vendor panel (Cowbell), describing vendor relationships and management approach."
+      },
+      {
+        "id": "interconnected-exclusion-risk-analysis",
+        "requirement": "Connects multiple exclusions or conditions to show compound implications for e-commerce operations or incident scenarios",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response links multiple exclusions/conditions to operational implications, e.g., unpatched vulnerabilities plus patch windows affecting claim eligibility, contractual-liability exclusions unless independent tort exists, and non-disclosure/pre-existing incidents voiding coverage. It also connects sublimits with defense-cost erosion and state-law insurability to show compound effects on breach scenarios."
+      },
+      {
+        "id": "conditional-recommendation-logic",
+        "requirement": "Provides if-then decision logic showing how controls, risk profile, or business factors change carrier suitability",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes decision-style logic linking business/security factors to carrier fit, e.g., noting that Coalition and Cowbell provide premium credits for MDR/security integrations while all carriers penalize weak controls, and that Chubb is more customizable via endorsements/sublimits. It also ties unpatched-vulnerability practices and disclosure issues to coverage suitability."
+      },
+      {
+        "id": "implementation-specification-framework",
+        "requirement": "Provides structured broker RFP specification, quote request parameters, or step-by-step binding checklist with specific limit targets",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides a comparative analysis of carriers and discusses sublimits and premium drivers, but it does not present a structured broker RFP/specification, quote request parameters, or a step-by-step binding checklist. It also lacks specific limit targets to request (e.g., explicit sublimit amounts to require for fines, PCI assessments, IR costs)."
+      },
+      {
+        "id": "operational-workflow-implications",
+        "requirement": "Analyzes how policy features affect real-time incident response, payment processing operations, or vendor approval workflows",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses incident response services and response times/SLAs (e.g., Coalition’s 5-minute response, MDR 30-minute SLA; Chubb/Cowbell rapid triage) and explains vendor panel usage and approval/engagement (e.g., Coalition approval for outside counsel, curated vendor panels). It also ties policy features like patching endorsements and “minimum security” requirements to operational incident handling."
+      },
+      {
+        "id": "price-only-recommendation",
+        "requirement": "Recommends selecting a carrier based primarily on premium cost without analyzing coverage adequacy for the stated regulatory exposure",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response emphasizes scrutinizing regulatory fine coverage, sublimits, exclusions, and incident response terms, and it advises reviewing policy schedules and endorsements with a broker. It discusses premium drivers but does not recommend choosing a carrier primarily based on lowest premium without assessing coverage adequacy for PCI/HIPAA exposure."
+      },
+      {
+        "id": "undifferentiated-carriers",
+        "requirement": "Treats all three carriers as functionally interchangeable without explaining differences in coverage, service, or suitability for the user's profile",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly distinguishes Chubb, Coalition, and Cowbell on sublimit structures, incident-response delivery models and response times, exclusions (e.g., Chubb’s patch window vs others’ minimum-security framing), and insurer-specific premium drivers/underwriting approaches. It does not present them as interchangeable and includes suitability-relevant differences for the user’s PCI/HIPAA e-commerce profile."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "insurance-terminology-precision",
+        "requirement": "Uses precise insurance terminology - sub-limits, aggregate, insuring clauses, breach response costs, or panel vendors",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses precise insurance terminology throughout, including repeated references to sublimits, aggregate limits, defense costs eroding limits, endorsements, and panel/preferred vendors for incident response services."
+      },
+      {
+        "id": "structured-comparative-format",
+        "requirement": "Organizes information with clear sections, headings, or tables to facilitate carrier-by-carrier comparison",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized with clear numbered sections and headings, and within each section it breaks out carrier-specific subsections for Chubb, Coalition, and Cowbell, enabling carrier-by-carrier comparison."
+      },
+      {
+        "id": "professional-advisory-tone",
+        "requirement": "Maintains professional business advisory tone without marketing language or unsupported claims",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a formal, advisory structure with cautious qualifiers (e.g., “policy-specific,” “where legally insurable,” “broker confirmation required”) and avoids overt promotional phrasing. It generally refrains from absolute guarantees and frames carrier differences as conditional on policy language and endorsements."
+      },
+      {
+        "id": "recommendation-prominent",
+        "requirement": "Places carrier recommendation or ranking in opening summary or clearly marked conclusion, not buried in middle sections",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a clearly marked “Conclusion” section near the end that summarizes differences and provides a recommendation, making the carrier guidance easy to find rather than buried in the middle."
+      },
+      {
+        "id": "buried-exclusion-warnings",
+        "requirement": "Buries critical exclusion warnings or coverage gaps within general discussion rather than highlighting them with distinct formatting or emphasis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response lists exclusions in a dedicated section (“Key Policy Exclusions Relevant to E-Commerce”) with bullet points and also reiterates exclusions in the conclusion, rather than burying them inside general narrative. It does not hide coverage gaps; it calls out sublimits, insurability limits, and lack of formal SLAs explicitly."
+      },
+      {
+        "id": "filler-padding",
+        "requirement": "Pads response with generic advisory clichés or repeated conclusions without adding carrier-specific substantive analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response includes some generic advisory language and a repeated summary/conclusion section (e.g., “Critical Recommendation: Engage an experienced cyber insurance broker…”), but most of the content is carrier-specific and substantively compares sublimits, SLAs, exclusions, and premium drivers. It is not predominantly padded with clichés or repeated conclusions."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "references-carrier-official-materials",
+        "requirement": "References carrier policy forms, coverage guides, official websites, or published service descriptions for at least 2 of the 3 carriers",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites official/published carrier materials for at least two carriers, including Chubb policy guides/official pages and Coalition coverages/industry pages (and also Cowbell product overviews and claims services). These references meet the requirement to use carrier policy forms, coverage guides, official websites, or published service descriptions."
+      },
+      {
+        "id": "cites-industry-pricing-data",
+        "requirement": "References industry market reports, broker pricing benchmarks, or insurance market surveys for premium range estimates",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites external sources such as MoneyGeek’s cyber insurance requirements guide and a cyber insurance statistics report, and it provides a premium range estimate tied to those references, which functions as an industry market survey/benchmark."
+      },
+      {
+        "id": "documents-response-time-claims",
+        "requirement": "References carrier case studies, claims reports, or published service-level metrics when stating specific response times or breach handling performance",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites published sources when giving specific response-time claims, such as Coalition’s “average real-world claims response time of five minutes” linked to a Coalition incident response blog and Cowbell’s response references linked to a claims report and claims-services page."
+      },
+      {
+        "id": "carrier-self-reports-only",
+        "requirement": "Cites only carrier marketing materials or self-reported metrics as sole evidence for claims handling performance without independent case references",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly supports claims-handling performance and SLAs using carrier materials and self-reported metrics (e.g., Coalition blog for “5 minutes,” Cowbell claims report, Chubb marketing pages) without providing independent case references beyond a single court article about limits rather than performance."
+      },
+      {
+        "id": "anecdotal-claims-evidence",
+        "requirement": "Treats Reddit posts, forum comments, or individual anecdotes as authoritative evidence for claims handling quality or carrier reliability",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites insurer documents, product pages, and trade/guide sources, but it does not rely on Reddit posts, forum comments, or individual anecdotes as authoritative evidence for claims handling quality or carrier reliability."
+      }
+    ]
+  }
+}

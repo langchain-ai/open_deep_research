@@ -1,0 +1,365 @@
+{
+  "task_id": "task_006",
+  "domain": "Personalized Assistant",
+  "report_file": "task_006_v1.md",
+  "summary": {
+    "total_criteria": 40,
+    "positive_criteria": 36,
+    "negative_criteria": 4,
+    "correctly_handled": 15,
+    "pass_rate": 37.5,
+    "normalized_score": 29.68,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 23,
+        "correctly_handled": 7,
+        "normalized_score": 26.09
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 1,
+        "normalized_score": 0.0
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 4,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 4,
+        "correctly_handled": 3,
+        "normalized_score": 61.9
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "ontario-marginal-rate-95k",
+        "requirement": "States combined federal+Ontario marginal tax rate at $95k income is 31%-32% or identifies bracket approximately $93k-$106k",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says the combined federal+Ontario marginal rate at $95,000 “hover around 31-38%,” but it does not state the narrower 31–32% range or identify the bracket as approximately $93k–$106k. The required specific marginal-rate range or bracket identification is missing."
+      },
+      {
+        "id": "rrsp-deduction-value",
+        "requirement": "Calculates $1,000 RRSP contribution saves approximately $310-$320 in tax at 31%-32% marginal rate",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Ontario marginal tax rates and notes RRSP contributions provide tax savings, but it never calculates or states that a $1,000 RRSP contribution saves about $310–$320 at a 31%–32% marginal rate. No explicit per-$1,000 tax-savings example or the 31%–32% range is provided."
+      },
+      {
+        "id": "rrsp-2025-dollar-limit",
+        "requirement": "States 2025 RRSP annual dollar limit is $32,490",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses RRSPs, RESPs, and savings allocations but never states the 2025 RRSP annual dollar limit or the specific figure $32,490. The required explicit statement about the 2025 RRSP limit is missing."
+      },
+      {
+        "id": "rrsp-18-percent-formula",
+        "requirement": "States RRSP contribution room is 18% of prior year earned income (lesser of percentage or dollar limit plus carry-forward)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses spousal vs. individual RRSPs and notes that both use the contributor’s available contribution room, but it never states the specific RRSP contribution room formula (18% of prior-year earned income, limited by the annual dollar cap, plus carry-forward). The required “18% of prior year earned income (lesser of percentage or dollar limit plus carry-forward)” element is absent."
+      },
+      {
+        "id": "rrsp-room-calculation-95k",
+        "requirement": "Calculates 18% of $95,000 yields approximately $17,000-$17,100 in new RRSP contribution room",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response never computes 18% of $95,000 or states that it equals roughly $17,000–$17,100 of new RRSP contribution room. It discusses RRSP contribution targets and tax rates but omits the specific 18% calculation and resulting dollar range."
+      },
+      {
+        "id": "cesg-basic-grant-rate",
+        "requirement": "States CESG provides 20% grant on first $2,500 contributed per child per year",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that the CESG matches 20% of annual RESP contributions up to $2,500 per beneficiary per year, which implies a 20% grant on the first $2,500 contributed per child per year."
+      },
+      {
+        "id": "cesg-annual-maximum",
+        "requirement": "States CESG annual maximum is $500 per child per year",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that the CESG provides a maximum annual grant of $500, based on 20% of up to $2,500 contributed per beneficiary per year."
+      },
+      {
+        "id": "cesg-lifetime-maximum",
+        "requirement": "States CESG lifetime maximum is $7,200 per child",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states: “Lifetime CESG maximum per child is $7,200,” satisfying the requirement to state the CESG lifetime maximum is $7,200 per child."
+      },
+      {
+        "id": "cesg-catchup-mechanism",
+        "requirement": "Explains $5,000 contribution per child in one year can capture up to $1,000 CESG when unused grant room carried forward",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that CESG catch-up is limited to $5,000 annually and implies this can recapture carried-forward CESG, but it does not explicitly explain that a $5,000 contribution per child in one year can generate up to $1,000 of CESG due to unused grant room. It also incorrectly references $5,500 and does not clearly tie the $5,000 amount to the $1,000 CESG outcome."
+      },
+      {
+        "id": "cesg-age-16-17-eligibility",
+        "requirement": "States to receive CESG at ages 16-17 must have contributed either $2,000 before year child turned 15 OR $100 in any four prior years",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses CESG basics, annual limits, lifetime maximums, and catch-up contribution limits, but it does not state the specific rule that to receive CESG at ages 16–17 the child must have had either $2,000 contributed before turning 15 or $100 contributed in any four prior years. That exact eligibility condition is missing."
+      },
+      {
+        "id": "resp-lifetime-contribution-limit",
+        "requirement": "States RESP lifetime contribution limit is $50,000 per beneficiary",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states: “RESP lifetime contribution limit per child is $50,000,” which matches the required lifetime contribution limit per beneficiary."
+      },
+      {
+        "id": "resp-cesg-qualifying-amount",
+        "requirement": "Identifies $36,000 in contributions needed to maximize $7,200 CESG (since $7,200 divided by 20% equals $36,000)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explains CESG basics (20% match and $7,200 lifetime maximum) but never calculates or states that $36,000 of contributions are needed to maximize the $7,200 CESG. It also does not include the explicit equation $7,200 ÷ 20% = $36,000."
+      },
+      {
+        "id": "resp-non-grant-room",
+        "requirement": "Notes up to $14,000 additional contribution per child ($50,000 lifetime minus $36,000 for CESG) earns tax-deferred growth without additional grant",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes the $50,000 lifetime RESP contribution limit and the $7,200 lifetime CESG maximum, but it does not state that up to $14,000 additional contribution per child ($50,000 minus $36,000 CESG-eligible contributions) earns tax-deferred growth without additional grant. It also never mentions the $36,000 CESG-eligible contribution amount or explicitly frames the remaining $14,000 as grant-ineligible but tax-deferred."
+      },
+      {
+        "id": "spousal-rrsp-deduction-timing",
+        "requirement": "States contributor claims RRSP deduction immediately at their marginal rate whether contribution goes to own RRSP or spousal RRSP",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says the contributor claims the spousal RRSP deduction at the contributor’s higher marginal rate, but it does not explicitly state that the deduction is immediate and at the contributor’s marginal rate in both cases (own RRSP and spousal RRSP). It also doesn’t clearly assert equivalence of the deduction treatment between individual and spousal RRSP contributions."
+      },
+      {
+        "id": "spousal-rrsp-ownership-withdrawal",
+        "requirement": "Explains spousal RRSP account is owned by spouse and withdrawals after attribution period are taxed to spouse not contributor",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that a spousal RRSP is contributed to by one spouse but owned by the other (the annuitant), and it notes the 3-year attribution rule where withdrawals within three years are taxed to the contributor, implying that after the attribution period withdrawals are taxed in the annuitant/spouse’s hands."
+      },
+      {
+        "id": "spousal-rrsp-attribution-rule",
+        "requirement": "States spousal RRSP 3-calendar-year attribution rule (withdrawal in contribution year or following 2 calendar years attributed back to contributor)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions the 3-year attribution rule but does not state the specific spousal RRSP attribution detail that withdrawals in the contribution year or the following two calendar years are attributed back to the contributor."
+      },
+      {
+        "id": "spousal-rrsp-rrif-exception",
+        "requirement": "Notes minimum RRIF payments from spousal account are exempt from attribution (only excess over minimum can be attributed back)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions the 3-year attribution rule for spousal RRSP withdrawals but does not note the specific exception that minimum RRIF payments from a spousal account are exempt from attribution (only amounts above the minimum can be attributed). This exemption is not discussed anywhere in the spousal RRSP/RRIF section."
+      },
+      {
+        "id": "spousal-rrsp-income-splitting-benefit",
+        "requirement": "Explains spousal RRSP creates income-splitting opportunity if spouse expected to be in lower tax bracket during retirement",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that contributing to a spousal RRSP can allow the higher-income spouse to claim the deduction now while withdrawals are taxed to the lower-income spouse in retirement, creating an income-splitting opportunity if the spouse is in a lower tax bracket."
+      },
+      {
+        "id": "tfsa-2025-annual-limit",
+        "requirement": "States 2025 TFSA annual contribution limit is $7,000",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses TFSA use and contribution limits generally but never states the 2025 TFSA annual contribution limit or the specific figure of $7,000. The required explicit statement about the 2025 limit is missing."
+      },
+      {
+        "id": "tfsa-withdrawal-tax-treatment",
+        "requirement": "States TFSA withdrawals are tax-free and do not affect income-tested benefits",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes TFSA interest/growth is tax-free and mentions easy access, but it does not state that TFSA withdrawals are tax-free nor that withdrawals do not affect income-tested benefits. It never addresses the impact of TFSA withdrawals on benefits such as CCB/GIS or other income-tested programs."
+      },
+      {
+        "id": "tfsa-recontribution-timing",
+        "requirement": "Explains withdrawn amount from TFSA is added back to contribution room on January 1 of following calendar year",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses TFSA liquidity and withdrawals generally but never states that TFSA withdrawals are added back to contribution room on January 1 of the following calendar year. This specific TFSA recontribution timing rule is not mentioned anywhere in the response."
+      },
+      {
+        "id": "two-children-resp-calculation",
+        "requirement": "Calculates $2,500 per child equals $5,000 total annual RESP contribution for two children to maximize $1,000 combined annual CESG",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that CESG is maximized at $2,500 per child per year and later recommends $417/month ($5,000 annually) for two children, but it does not explicitly calculate “$2,500 per child equals $5,000 total annual RESP contribution” in the context of maximizing a “$1,000 combined annual CESG.” It also never states the combined CESG as $1,000."
+      },
+      {
+        "id": "wrong-marginal-rate",
+        "requirement": "States combined marginal rate at $95k income is 37% or higher without clarifying this applies only to income above approximately $109k",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response gives a marginal-rate range of “31–38%” at $95,000 income but does not state that the combined marginal rate at $95k is 37% or higher. It also does not assert 37%+ at $95k without clarifying it applies only above about $109k."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "next-bracket-threshold-identification",
+        "requirement": "Identifies income threshold of approximately $106,000 where marginal rate increases above current 31-32% bracket to 33.89%",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Ontario marginal tax rates at $95,000 only in broad terms (\"31-38%\") and does not identify an income threshold around $106,000 where the marginal rate rises above the 31–32% bracket to 33.89%. It never mentions $106,000 or the specific 33.89% marginal rate. Therefore the required threshold detail is missing."
+      },
+      {
+        "id": "non-cesg-resp-capacity-calculation",
+        "requirement": "Calculates $14,000 non-CESG contribution capacity per child by subtracting $36,000 CESG-eligible from $50,000 lifetime limit",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions the $50,000 RESP lifetime contribution limit and discusses CESG eligibility, but it never calculates a $14,000 non-CESG contribution capacity per child or performs the subtraction of $36,000 from $50,000. The specific computation and resulting figure are absent."
+      },
+      {
+        "id": "age-15-threshold-contextualization",
+        "requirement": "Connects $2,000-before-age-15 RESP requirement to children's current ages of 8 and 11 to avoid losing 16-17 grants",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explains CESG limits and notes grants are available until age 17, but it does not connect the specific “$2,000 before age 15” requirement to the children being 8 and 11 or explicitly frame it as necessary to avoid losing 16–17 grants. It also never mentions the $2,000-before-15 rule at all."
+      },
+      {
+        "id": "concrete-monthly-allocation-targets",
+        "requirement": "Provides specific monthly dollar contribution amounts for RESP RRSP and TFSA accounts (e.g. $417/month for two-child RESP)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives specific monthly dollar contribution amounts for RESP ($417/month total, $208/month per child) and RRSP (~$1,000/month). It does not provide a specific monthly dollar amount for TFSA contributions, describing it only as “remaining savings” or “variable.”"
+      },
+      {
+        "id": "spousal-rrsp-income-parity-analysis",
+        "requirement": "Analyzes that spousal RRSP provides minimal benefit when spouses expected to have similar retirement income levels",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response says a spousal RRSP is beneficial if the spouse’s income is lower and notes that if the spouse has comparable or higher income, an individual RRSP is “similarly effective.” However, it does not analyze or state that a spousal RRSP provides minimal benefit specifically when spouses are expected to have similar retirement income levels."
+      },
+      {
+        "id": "tfsa-room-restoration-cash-flow-link",
+        "requirement": "Explains TFSA room restoration on January 1 enables withdrawal during slow months and recontribution when cash flow improves",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends holding the emergency fund in a TFSA for liquidity but does not explain that TFSA contribution room is restored on January 1 after a withdrawal, enabling withdrawals during slow months and recontributions when cash flow improves. It also does not connect this restoration feature to managing irregular income timing."
+      },
+      {
+        "id": "prior-year-income-rrsp-room-connection",
+        "requirement": "Connects 2025 RRSP contribution room calculation to 2024 earned income (approximately $17,100 from $95,000 at 18%)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses RRSP deductions and contribution targets but never ties 2025 RRSP contribution room to 2024 earned income using the 18% formula. It does not compute or mention that $95,000 × 18% is approximately $17,100, nor explicitly connect that to 2025 room."
+      },
+      {
+        "id": "ignores-liquidity-constraint",
+        "requirement": "Recommends maximizing registered account contributions without addressing the stated 6-month emergency fund liquidity requirement",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly emphasizes maintaining a 6-month emergency fund and even states to prioritize building it before maximizing RRSP contributions. It recommends RESP and RRSP contributions only within a framework that preserves liquidity (e.g., holding the emergency fund in a TFSA HISA). It does not recommend maximizing registered contributions while ignoring the liquidity requirement."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "canadian-tax-terminology-precision",
+        "requirement": "Uses precise Canadian tax terms (RRSP RESP TFSA CESG RRIF attribution marginal rate) without generic language",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses multiple precise Canadian tax terms, including RRSP, spousal RRSP, RESP, CESG, TFSA, attribution (3-year attribution rule), and marginal tax rates in Ontario. These terms are used in context rather than relying only on generic language."
+      },
+      {
+        "id": "structured-financial-presentation",
+        "requirement": "Organizes multi-account strategy with headings numbered sections or tables for clarity",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response is organized with numbered section headings (e.g., sections 1–4 with subsections like 1.1, 2.1) and includes a table for the monthly savings flow, providing clear multi-account strategy structure."
+      },
+      {
+        "id": "professional-advisory-tone",
+        "requirement": "Maintains professional financial planning tone without product sales marketing language or vague recommendations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a structured, advisory financial planning tone with specific allocations, tax considerations, and account mechanics. It avoids promotional product language and largely provides concrete guidance rather than vague platitudes."
+      },
+      {
+        "id": "clear-strategy-recommendation",
+        "requirement": "States a definitive recommended strategy for the RRSP-RESP-TFSA allocation question rather than only listing options",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives a clear recommended allocation strategy (tax reserves first, then steady RESP to maximize CESG, then RRSP contributions, then TFSA with emergency fund in TFSA) and also recommends a hybrid RESP approach plus spousal RRSP when spouse income is lower. It goes beyond listing options by prescribing priorities and example monthly amounts."
+      },
+      {
+        "id": "over-explains-basics",
+        "requirement": "Explains fundamental concepts like what an RRSP or TFSA is to a financially sophisticated asker who already understands these accounts",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response includes basic definitional overviews such as “Overview of RRSPs and Spousal RRSPs” and “CESG Basics,” explaining what these accounts/grants are rather than assuming sophistication. It also explains TFSA usage at a high level (e.g., “Use the TFSA as a flexible, tax-free growth vehicle”)."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-cra-official-sources",
+        "requirement": "Cites canada.ca (Canada Revenue Agency) for RRSP RESP TFSA rules contribution limits and program details",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response cites a Canada.ca (CRA) page for spousal RRSP contributions, but it does not cite Canada.ca for RESP CESG rules, RESP contribution limits, or TFSA rules/limits/program details. Those sections rely on non-CRA sources (e.g., Invested MD, Canvas Wealth, TD, Kaleido) instead of Canada.ca."
+      },
+      {
+        "id": "cites-ontario-marginal-rates-source",
+        "requirement": "References authoritative source for 2025 Ontario marginal tax rates (accounting firms provincial budget documents or established Canadian tax sites)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites an authoritative Canadian tax source for Ontario marginal tax rates via a major accounting firm publication (Richter LLP “2024 Ontario Tax Rates Publication”) and includes other established Canadian finance/tax sites in the sources list."
+      },
+      {
+        "id": "cites-spousal-rrsp-attribution-source",
+        "requirement": "Cites authoritative Canadian tax resource for spousal RRSP attribution rules and timing (e.g. taxtips.ca major accounting firms or CRA publications)",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites an authoritative Canadian tax resource for spousal RRSP attribution/timing by linking to a CRA publication (“Contributing to your spouse's or common-law partner's RRSPs - Canada.ca”), which covers the spousal RRSP rules including attribution considerations."
+      },
+      {
+        "id": "us-tax-sources",
+        "requirement": "Cites US tax authority sources (IRS.gov or US tax code provisions) as applicable to Canadian tax planning",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response cites only Canadian sources (Canada.ca/CRA) and private Canadian financial sites, and does not reference IRS.gov or any US tax code provisions in its recommendations."
+      }
+    ]
+  }
+}

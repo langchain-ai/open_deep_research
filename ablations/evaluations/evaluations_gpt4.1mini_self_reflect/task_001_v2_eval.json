@@ -1,0 +1,469 @@
+{
+  "task_id": "task_001",
+  "domain": "Academic",
+  "report_file": "task_001_v2.md",
+  "summary": {
+    "total_criteria": 53,
+    "positive_criteria": 48,
+    "negative_criteria": 5,
+    "correctly_handled": 32,
+    "pass_rate": 60.38,
+    "normalized_score": 54.36,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 31,
+        "correctly_handled": 16,
+        "normalized_score": 52.86
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 9,
+        "correctly_handled": 7,
+        "normalized_score": 71.43
+      },
+      "presentation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 33.33
+      },
+      "citation-quality": {
+        "total": 8,
+        "correctly_handled": 6,
+        "normalized_score": 57.14
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "twfe-variance-weighted-decomposition",
+        "requirement": "States TWFE coefficient is variance-weighted average of all 2×2 DiD contrasts including forbidden comparisons using already-treated as controls",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that the TWFE coefficient can be decomposed into a weighted average of all two-group, two-period DiD estimators and explicitly notes inclusion of “forbidden comparisons” where earlier-treated groups serve as controls for later-treated groups."
+      },
+      {
+        "id": "twfe-negative-weights-under-heterogeneity",
+        "requirement": "Explains TWFE produces negative or non-convex weights when treatment effects are heterogeneous across cohorts or time",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that under heterogeneous or dynamic treatment effects, TWFE assigns negative/non-convex weights to some group-time comparisons, causing certain contrasts to subtract from the overall estimate and potentially reversing signs."
+      },
+      {
+        "id": "twfe-wrong-sign-bias",
+        "requirement": "Notes TWFE can produce biased estimates or wrong-sign results even when all true effects have same sign",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that under staggered adoption with heterogeneous/dynamic effects, TWFE can assign negative weights and yield counterintuitive estimates, including reversing sign relative to all underlying effects (\"even reversing sign relative to all underlying effects\")."
+      },
+      {
+        "id": "cs-att-gt-estimation",
+        "requirement": "States Callaway-Sant'Anna estimates group-time average treatment effects ATT(g,t) for each cohort g in each period t",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that Callaway and Sant'Anna estimate group-time average treatment effects ATT(g,t), defined for units first treated in period g and evaluated at time t, i.e., for each cohort g in each period t."
+      },
+      {
+        "id": "cs-clean-controls-then-aggregate",
+        "requirement": "Explains CS uses only clean controls (never-treated or not-yet-treated) for each ATT(g,t) estimate then aggregates flexibly",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that Callaway and Sant’Anna estimate cohort-time ATT(g,t) using only never-treated or not-yet-treated units as controls and then summarizes these ATT(g,t) via flexible aggregation schemes (overall, event-study, calendar-time)."
+      },
+      {
+        "id": "cs-aggregation-flexibility",
+        "requirement": "Notes CS allows flexible aggregation to overall ATT, event-study paths, cohort-specific effects, or calendar-time averages",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that Callaway and Sant’Anna estimate cohort-time ATT(g,t) and allow flexible aggregation into overall average effects, event-study (dynamic) paths, cohort-specific effects, and calendar-time specific parameters."
+      },
+      {
+        "id": "cs-cohort-specific-parallel-trends",
+        "requirement": "Specifies CS requires cohort-specific parallel trends relative to chosen control set",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes CS estimates cohort-specific ATT(g,t) and discusses conditional parallel trends, but it does not explicitly state that CS requires cohort-specific parallel trends relative to the chosen control set (e.g., never-treated or not-yet-treated). The required linkage between cohort-specific trends and the selected control group is not clearly specified."
+      },
+      {
+        "id": "cs-anticipation-windows",
+        "requirement": "States CS allows explicit anticipation windows where pre-specified periods can be dropped or excluded from control",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that Callaway and Sant’Anna assume limited/no anticipation and mentions sensitivity analyses for anticipation, but it does not state that CS allows explicit anticipation windows where pre-specified periods are dropped/excluded from the control group. There is no description of an explicit “anticipation window” parameter or dropping specific pre-treatment periods from controls."
+      },
+      {
+        "id": "cs-software-r-stata",
+        "requirement": "Names R package 'did' or Stata command 'csdid' for Callaway-Sant'Anna implementation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly names the R package ‘did’ as the software implementation for Callaway and Sant’Anna’s method in the “Empirical Software” bullet and again in the software availability discussion."
+      },
+      {
+        "id": "sa-cohort-eventtime-interactions",
+        "requirement": "States Sun-Abraham interacts cohort indicators with relative event-time dummies using cohort-share weights",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes Sun and Abraham as using interaction terms between cohort and event-time indicators, but it does not state that cohort indicators are interacted with relative event-time dummies using cohort-share weights. It mentions “interaction-weighted” and “non-negative weights” without specifying cohort-share weighting."
+      },
+      {
+        "id": "sa-clean-control-avoids-contamination",
+        "requirement": "Explains SA uses clean controls (never-treated or last-treated) and non-negative weights to avoid contamination from already-treated",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "In the Sun and Abraham section, the response states that SA compares treated groups only to never-treated or last-treated groups and thereby avoids negative/contaminated weights by generating non-negative, interpretable weights, explicitly to prevent contamination from already-treated units."
+      },
+      {
+        "id": "sa-event-study-framework",
+        "requirement": "Notes SA produces explicit relative-time event-study framework with interpretable coefficients at each event time",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes Sun and Abraham’s interaction-weighted event-study as providing consistent, dynamic effects “at each relative event-time” and emphasizes “uncontaminated event-study estimates,” which implies an explicit relative-time event-study framework with interpretable coefficients by event time."
+      },
+      {
+        "id": "sa-familiar-ols-implementation",
+        "requirement": "States SA has intuitive OLS-based implementation or is common default for plotting dynamics",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes Sun and Abraham’s estimator as a regression-based, interaction-weighted event-study implemented via Stata (‘eventstudyinteract’) and emphasizes its practical use for dynamic effects, but it does not state that SA has an “intuitive OLS-based implementation” or that it is a “common default” specifically for plotting dynamics."
+      },
+      {
+        "id": "sa-software-implementations",
+        "requirement": "Names 'eventstudyinteract', 'sunab' in fixest, or similar package for Sun-Abraham",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly names the Stata package ‘eventstudyinteract’ and also mentions Sun and Abraham’s estimator availability in fixest via ‘sunab’ as an option for implementing Sun-Abraham-style event studies."
+      },
+      {
+        "id": "bjs-imputation-two-step",
+        "requirement": "Explains BJS estimates untreated outcome model using only untreated observations then imputes counterfactual Y(0) for treated units",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes BJS as imputing untreated potential outcomes for treated units using pre-treatment data from untreated/not-yet-treated units, but it does not state that the untreated outcome model is estimated using only untreated observations. It also does not explicitly say the model is fit on untreated observations and then used to impute counterfactual Y(0) for treated units."
+      },
+      {
+        "id": "bjs-individual-treatment-effects",
+        "requirement": "States BJS obtains individual treatment effects τit by subtracting imputed Y(0) from observed outcomes for treated observations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes BJS as imputing untreated potential outcomes and estimating treatment effects as residuals between observed outcomes and imputed counterfactuals. However, it does not explicitly state the specific construction of individual treatment effects τ_it as observed Y_it minus imputed Y_it(0) for treated observations. The required subtraction formula for τ_it is not stated."
+      },
+      {
+        "id": "bjs-additive-fixed-effects-assumption",
+        "requirement": "Notes BJS requires untreated potential outcomes follow additive unit and time fixed effects (stronger functional form than CS)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes BJS as imputing untreated potential outcomes via regression and notes it “requires correctly specified untreated outcome models,” but it does not state that BJS specifically requires untreated potential outcomes to follow an additive unit and time fixed-effects structure, nor that this is a stronger functional-form assumption than Callaway–Sant’Anna."
+      },
+      {
+        "id": "bjs-efficiency-from-pooling",
+        "requirement": "States BJS achieves efficiency gains by pooling all untreated observations including pre-treatment periods",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes BJS as imputing untreated potential outcomes using pre-treatment data from untreated/not-yet-treated units, but it does not state that BJS achieves efficiency gains by pooling all untreated observations including pre-treatment periods. The specific efficiency-gain mechanism of pooling all untreated observations (including pre-treatment periods) is not mentioned."
+      },
+      {
+        "id": "did2s-two-stage-mechanics",
+        "requirement": "Explains did2s estimates unit and time effects on untreated observations in stage 1 then regresses residualized outcomes on treatment in stage 2",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes Borusyak et al.’s imputation approach as imputing untreated potential outcomes and then estimating treatment effects as residuals, but it does not explicitly explain the did2s two-stage procedure of estimating unit and time effects using untreated observations in stage 1 and then regressing residualized outcomes on treatment in stage 2."
+      },
+      {
+        "id": "did2s-equivalence-to-imputation",
+        "requirement": "Notes did2s yields estimates equivalent to particular imputation scheme via two standard OLS steps",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response describes Borusyak et al.’s imputation estimator as “single-step OLS or multi-step regression imputation,” but it does not note that did2s yields estimates equivalent to a particular imputation scheme implemented via two standard OLS steps. It never mentions did2s or the specific two-step OLS equivalence to an imputation approach."
+      },
+      {
+        "id": "all-methods-allow-heterogeneity",
+        "requirement": "States all three methods (CS, SA, BJS) allow unrestricted treatment effect heterogeneity across cohorts and event time",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that CS “fully permit heterogeneous and dynamic treatment effects,” SA estimates “heterogeneous cohort-average dynamic effects,” and BJS allows “unit-level heterogeneity,” implying all three allow unrestricted heterogeneity across cohorts and event time."
+      },
+      {
+        "id": "roth-low-power-problem",
+        "requirement": "States Roth (2022) identifies low power where standard pre-trend tests fail to detect violations large enough to materially bias treatment effect estimates",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that Roth (2022) argues pre-trend tests can be underpowered and may fail to detect violations, but it does not specifically state that these undetected violations can be large enough to materially bias treatment effect estimates. The required link between low power and materially biased estimates is not explicitly made."
+      },
+      {
+        "id": "roth-conditioning-bias-problem",
+        "requirement": "Explains Roth notes inference conditional on passing pre-trend tests creates selection bias and nominal confidence intervals may undercover",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Roth (2022) but does not explain Roth’s point that conditioning inference on passing pre-trend tests induces selection bias and can cause nominal confidence intervals to undercover. It mentions underpowered tests and simultaneous bands/sensitivity analyses, but omits the selection-on-significance/coverage problem."
+      },
+      {
+        "id": "sa-cleans-pretrend-contamination",
+        "requirement": "Notes SA cleans pre-period coefficients of cross-cohort contamination making nonzero leads more diagnostic of genuine violations",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not note that Sun and Abraham “cleans” pre-period (lead) coefficients of cross-cohort contamination, nor does it state that this makes nonzero leads more diagnostic of genuine violations. It only says SA yields “uncontaminated event-study estimates” and “more reliable pre-treatment confidence intervals,” without the specific lead-contamination/diagnostic point."
+      },
+      {
+        "id": "bjs-untreated-only-pretrend-test",
+        "requirement": "States BJS offers pre-trend test estimated on untreated observations only to reduce inference-after-pretest distortions",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state that BJS offers a pre-trend test estimated on untreated observations only, nor does it mention doing so to reduce “inference-after-pretest” distortions. It only says BJS allows “pre-trend diagnostics using imputed untreated paths,” which is different from an untreated-only pre-trend test and does not reference inference-after-pretest issues."
+      },
+      {
+        "id": "honest-did-sensitivity-bounds",
+        "requirement": "Discusses Rambachan-Roth honest DiD confidence sets or bounds valid under specified classes of parallel trends violations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly mentions Rambachan and Roth (2022) and states that Callaway and Sant’Anna can incorporate their “sensitivity analyses and bounding methods” to assess robustness to pre-trend deviations, i.e., honest DiD-style bounds under classes of parallel trends violations."
+      },
+      {
+        "id": "display-pretrends-without-gating",
+        "requirement": "Advises displaying pre-trend estimates but avoiding conditioning main inference on pass/fail tests",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses Roth (2022) and emphasizes using event-study graphs and simultaneous confidence intervals/sensitivity analyses, rather than relying on statistical insignificance of pre-trend tests. It characterizes pre-trend pass/fail testing as insufficient and recommends richer diagnostics and robustness checks instead of conditioning main inference on those tests."
+      },
+      {
+        "id": "adoption-2020-2021-awareness",
+        "requirement": "States 2020-2021 period showed awareness of Goodman-Bacon critique with TWFE kept but scrutinized",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly says TWFE remains prevalent in 2020–2024 but is increasingly accompanied by acknowledgments of Goodman-Bacon (2021) biases and use of alternative estimators/diagnostics, indicating awareness while keeping TWFE under scrutiny."
+      },
+      {
+        "id": "cs-labor-economics-adoption",
+        "requirement": "States CS is widely used in labor economics applications for transparency and flexible aggregation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes Callaway and Sant’Anna’s method as “widely used in applied work” and emphasizes “transparent aggregation” and “aggregation flexibility,” which matches the criterion’s focus on transparency and flexible aggregation in labor economics applications."
+      },
+      {
+        "id": "modal-triangulation-pattern",
+        "requirement": "Identifies modal practice as triangulation using SA for dynamic figures and CS or BJS for level effects",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that applied work often uses triangulation: it describes Sun and Abraham as the preferred approach for dynamic/event-study effects and Callaway–Sant’Anna or Borusyak–Jaravel–Spiess as dominant alternatives for overall/level effects, implying the modal practice of using SA for dynamics and CS/BJS for levels."
+      },
+      {
+        "id": "bacon-decomposition-as-diagnostic",
+        "requirement": "Mentions Goodman-Bacon decomposition as diagnostic tool to assess severity of forbidden comparisons",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly mentions “The Goodman-Bacon decomposition serves as a diagnostic to detect the contribution of problematic comparisons and negative weights,” linking it to assessing the severity of forbidden comparisons."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "conditional-estimator-selection-logic",
+        "requirement": "Provides if-then guidance for choosing estimators based on 3+ design features (never-treated, timing density, goal)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response compares CS, SA, and BJS and includes conditional guidance tied to multiple design features: availability of never-treated/not-yet-treated controls, emphasis on dynamic/event-study goals, and complexity of treatment timing/data structure (e.g., repeated cross-sections/multiple fixed effects). These are presented as cues for when each estimator is favored."
+      },
+      {
+        "id": "assumption-strength-hierarchy",
+        "requirement": "Ranks assumption strength across estimators (e.g., notes CS nonparametric PT is weaker than BJS additive FE functional form)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response compares assumptions across CS, SA, and BJS, explicitly noting differences in parallel trends and model dependence (e.g., CS conditional PT vs BJS requiring correct untreated-outcome model specification). This constitutes a ranking/contrast of assumption strength across estimators, including the example contrast between CS nonparametric PT and BJS functional-form reliance."
+      },
+      {
+        "id": "multiple-dominance-perspectives",
+        "requirement": "Presents 2+ competing views on estimator dominance or acknowledges no consensus and uncertainty about definitive bibliometric evidence",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response presents competing views by claiming Callaway & Sant’Anna is “dominant” while also noting Sun & Abraham is favored for dynamic event studies and Borusyak et al. is “gaining traction,” implying multiple approaches are used. It does not explicitly acknowledge uncertainty or lack of consensus, but it does provide 2+ competing perspectives on dominance."
+      },
+      {
+        "id": "temporal-adoption-evolution",
+        "requirement": "Traces practice evolution through 3+ time periods (2020-2021, 2022-2023, 2023-2024) noting specific changes in each phase",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses methodological developments generally and includes an adoption section labeled 2020–2024, but it does not trace practice evolution across three distinct phases (2020–2021, 2022–2023, 2023–2024) with specific changes in each. It lacks a period-by-period narrative of how applied usage shifted over those intervals."
+      },
+      {
+        "id": "mechanics-transparency-tradeoff",
+        "requirement": "Explains transparency vs efficiency trade-off (e.g., CS disaggregated ATT(g,t) display vs BJS pooling untreated observations)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses a transparency/efficiency tension by emphasizing CS’s explicit cohort-by-time ATT(g,t) estimation and aggregation (more transparent) versus BJS’s regression/imputation approach that pools untreated/not-yet-treated observations via an outcome model (more efficient but less directly disaggregated). This contrast is described in the method overviews and comparison table."
+      },
+      {
+        "id": "roth-concerns-integration",
+        "requirement": "Connects specific estimator features (SA contamination cleaning, BJS untreated-only tests) to addressing Roth's low-power or conditioning bias",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses SA avoiding contaminated weights and BJS providing alternative pre-trend diagnostics, but it does not explicitly connect SA “contamination cleaning” or BJS “untreated-only tests” to Roth’s specific concerns about low-powered pre-trend tests or conditioning bias. Roth is addressed generally (simultaneous bands, sensitivity/bounds) without tying these named estimator features to those particular Roth critiques."
+      },
+      {
+        "id": "strategic-triangulation-roles",
+        "requirement": "Assigns specific validation roles to multiple estimators (SA for dynamics, CS for transparency, BJS for efficiency) in reporting workflow",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly assigns roles to multiple estimators in the comparison table and surrounding text: Sun and Abraham (SA) is framed as focusing on dynamic/event-study effects, Callaway and Sant’Anna (CS) on transparent two-stage aggregation, and Borusyak-Jaravel-Spiess (BJS) on computational efficiency via imputation."
+      },
+      {
+        "id": "pretest-gating",
+        "requirement": "Recommends conditioning main inference on passing pre-trend tests without addressing low-power or conditioning bias concerns",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Roth’s (2022) critique by noting low power and that insignificant pre-trends don’t validate parallel trends, and it recommends sensitivity analyses and simultaneous confidence bands rather than conditioning identification on passing pre-trend tests. It does not advocate restricting inference to cases where pre-trend tests “pass” without addressing conditioning bias."
+      },
+      {
+        "id": "twfe-acceptable-heterogeneity",
+        "requirement": "States TWFE produces unbiased or reliable estimates when treatment effects are heterogeneous across cohorts or time",
+        "weight": -15,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response characterizes TWFE as biased under staggered adoption with heterogeneous/dynamic effects (e.g., negative weights, contamination bias) and says validity relies on parallel trends plus treatment-effect homogeneity. It does not claim TWFE produces unbiased or reliable estimates under heterogeneity; it argues the opposite."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "precise-econometric-terminology",
+        "requirement": "Uses exact econometric terminology (ATT, parallel trends, TWFE, cohort-specific effects) without simplifying for lay audiences",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly uses exact econometric terminology such as TWFE, ATT(g,t), parallel trends (conditional/unconditional), cohort-specific effects, and interaction-weighted estimators throughout, without translating these into lay explanations."
+      },
+      {
+        "id": "systematic-comparison-structure",
+        "requirement": "Uses systematic structure (numbered sections, headers, bullet points) for multi-method comparison",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses a clear systematic structure with a top-level title, multiple section headers (e.g., “Alternative Modern Estimators…”, “Comparative Analysis…”), bullet-pointed feature lists for each method, and a comparison table, which supports multi-method comparison."
+      },
+      {
+        "id": "balanced-perspectives-uncertainty",
+        "requirement": "Acknowledges competing methodological views or uncertainty without asserting false consensus",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly distinguishes among approaches and notes differing assumptions (e.g., conditional vs unconditional parallel trends, model-specification reliance, and anticipation handling) rather than claiming universal agreement. It also uses hedging language about journal “dominance” and adoption (e.g., “has become,” “gaining traction,” “somewhat less widespread”), indicating uncertainty rather than false consensus."
+      },
+      {
+        "id": "over-explains-basics",
+        "requirement": "Explains basic econometric concepts (what DiD is, what fixed effects are) that an applied economist would already know",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response includes basic explanations of DiD and TWFE/fixed-effects-style concepts (e.g., defining DiD as a causal technique and discussing two-way fixed effects and their issues) that an applied economist would typically already know, especially in the introduction and Goodman-Bacon critique sections."
+      },
+      {
+        "id": "repetitive",
+        "requirement": "Restates the same methodological points or recommendations multiple times without adding new technical detail",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly reiterates broad points like “avoiding forbidden comparisons/negative weights,” “no anticipation,” and “modern estimators address Roth via better diagnostics” across multiple sections (e.g., estimator descriptions, comparative table, conclusion) without adding new technical distinctions each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "cites-goodman-bacon-2021",
+        "requirement": "References Goodman-Bacon (2021) on TWFE decomposition in staggered adoption settings",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites Goodman-Bacon (2021) and describes the TWFE “decomposition” into weighted averages of 2x2 DiD comparisons with potentially negative weights in staggered adoption settings."
+      },
+      {
+        "id": "cites-callaway-santanna",
+        "requirement": "References Callaway and Sant'Anna methodology for group-time ATT estimation",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses “Callaway and Sant'Anna’s (2019, 2021) two-stage aggregation method” and describes estimating group-time average treatment effects ATT(g,t), which is the Callaway and Sant’Anna methodology for group-time ATT estimation."
+      },
+      {
+        "id": "cites-sun-abraham",
+        "requirement": "References Sun and Abraham interaction-weighted estimator",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses “Sun and Abraham’s (2020, 2021) interaction-weighted (IW) event-study estimator” and repeatedly refers to their “interaction-weighted event-study estimators.”"
+      },
+      {
+        "id": "cites-borusyak-et-al",
+        "requirement": "References Borusyak, Jaravel, and Spiess (BJS) imputation-based estimator",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly discusses “Borusyak, Jaravel, and Spiess’s (2021, 2024) imputation-based estimators” in its list of modern alternatives and includes a dedicated section titled “Borusyak, Jaravel, and Spiess’s Imputation-Based Estimators.”"
+      },
+      {
+        "id": "cites-roth-2022",
+        "requirement": "References Roth (2022) on low power and conditioning bias in pre-trend testing",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites Roth (2022) and discusses his points about low power and limitations of pre-trend testing, including conditioning/heterogeneity-related issues, and then explains how newer estimators address these concerns in the “Integration of Roth (2022) Critique” section."
+      },
+      {
+        "id": "cites-rambachan-roth-honest-did",
+        "requirement": "References Rambachan-Roth honest DiD sensitivity analysis methodology",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references “Rambachan and Roth (2022)” and describes their “bounded deviation sensitivity analyses” as a method for assessing robustness to pre-trend deviations and anticipation, including a citation in the sources list."
+      },
+      {
+        "id": "journal-adoption-evidence",
+        "requirement": "Discusses adoption patterns in econometrics journals (AER, QJE, JPE) for 2020-2024 period with field-specific examples",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions AER, QJE, and JPE and broadly claims adoption dominance, but it does not provide concrete 2020–2024 adoption patterns (e.g., counts/shares by journal) or field-specific examples from labor and health papers in those journals. It also lacks specific article-level illustrations showing which estimator was used in each field and period."
+      },
+      {
+        "id": "informal-methods-sources",
+        "requirement": "Cites blog posts, Twitter threads, or informal tutorials as primary sources for econometric methodology claims",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response includes informal sources in its references, such as a Substack post (“causalinf.substack.com”) and GitHub links for documentation/tutorial material, alongside formal papers. These are presented in the “Sources” list supporting methodological claims, which constitutes citing informal tutorials/blog-style content as primary sources."
+      }
+    ]
+  }
+}

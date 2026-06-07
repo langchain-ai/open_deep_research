@@ -1,0 +1,461 @@
+{
+  "task_id": "task_080",
+  "domain": "Finance",
+  "report_file": "task_080_v2.md",
+  "summary": {
+    "total_criteria": 52,
+    "positive_criteria": 48,
+    "negative_criteria": 4,
+    "correctly_handled": 28,
+    "pass_rate": 53.85,
+    "normalized_score": 46.6,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 32,
+        "correctly_handled": 14,
+        "normalized_score": 42.96
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 9,
+        "correctly_handled": 8,
+        "normalized_score": 87.5
+      },
+      "presentation-quality": {
+        "total": 7,
+        "correctly_handled": 3,
+        "normalized_score": 20.0
+      },
+      "citation-quality": {
+        "total": 4,
+        "correctly_handled": 3,
+        "normalized_score": 23.08
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "edelweiss-fund-structure",
+        "requirement": "Edelweiss Greater China invests about 96-97 percent, essentially its entire portfolio, in the JPMorgan Funds - Greater China Fund located in Luxembourg (SICAV).",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that the Edelweiss Greater China Equity Offshore Fund invests approximately 97.52% of its assets into the JPMorgan Funds - JF Greater China Equity Fund, described as a Luxembourg-domiciled SICAV, which matches the criterion’s 96–97% essentially-entire-portfolio claim."
+      },
+      {
+        "id": "edelweiss-jpm-share-classes",
+        "requirement": "States Edelweiss holds two JPM Greater China share classes (I2 and I) at approximately 53-54% and 43-44% respectively",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Edelweiss investing ~97.52% into the JPMorgan Greater China fund but does not state that Edelweiss holds two JPM Greater China share classes (I2 and I) nor does it provide the approximate 53–54% and 43–44% weights for those share classes."
+      },
+      {
+        "id": "edelweiss-sector-focus",
+        "requirement": "Identifies Edelweiss primary sectors as Technology, Consumer Discretionary, and Communication Services",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists Edelweiss sector allocation with Technology, Consumer Cyclical (not Consumer Discretionary), and Communication Services as top sectors. It does not explicitly identify the primary sectors as Technology, Consumer Discretionary, and Communication Services. Therefore the required sector trio is not stated as such."
+      },
+      {
+        "id": "edelweiss-underlying-holdings",
+        "requirement": "Mentions at least 4 of Edelweiss's typical underlying holdings (TSMC, Tencent, Alibaba, Meituan, PDD Holdings, AIA, Hong Kong Exchanges, NetEase, JD.com, Baidu)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response mentions multiple typical Edelweiss underlying holdings, including TSMC, Tencent, Alibaba, Meituan, PDD Holdings, NetEase, JD.com, and Baidu."
+      },
+      {
+        "id": "dsp-fund-structure",
+        "requirement": "States DSP Global Innovation is multi-manager or multi-vehicle FoF investing in basket of global funds and ETFs",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes DSP Global Innovation Overseas Equity Omni FOF as a fund-of-funds that invests through multiple underlying global funds and ETFs (e.g., BlueBox Global Technology Fund, iShares NASDAQ 100 UCITS ETF, Invesco NASDAQ-100 EW, KWEB), i.e., a multi-vehicle basket of global funds/ETFs."
+      },
+      {
+        "id": "dsp-bluebox-allocation",
+        "requirement": "States DSP holds BlueBox Global Technology Fund at ~37%",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states that DSP Global Innovation Overseas Equity Omni FOF holds the BlueBox Global Technology Fund at 38.75% (also described as 38.8%), which is approximately ~37%."
+      },
+      {
+        "id": "dsp-ishares-nasdaq-allocation",
+        "requirement": "States DSP holds iShares NASDAQ-100 UCITS ETF at ~27%",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that DSP holds iShares NASDAQ 100 UCITS ETF at 28.50%, not approximately 27%. It does not include any statement indicating a ~27% allocation to that ETF, so the required figure is missing."
+      },
+      {
+        "id": "dsp-kweb-allocation",
+        "requirement": "States DSP holds KraneShares CSI China Internet ETF (KWEB) at ~14-15%",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states DSP’s allocation to KWEB as about 11.16%/11.2%, not approximately 14–15%. It does not contain any statement that DSP holds KWEB at ~14–15%, so the required allocation range is missing."
+      },
+      {
+        "id": "dsp-invesco-allocation",
+        "requirement": "States DSP holds Invesco NASDAQ-100 Equal Weight UCITS ETF at ~11.6-11.8%",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that DSP holds the Invesco NASDAQ-100 Equal Weight UCITS ETF at 12.26% (and elsewhere 12.3%), which is outside the required ~11.6–11.8% range. It does not mention an allocation in the ~11.6–11.8% band for this ETF. Therefore the specified percentage statement is not satisfied."
+      },
+      {
+        "id": "dsp-fidelity-medtech-allocation",
+        "requirement": "States DSP holds Fidelity Select Medical Technology & Devices at ~4.3-4.4%",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that DSP holds “Fidelity Select Medical Technology and Devices Portfolio” at 3.37% (and elsewhere 3.4%), not approximately 4.3–4.4%. Therefore, it does not include the required ~4.3–4.4% figure for this holding."
+      },
+      {
+        "id": "dsp-geographic-focus",
+        "requirement": "States DSP has a strong US/tech orientation with notable exposure to China internet via KWEB, but overall it is more globally diversified than purely US-centric",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response describes DSP as having majority U.S. exposure (about 55–70%) and being tech/innovation-heavy, while also noting a meaningful China internet sleeve via an ~11.2% allocation to KWEB. It also contrasts this with Edelweiss’ Greater China concentration and explicitly frames DSP as more diversified globally than a purely U.S.-centric portfolio."
+      },
+      {
+        "id": "dsp-sector-themes",
+        "requirement": "Identifies at least 3 DSP innovation themes (semiconductors, e-commerce, fintech, AI, biotech, internet/interactive media, aerospace)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies multiple DSP innovation themes, including semiconductors/technology, internet/interactive media (consumer internet), AI, and biotech/precision medicine."
+      },
+      {
+        "id": "overlap-direct-level",
+        "requirement": "States that at the fund share class level there is no direct overlap, but indirect overlap exists through DSP's KWEB exposure to underlying China internet stocks that are also in the Edelweiss fund",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response states there is no direct share-class overlap because Edelweiss holds individual Greater China equities while DSP is a fund-of-funds, and it explains indirect overlap via DSP’s KWEB allocation creating ~4% overlap in underlying China internet stocks (e.g., Tencent, Alibaba) also held by Edelweiss."
+      },
+      {
+        "id": "overlap-indirect-kweb",
+        "requirement": "Explains overlap occurs indirectly through DSP's KWEB allocation exposing to Chinese internet/tech stocks",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that overlap is largely indirect because DSP holds KWEB (about 11.2%), which itself holds Chinese internet/tech stocks like Alibaba and Tencent that are also in the Edelweiss Greater China portfolio, creating an estimated ~4% overlap."
+      },
+      {
+        "id": "overlap-quantification",
+        "requirement": "Provides calculation or quantification showing limited look-through overlap (e.g., DSP's effective exposure to common holdings is 1-2% or under 3%)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes a quantitative overlap estimate, but it concludes the total estimated overlap is ~3.9–4.4% of DSP NAV. This does not demonstrate “limited look-through overlap” at 1–2% or under 3% as required; it explicitly states overlap is around 4%."
+      },
+      {
+        "id": "overlap-common-names",
+        "requirement": "Names at least 3 common holdings through KWEB overlap (Alibaba, Tencent, PDD Holdings, Meituan, JD.com, Baidu, NetEase, Trip.com, Kuaishou)",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response names multiple common KWEB holdings, including Alibaba, Tencent, PDD Holdings, Meituan, NetEase, JD.com, and Baidu, satisfying the requirement to list at least three."
+      },
+      {
+        "id": "edelweiss-direct-ter",
+        "requirement": "States Edelweiss Direct plan TER as ~1.49%",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state Edelweiss Direct plan TER as ~1.49%. Instead, it reports Edelweiss Direct Plan TER as ~2.32% (and mentions other varying figures), so the required ~1.49% value is absent."
+      },
+      {
+        "id": "edelweiss-underlying-expense-component",
+        "requirement": "Notes Edelweiss TER includes underlying fund expense of approximately 0.7-0.8% or mentions double-layer fee structure",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that Edelweiss is a feeder into a JPMorgan Greater China fund and mentions the underlying fund has an ongoing charge of “0.92–1.81%,” but it does not state that Edelweiss TER includes an underlying expense of ~0.7–0.8% nor explicitly describe a double-layer fee structure for Edelweiss. The required 0.7–0.8% underlying-expense detail/double-layer framing is missing."
+      },
+      {
+        "id": "edelweiss-regular-ter",
+        "requirement": "States Edelweiss Regular plan TER as 2.35-2.45% (within range)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state the Edelweiss Regular plan TER as being in the 2.35–2.45% range. It instead gives “Regular Plan TER: 1.57% - 3.07% (varies by source)” and does not provide a specific regular-plan TER within 2.35–2.45%."
+      },
+      {
+        "id": "dsp-direct-ter",
+        "requirement": "States DSP Direct plan TER as ~1.15-1.20%",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states the DSP Global Innovation Overseas Equity Omni FOF Direct Plan TER as 1.08%, not approximately 1.15–1.20%. It does not provide any TER figure in the ~1.15–1.20% range for the DSP Direct plan. Therefore the required TER statement is missing."
+      },
+      {
+        "id": "dsp-regular-ter",
+        "requirement": "States DSP Regular plan TER as 2.00-2.10% (within range)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states the DSP Global Innovation Overseas Equity Omni FOF Regular Plan TER as 2.03%, not within the required 2.00–2.10% range. It does not provide any DSP Regular plan TER figure that falls between 2.00% and 2.10%."
+      },
+      {
+        "id": "edelweiss-2024-calendar-performance",
+        "requirement": "States Edelweiss 2024 calendar year return between 13-17% or ~15% or provides quarterly breakdown showing similar result",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state Edelweiss’s 2024 calendar-year return as being between 13–17% (or ~15%), and it explicitly says “Calendar 2024: Data not confirmed.” It also does not provide a quarterly 2024 breakdown that would imply a ~15% full-year result."
+      },
+      {
+        "id": "dsp-2024-calendar-performance",
+        "requirement": "States DSP 2024 calendar year return between 18-24% or ~20-22% or provides quarterly breakdown showing similar result",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state DSP’s 2024 calendar-year return in the 18–24% (or ~20–22%) range, nor does it provide a quarterly 2024 breakdown to imply such a result. It explicitly says “Calendar 2024: N/A (data not confirmed)” for DSP, so the required 2024 CY return information is missing."
+      },
+      {
+        "id": "edelweiss-3yr-return",
+        "requirement": "States Edelweiss 3-year CAGR between -10% to +10% OR notes negative to low-positive range",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides some return figures (e.g., 1-year return and since-inception CAGR) but does not state Edelweiss 3-year CAGR within -10% to +10% or explicitly describe it as being in a negative-to-low-positive range. It even lists the 3-year return as “Data not confirmed,” so the required 3-year CAGR range is not addressed."
+      },
+      {
+        "id": "edelweiss-5yr-return",
+        "requirement": "States Edelweiss 5-year CAGR between 1.5% to 3.5% OR notes weak or low single-digit returns",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state Edelweiss’s 5-year CAGR as being between 1.5% and 3.5%, nor does it characterize Edelweiss’s 5-year performance as weak or low single-digit returns. It mentions a prior report’s “+2.4% annualized” 5-year figure, but does not clearly present it as the Edelweiss 5-year CAGR as of December 2024 or explicitly label returns as weak/low single-digit."
+      },
+      {
+        "id": "dsp-launch-date-or-limited-history",
+        "requirement": "States DSP launched February 2022 OR notes fund has limited 3-year track record OR notes 5-year returns not available",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the DSP Global Innovation Overseas Equity Omni FOF was launched on February 14, 2022 in the fund overview section."
+      },
+      {
+        "id": "dsp-1yr-return-variability",
+        "requirement": "States DSP 1-year trailing return with range (10-35%) OR notes variability across sources",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states DSP’s 1-year return as “+43.96% to +44.00%” in the Historical Returns section, which falls within the required 10–35% range only if interpreted as a range requirement, but it does not provide a 10–35% range nor note variability across sources specifically for a 10–35% band."
+      },
+      {
+        "id": "dsp-3yr-availability-caveat",
+        "requirement": "Notes DSP 3-year trailing returns not fully available as of December 2024 OR may not exist until February 2025 OR cites limited availability",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides 3-year trailing returns for the DSP fund (e.g., “3-Year: +28.88% to +30.43%”) and does not note any limited availability or that 3-year returns were not fully available as of December 2024 or might not exist until February 2025."
+      },
+      {
+        "id": "return-data-source-variability",
+        "requirement": "Acknowledges return figures vary by source, measurement date, or Direct vs Regular plans",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes that figures vary by source (e.g., “There is significant variation across sources” for TER and “varies by source” for Sharpe ratio), and it distinguishes Direct vs Regular plan returns/TER in multiple tables."
+      },
+      {
+        "id": "both-very-high-risk",
+        "requirement": "States both funds are rated Very High Risk or notes both are high-volatility/high-risk funds",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly lists the Riskometer for both funds as “Very High” in their respective overview tables (sections 1.1 and 1.2), indicating both are rated Very High Risk."
+      },
+      {
+        "id": "edelweiss-exit-load",
+        "requirement": "States Edelweiss charges 1% exit load if redeemed within 90 days or within 3 months",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly lists Edelweiss fund “Exit Load: 1% if redeemed within 90 days; Nil after 90 days,” and repeats “1% if redeemed within 90 days” in the fee section."
+      },
+      {
+        "id": "dsp-no-exit-load",
+        "requirement": "States DSP has no exit load or zero exit load",
+        "weight": 6,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states for the DSP Global Innovation Overseas Equity Omni FOF that the “Exit Load” is “Nil” in multiple places, including the fund overview table and the fee comparison section."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "core-satellite-allocation-framework",
+        "requirement": "Provides graduated portfolio allocation strategy with specific percentages (e.g., DSP 75-90% core + Edelweiss 10-25% satellite for 5-year horizon)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides a combined portfolio allocation strategy, explicitly recommending a core/satellite split of 70–80% DSP Global Innovation Omni FOF and 20–30% Edelweiss Greater China, and also mentions alternative satellite ranges (10–20% and 20–30%) tied to longer-horizon positioning."
+      },
+      {
+        "id": "quantified-look-through-exposure-calculation",
+        "requirement": "Calculates effective exposure through fund layers (e.g., DSP 15% KWEB × KWEB 10% Tencent = 1.5% effective) showing mathematical precision",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses indirect overlap and provides estimated overlap percentages, but it does not explicitly calculate effective exposure through fund layers using precise multiplication examples (e.g., 11.2% KWEB × 9.44% Tencent = ~1.06%). The required layer-by-layer math demonstrating effective exposure is missing."
+      },
+      {
+        "id": "multi-category-risk-decomposition",
+        "requirement": "Identifies and explains 4+ distinct risk categories (country concentration, regulatory, geopolitical, sector, valuation, disruption, or similar)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains multiple distinct risk categories, including country/geographic concentration (single-country China/Taiwan exposure), regulatory risk (China crackdowns), geopolitical risk (US–China/Taiwan tensions), sector/concentration risk (heavy tech/Nasdaq concentration), and valuation risk (elevated US tech multiples vs China discount)."
+      },
+      {
+        "id": "causal-performance-attribution",
+        "requirement": "Explains root causes of performance divergence (China regulatory crackdown 2021-2023, property crisis, policy changes) not just results",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses underlying drivers of China-related performance, explicitly citing the 2021–2022 regulatory crackdown, ongoing regulatory uncertainty, and the property sector fragility/contagion risk as key factors affecting drawdowns and risk. It also provides broader policy-related catalysts (stimulus/support) for the subsequent rebound, going beyond reporting returns."
+      },
+      {
+        "id": "conditional-suitability-criteria",
+        "requirement": "Specifies 3+ conditions when Edelweiss becomes appropriate (China conviction, valuation reset belief, satellite-only use, multi-year drawdown tolerance)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response specifies multiple conditions under which Edelweiss is appropriate, including needing high conviction in Chinese equities, believing in attractive/“reset” valuations, using it as a tactical/satellite allocation rather than a core holding, and being able to tolerate extreme drawdowns/very high risk over multi-year horizons."
+      },
+      {
+        "id": "horizon-specific-multi-factor-justification",
+        "requirement": "Provides 4+ distinct factors for each horizon recommendation (geographic risk, momentum, concentration trade-offs, theme catalysts, volatility comparison)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "For the 2-year horizon, the response lists 5+ distinct factors (expenses, China momentum vs risk/geopolitics, volatility/drawdown comparison, exit-load/liquidity, risk-reward framing). For the 5-year horizon, it provides 6+ factors (return consistency, diversification/geographic risk, cost compounding, theme catalysts, management stability, China as component plus concentration concerns)."
+      },
+      {
+        "id": "secular-vs-cyclical-growth-distinction",
+        "requirement": "Distinguishes structural/secular growth drivers (innovation, AI, semiconductors) from recovery/cyclical opportunities (China normalization)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly contrasts secular/structural innovation drivers (AI, semiconductors, cloud, precision medicine) with China’s rebound framed as a comeback driven by normalization-style catalysts (stimulus, valuation discount, inflows), and uses this distinction in its horizon recommendations."
+      },
+      {
+        "id": "risk-adjusted-return-perspective",
+        "requirement": "References risk-adjusted returns, return per unit of risk, tracking error, or volatility-adjusted performance rather than absolute returns alone",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response discusses risk-adjusted performance using metrics like Sharpe ratio, standard deviation (volatility), and maximum drawdown, and explicitly cites “superior risk-adjusted returns” rather than only absolute returns."
+      },
+      {
+        "id": "undifferentiated-horizons",
+        "requirement": "Recommends the same fund for both 2-year and 5-year horizons without distinct rationale or acknowledging how risk profiles differ across timeframes",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response recommends DSP Global Innovation for both the 2-year and 5-year horizons, but it provides distinct rationales for each timeframe (e.g., 2-year focus on drawdown/exit load and 5-year focus on compounding/diversification and cost compounding). It also explicitly contrasts risk differences, noting Edelweiss as a higher-risk tactical/satellite option."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "structured-comparative-format",
+        "requirement": "Uses tables or comparison matrices with consistent columns to organize fund metrics, allocations, and returns side-by-side",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses multiple side-by-side tables with consistent columns (e.g., Metric/Value, Sector/Weight, Rank/Holding/Weight, fee and return comparison tables, and a final summary comparison table) to organize allocations, metrics, and returns across the two funds."
+      },
+      {
+        "id": "professional-investment-advisory-tone",
+        "requirement": "Maintains professional advisory tone using precise financial terminology without promotional language or speculation",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses a professional advisory tone with precise financial terminology (e.g., TER, AUM, benchmark, standard deviation, maximum drawdown, concentration, annualized returns). However, it includes speculative/promotional phrasing such as “China Momentum vs. Risk,” “more room to run,” “expected to unfold,” and “comeback story,” which violates the “without promotional language or speculation” requirement."
+      },
+      {
+        "id": "quantitative-data-precision",
+        "requirement": "Presents all quantitative metrics with units (%, CAGR, TER), time periods, and ranges consistently specified",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response frequently provides quantitative metrics with units and time frames (e.g., TER in %, returns in % over 1-year/3-year, allocations in %). However, it is not consistent: several figures are given as approximate ranges without clear period anchors (e.g., “US ~55–70%”), and key requested return periods “as of December 2024” are missing or replaced with May 2026 data."
+      },
+      {
+        "id": "horizon-specific-recommendations",
+        "requirement": "States clear recommendation for each investment horizon (2-year and 5-year) in distinct, labeled sections or paragraphs",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes distinct, labeled sections for both horizons: “8.2 Recommendation for a 2-Year Investment Horizon” and “8.3 Recommendation for a 5-Year Investment Horizon,” each stating which fund is more suitable and providing a clear verdict."
+      },
+      {
+        "id": "risk-disclosure-caveats",
+        "requirement": "Includes caveats about data limitations, past performance not guaranteeing future results, or recommendation to consult professional advisor",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses uncertainty and risks (e.g., “sustainability of this momentum is uncertain,” geopolitical/regulatory risks, and drawdown history) but does not include an explicit caveat that past performance doesn’t guarantee future results or a recommendation to consult a professional advisor."
+      },
+      {
+        "id": "narrative-dump",
+        "requirement": "Presents financial data and fund comparisons as prose paragraphs instead of structured tables or organized lists",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response primarily uses structured tables and organized bullet lists for metrics, allocations, holdings, fees, and returns (e.g., multiple Markdown tables in sections 1–5 and a summary comparison table). While it includes some explanatory prose, it does not present the financial data mainly as unstructured paragraphs."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same fund characteristic, comparison point, or recommendation multiple times using different wording without adding new analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly restates the same recommendations and comparisons (e.g., DSP is cheaper, lower drawdown/volatility, better for 2- and 5-year horizons; Edelweiss is a tactical/satellite China play) across the Executive Summary, Sections 8.2/8.3/8.4, the Summary Table, and the Conclusion with only minor rewording."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "portfolio-holdings-documentation",
+        "requirement": "References fund factsheets, official AMC portfolio disclosures, or AMFI regulatory data for allocation percentages and underlying holdings",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites official fund factsheets and disclosures for allocation and holdings, including the DSPIM Factsheet (April 2026) and the J.P. Morgan Asset Management Greater China fund factsheet, and uses these sources when stating portfolio weights and top holdings."
+      },
+      {
+        "id": "performance-expense-data-platforms",
+        "requirement": "References Value Research, Morningstar, or comparable mutual fund aggregator platforms for historical returns, expense ratios, and risk metrics",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites mutual fund aggregator platforms including Morningstar India and Value Research (and also Groww, Moneycontrol, Advisorkhoj, ET Money) as sources for returns, TER/expense ratios, and risk metrics like standard deviation and drawdown."
+      },
+      {
+        "id": "acknowledges-data-recency",
+        "requirement": "Notes data is as of December 2024 or specifies measurement period for performance and portfolio composition",
+        "weight": 3,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states the measurement date as “Data as of May 30, 2026” and repeatedly tags portfolio composition figures as “as of April 30, 2026,” thereby specifying the measurement period for performance and portfolio composition."
+      },
+      {
+        "id": "informal-sources",
+        "requirement": "Cites Reddit, YouTube influencers, or social media posts as sources for fund performance, allocation, or expense data",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites a YouTube source (“KraneShares Webinar” with a youtube.com link) in the Sources section and references it in the market context, using it as support for outlook/performance-related discussion."
+      }
+    ]
+  }
+}

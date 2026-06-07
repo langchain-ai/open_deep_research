@@ -1,0 +1,365 @@
+{
+  "task_id": "task_008",
+  "domain": "Shopping/Product Comparison",
+  "report_file": "task_008_v2.md",
+  "summary": {
+    "total_criteria": 40,
+    "positive_criteria": 36,
+    "negative_criteria": 4,
+    "correctly_handled": 25,
+    "pass_rate": 62.5,
+    "normalized_score": 59.01,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 22,
+        "correctly_handled": 14,
+        "normalized_score": 65.38
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 7,
+        "correctly_handled": 3,
+        "normalized_score": 33.33
+      },
+      "presentation-quality": {
+        "total": 6,
+        "correctly_handled": 5,
+        "normalized_score": 75.0
+      },
+      "citation-quality": {
+        "total": 5,
+        "correctly_handled": 3,
+        "normalized_score": 30.77
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "all-models-identified-with-capacities",
+        "requirement": "Identifies all 3 models - Bosch Serie 8 (WTX88M20AU/8kg or WTX88MH0AU/9kg), LG DVH9-09W (9kg), Samsung DV90T6240LH or AU alternative (9kg) - with their capacities",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response identifies Bosch Serie 8 WTX88M20AU as 8kg, LG DVH9-09W as 9kg, and Samsung DV90T6240LH as a 9kg model (not sold in Australia) while also listing Australian 9kg alternatives (e.g., DV91T6440LE). These cover all three requested models and their capacities."
+      },
+      {
+        "id": "energy-star-ratings-stated",
+        "requirement": "States energy star ratings (Bosch 8kg=10-star, Bosch 9kg=8-star, LG=9-star, or equivalent star ratings for AU models)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states Australian Energy Star ratings for Bosch WTX88M20AU as 10-star and LG DVH9-09W as 9-star, and it also provides 9-star ratings for Samsung Australian equivalents. It does not state a Bosch 9kg model as 8-star, but it does include equivalent AU star ratings for the compared models."
+      },
+      {
+        "id": "annual-kwh-from-au-labels",
+        "requirement": "States annual kWh consumption from AU energy labels (Bosch 8kg=98 kWh/yr, Bosch 9kg=145 kWh/yr, LG=129 kWh/yr within +/- 5 kWh)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states Bosch 8kg WTX88M20AU annual consumption as 98 kWh/yr and LG DVH9-09W as 129 kWh/yr. It does not state a Bosch 9kg annual kWh of 145 kWh/yr (±5); instead it gives Bosch 9kg WQG24201AU as 170 kWh/yr, which is outside the required range."
+      },
+      {
+        "id": "per-cycle-energy-figures",
+        "requirement": "Provides or calculates per-cycle energy consumption (e.g., Bosch 9kg ~2.8 kWh/cycle, LG ~2.5 kWh/cycle from label/52 weeks)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides per-cycle energy consumption by converting annual kWh (based on 52 cycles) into kWh/cycle in the energy table (e.g., Bosch WTX88M20AU 98 kWh/yr → 1.88 kWh/cycle; LG DVH9-09W 129 kWh/yr → 2.48 kWh/cycle; Bosch WQG24201AU 170 kWh/yr → 3.27 kWh/cycle)."
+      },
+      {
+        "id": "noise-levels-in-db",
+        "requirement": "States noise levels in dB(A) for models (Bosch ~62 dB, Samsung ~63 dB, LG ~60-65 dB or similar ranges)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states Bosch noise as 62 dB(A) and Samsung noise as 63 dB(A) (for DV90T6240LH) and 60 dBA (for DV90T8440SH). It explicitly says LG does not publish official dB(A) figures for the DVH9/DXH9 models, so it does not provide an LG dB(A) range like 60–65 dB."
+      },
+      {
+        "id": "samsung-au-registration-issue",
+        "requirement": "Flags DV90T6240LH as UK/EU model not officially sold in Australia and recommends AU-registered alternative (DV90/91T6440 series or similar AU model)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the Samsung DV90T6240LH is a UK/European-only model not sold in Australia and advises using Australian-market equivalents, including the DV91T6440LE and other DV90-series AU models."
+      },
+      {
+        "id": "victorian-electricity-rates",
+        "requirement": "Provides Victorian electricity rates in range 20-35 c/kWh or specific rate (e.g., 27.33 c/kWh CitiPower, 22 c/kWh, or 29-30 c/kWh range)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides Victorian Default Offer electricity rates including 35.80 c/kWh peak and 23.20 c/kWh off-peak, and also uses a blended 26–28 c/kWh rate for calculations. These values fall within the requested 20–35 c/kWh range."
+      },
+      {
+        "id": "veu-rebate-amount",
+        "requirement": "States Victorian Energy Upgrades rebate amount as approximately $70 (within +/- $20) per qualifying dryer",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states the Victorian Energy Upgrades rebate as “up to $120 cashback” and also mentions “$45 cashback,” but it never gives an approximate $70 per qualifying dryer. There is no rebate figure in the $50–$90 range presented as the typical/approximate amount."
+      },
+      {
+        "id": "street-prices-provided",
+        "requirement": "Provides approximate street prices for models (Bosch ~$2,000-2,400, LG ~$1,400-1,800, Samsung ~$1,200-1,800 or similar ranges)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides street pricing tables showing Bosch models around $1,200–$1,700, LG DVH9-09W around $1,455–$1,499, and Samsung models around $1,495–$1,595. These figures constitute approximate street prices and fall within ranges similar to those requested."
+      },
+      {
+        "id": "ten-year-tco-calculations",
+        "requirement": "Provides 10-year total cost of ownership calculations showing totals for each model (e.g., LG ~$4,000-4,500, Bosch ~$5,000-5,500, Samsung ~$3,000-3,500 or methodology yielding similar differentials)",
+        "weight": 20,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a 10-year total cost of ownership section with calculated 10-year totals for each compared model (e.g., LG ~$3,974–$4,074; Bosch ~$4,654–$4,854; Samsung ~$5,000–$5,300), showing the required differentials and methodology."
+      },
+      {
+        "id": "bosch-autocleen-condenser",
+        "requirement": "Specifies Bosch has AutoClean/SelfCleaning condenser requiring minimal user maintenance",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that the Bosch WTX88M20AU has a “Self-cleaning condenser” and describes it as requiring minimal maintenance (e.g., “cleans itself up to 4 times per cycle” and “self-cleaning condenser — low maintenance requirement”). This satisfies the requirement that Bosch has an AutoClean/SelfCleaning condenser needing minimal user maintenance."
+      },
+      {
+        "id": "lg-auto-cleaning-plus-filters",
+        "requirement": "Specifies LG has auto-cleaning condenser plus dual lint filters requiring routine cleaning",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states LG has an “Auto Cleaning Condenser” and a “Double Layer Air Filter,” and later instructs to clean the double-layer lint filter after every load. However, it does not explicitly specify that LG has dual lint filters requiring routine cleaning as a distinct point (i.e., “dual lint filters”), only “double layer air filter.”"
+      },
+      {
+        "id": "samsung-manual-heat-exchanger",
+        "requirement": "Specifies Samsung requires manual heat-exchanger cleaning periodically (e.g., monthly at high usage)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that Samsung heat pump dryers require periodic manual heat exchanger cleaning and gives a recommended frequency of at least once a month, noting heavier usage may require more frequent cleaning."
+      },
+      {
+        "id": "no-external-vent-required",
+        "requirement": "States heat-pump dryers are closed-loop condensing systems requiring no external vent",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that heat pump dryers are “fully self-condensing” and “require NO external venting,” and also describes them as “self-contained indoor appliances.” This directly matches the criterion that they are closed-loop condensing systems requiring no external vent."
+      },
+      {
+        "id": "standard-power-requirement",
+        "requirement": "States standard 10A outlet is sufficient for power supply",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states under “Electrical Requirements” that all models are compatible with standard Australian 10A circuits and that none require a 15A circuit, implying a standard 10A outlet is sufficient."
+      },
+      {
+        "id": "condensate-drain-plumbing",
+        "requirement": "Recommends plumbing condensate drain to waste to avoid tank emptying",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly recommends connecting the included drain hose for continuous drainage, stating it is “strongly recommended” to avoid manually emptying the water tank after every 1–2 loads."
+      },
+      {
+        "id": "choice-reliability-percentages",
+        "requirement": "States Choice reliability data with percentages (LG ~85-90%, Bosch ~75-80%, or heat-pump overall ~75-80%)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses CHOICE reliability only qualitatively (e.g., “Best Dryer Brand”) and does not provide any CHOICE reliability percentages for LG, Bosch, or heat-pump dryers overall. No numeric reliability ranges like LG ~85–90% or Bosch ~75–80% appear anywhere. Therefore the required percentage reliability data is missing."
+      },
+      {
+        "id": "warranty-terms-provided",
+        "requirement": "Provides warranty terms for models (Bosch 2 years, LG 2 years + 10-year motor/compressor parts, Samsung 2 years + long motor warranty)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides warranty terms for each brand: Bosch is stated as 2 years, LG as 2 years plus extended parts coverage on inverter compressor & motor, and Samsung as 2 years plus a 10-year motor warranty (limited parts). These satisfy the requested warranty-term comparisons for the models/brands."
+      },
+      {
+        "id": "victorian-noise-time-restrictions",
+        "requirement": "States Victorian noise compliance time restrictions (avoid before 7am or after 8pm weekdays, before 9am or after 8pm weekends, or similar prohibited times)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses Victorian noise rules using a 10pm–7am/9am framework and states there are no specific prohibited hours for operating a clothes dryer. It does not state the Victorian residential noise compliance time restrictions like avoiding before 7am or after 8pm on weekdays and before 9am or after 8pm on weekends."
+      },
+      {
+        "id": "heritage-overlay-internal-works",
+        "requirement": "States Heritage Overlay typically permits internal appliance installation without heritage permit as no external modifications required",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that internal installation of a self-contained heat pump dryer in a heritage-listed terrace does not require a planning permit because no external structural modifications or visible external changes are needed. It repeats this point in the Heritage Overlay section and final notes."
+      },
+      {
+        "id": "heat-pump-operating-temperature",
+        "requirement": "Mentions heat-pump dryers operate at lower temperatures (~50°C or \"cooler than vented\") protecting fabrics",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that heat pump dryers are quieter due to “lower-temperature operation” and notes they require no external venting, but it does not mention operating at ~50°C or explicitly say the lower temperature protects fabrics. The specific fabric-protection point tied to lower temperatures is missing."
+      },
+      {
+        "id": "cycle-time-comparison",
+        "requirement": "Notes heat-pump dryers have longer cycle times (45-90 minutes more or \"longer than vented/condenser\") due to lower temperatures",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response notes that heat pump dryers operate at lower temperatures and discusses long drying times (e.g., LG complaints of 6–7+ hours and expected 2–4 hours). However, it does not explicitly compare cycle times as “longer than vented/condenser” nor state the specific 45–90 minutes longer figure due to lower temperatures."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "model-registration-risk-analysis",
+        "requirement": "Identifies DV90T6240LH as non-AU model and explains warranty/service/VEU implications of choosing non-registered models with AU alternatives",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly identifies Samsung DV90T6240LH as a UK/European-only model not sold in Australia and advises it should be disregarded for Australian purchasing. However, it does not explain the specific warranty/service/VEU implications of buying a non-AU/non-registered model (e.g., ineligibility for VEU rebates, lack of Australian registration/support), beyond general availability statements."
+      },
+      {
+        "id": "tco-methodology-transparency",
+        "requirement": "Explains why different TCO calculations exist (scaling assumptions, tariff choices, AU vs EU label differences) to enable user evaluation",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explains that TCO varies because Australian energy labels assume 52 cycles/year and must be scaled to 6–8 loads/week, and it notes AU vs EU label differences (A+++ not comparable to AU stars). It also discusses tariff assumptions by using Victorian Default Offer rates and a blended rate for calculations, enabling evaluation of differing TCO outcomes."
+      },
+      {
+        "id": "energy-label-scaling-methodology",
+        "requirement": "Explains AS/NZS label assumes 1 load/week and demonstrates scaling to 6-8 loads/week for realistic household usage comparison",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly notes the AS/NZS energy label is based on 52 cycles/year (once weekly) and then scales consumption to 312–416 cycles/year for 6–8 loads/week, including using a ×6 multiplier for 6 loads/week in the TCO section. This directly demonstrates how to adjust label figures for realistic household usage."
+      },
+      {
+        "id": "heritage-context-checklist",
+        "requirement": "Provides heritage terrace-specific action checklist (Heritage Overlay confirmation, noise timing, installation, maintenance, or stacking)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses heritage overlay permit requirements and gives some practical noise timing guidance (e.g., 7am–10pm) plus installation clearances and drainage options. However, it does not present a terrace/heritage-specific action checklist format covering the requested items (overlay confirmation steps, noise timing plan, installation/stacking steps, and ongoing maintenance checklist)."
+      },
+      {
+        "id": "real-world-performance-caveats",
+        "requirement": "Provides model-specific owner-reported issues with practical workarounds (Bosch lint pooling, LG tangling, Samsung cleaning discipline)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes a dedicated section on owner-reported issues and gives practical workarounds, including Bosch sheet tangling and Samsung’s need for strict heat-exchanger cleaning discipline. However, it does not mention Bosch lint pooling or LG tangling specifically, instead discussing LG long drying times."
+      },
+      {
+        "id": "capacity-efficiency-tradeoff",
+        "requirement": "Identifies within-brand capacity vs efficiency trade-offs (e.g., Bosch 8kg 10-star vs 9kg 8-star) with selection guidance",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response compares different brands and capacities (e.g., Bosch 8kg vs 9kg models) and discusses energy ratings, but it does not explicitly frame a within-brand capacity vs efficiency trade-off example (like Bosch 8kg 10-star vs 9kg 8-star) with clear selection guidance. It lacks a concise decision rule for choosing smaller/higher-star vs larger/lower-star within the same brand line."
+      },
+      {
+        "id": "conflates-energy-standards",
+        "requirement": "Compares EU energy label figures with AU AS/NZS figures directly without distinguishing the different test methodologies",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response explicitly notes the Samsung DV90T6240LH has a European A+++ energy rating that is “incomparable to Australian star ratings,” and it otherwise bases energy figures on Australian AS/NZS 2442.2 data. It does not directly compare EU label figures to AU AS/NZS figures without distinguishing different test methodologies."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "comparison-table-structure",
+        "requirement": "Presents product specifications in side-by-side table or consistent parallel sections enabling direct comparison across all three models",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes multiple side-by-side tables comparing specifications across the Bosch, LG, and Samsung models (e.g., energy consumption, noise, clearances, and pricing). It also uses consistent parallel sections for each brand/model, enabling direct comparison across all three."
+      },
+      {
+        "id": "technical-specs-with-practical-context",
+        "requirement": "Translates technical specifications into practical terms (e.g., dB as familiar sounds, kWh as dollar costs, cycle times as real durations)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response translates some technical specs into practical terms, e.g., explaining that a 2 dB difference is barely perceptible and that 3 dB is a doubling of sound intensity, and converting annual kWh figures into per-cycle kWh and 10-year dollar costs at Victorian rates. It also converts cycle counts into real household usage (312 cycles/year) and discusses cleaning frequency in weeks."
+      },
+      {
+        "id": "financial-data-organized",
+        "requirement": "Groups financial data (purchase prices, operating costs, TCO figures) in dedicated section or table rather than scattered throughout prose",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly consolidates financial figures into dedicated tables/sections, including multiple pricing tables and a clearly labeled “Total Cost of Ownership (10-Year Horizon)” section with net initial cost, annual energy costs, and 10-year total cost tables. Purchase prices, rebate impacts, and TCO totals are presented in grouped tabular form rather than only embedded in prose."
+      },
+      {
+        "id": "recommendation-tied-to-constraints",
+        "requirement": "States clear recommendation with explicit reasoning linked to user's stated constraints (heritage overlay, shared walls, 6-8 weekly loads)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response gives a clear recommendation (LG DVH9-09W first choice) and explicitly ties the reasoning to the user’s constraints: heritage overlay (no permit/internal install), shared-wall noise/vibration considerations, and high usage (6–8 loads/week) with maintenance implications like condenser cleaning."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same recommendation, conclusion, or specification multiple times using different wording without adding new information",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response frequently repeats the same conclusions without adding new information, such as reiterating that certain models are “not sold in Australia/disregarded,” that “no heritage permit is required,” and that “all models include a drain hose,” across multiple sections (executive summary, model sections, and final notes). These restatements are largely reworded duplicates rather than new analysis."
+      },
+      {
+        "id": "casual-forum-tone",
+        "requirement": "Uses casual first-person advisory tone (e.g., \"my take\", \"what I'd do\", \"if you hate X\") rather than objective analytical presentation",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response maintains an objective, report-style analytical tone throughout, using headings, tables, and sourced claims. It does not use casual first-person advisory phrasing like “my take” or “what I’d do,” and recommendations are framed impersonally."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "references-choice-reliability-data",
+        "requirement": "References Choice reliability survey or member data with specific reliability percentages or satisfaction ratings (e.g., Choice 2025 data)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response references CHOICE reviews and awards but does not provide any specific CHOICE reliability survey/member data percentages or satisfaction ratings. It includes no numerical reliability percentages (e.g., failure rates) or satisfaction scores tied to CHOICE 2025/2026 data. Therefore the required specific percentage/rating data is missing."
+      },
+      {
+        "id": "references-as-nzs-testing-standards",
+        "requirement": "References AS/NZS 2442.1 or AS/NZS 2442.2 testing standards for dryer energy ratings",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly references AS/NZS 2442.2 multiple times when discussing annual kWh figures and energy label methodology (e.g., tables listing “Test Standard: AS/NZS 2442.2” and notes like “per AS/NZS 2442.2”). It also mentions “AS/NZS 2442.1/2442.2 test results” in the methodology section."
+      },
+      {
+        "id": "references-veu-program",
+        "requirement": "References Victorian Energy Upgrades (VEU) program as source for rebate eligibility and amount",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly cites the Victorian Energy Upgrades (VEU) program as the basis for dryer rebate eligibility (7-star+ requirement) and discusses the rebate amount as variable with examples (e.g., up to $120 cashback) sourced from the official VEU page."
+      },
+      {
+        "id": "references-heritage-regulations",
+        "requirement": "References Heritage Overlay regulations or heritage permit requirements for Melbourne properties",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a dedicated section on “Heritage Overlay — Planning Permit Requirements,” stating that internal installation does not require a planning permit and discussing Heritage Overlay provisions for Melbourne-area councils. It explicitly references heritage overlay regulations and permit requirements for heritage-listed Melbourne properties."
+      },
+      {
+        "id": "informal-reliability-sources",
+        "requirement": "Cites Reddit posts, forum anecdotes, or YouTube reviews as authoritative evidence for reliability or performance claims",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites forum-style anecdotes as evidence for reliability/performance, including Samsung Community threads about a melting issue and ProductReview.com.au user reviews about drying times and tangling, and uses these to support reliability/performance claims and recommendations. It also cites a YouTube video (“Bosch AntiVibration Design”) as supporting evidence for vibration/noise-related claims."
+      }
+    ]
+  }
+}

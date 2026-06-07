@@ -1,0 +1,565 @@
+{
+  "task_id": "task_098",
+  "domain": "Finance",
+  "report_file": "task_098_v2.md",
+  "summary": {
+    "total_criteria": 65,
+    "positive_criteria": 60,
+    "negative_criteria": 5,
+    "correctly_handled": 21,
+    "pass_rate": 32.31,
+    "normalized_score": 27.24,
+    "per_category": {
+      "factual-accuracy": {
+        "total": 48,
+        "correctly_handled": 10,
+        "normalized_score": 22.75
+      },
+      "breadth-and-depth-of-analysis": {
+        "total": 8,
+        "correctly_handled": 5,
+        "normalized_score": 45.83
+      },
+      "presentation-quality": {
+        "total": 7,
+        "correctly_handled": 5,
+        "normalized_score": 60.0
+      },
+      "citation-quality": {
+        "total": 2,
+        "correctly_handled": 1,
+        "normalized_score": 0.0
+      }
+    }
+  },
+  "results": {
+    "factual-accuracy": [
+      {
+        "id": "position-sizing-conservative-range",
+        "requirement": "States maximum risk per trade as 5-10% ($35-70) for conservative approach",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a risk table listing an “Extreme (Not Recommended)” maximum risk per trade of 5.0–10.0% and explicitly converts this to $35.00–$70.00 on a $700 account. This directly states the 5–10% ($35–$70) maximum risk per trade range."
+      },
+      {
+        "id": "position-sizing-aggressive-range",
+        "requirement": "States maximum risk per trade as 10-15% baseline ($70-105) with optional high-conviction up to 20-25% ($140-175) for aggressive approach",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state a baseline maximum risk per trade of 10–15% ($70–$105) nor an optional high-conviction maximum of 20–25% ($140–$175). It mentions 10% ($70) in examples and discusses 10%+ as “gambling,” but it never presents the required 10–15% baseline and 20–25% aggressive ranges together."
+      },
+      {
+        "id": "maximum-open-positions",
+        "requirement": "Specifies maximum concurrent positions as 2-3 (conservative) or 2-4 (aggressive)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists maximum concurrent positions as 1–2 (conservative), 2–3 (moderate), 3–5 (aggressive), and 5 absolute maximum. It does not specify the requested maximum concurrent positions ranges of 2–3 (conservative) or 2–4 (aggressive). The exact conservative/aggressive ranges required are missing."
+      },
+      {
+        "id": "maximum-capital-deployed",
+        "requirement": "States maximum capital deployed as 30-40% (conservative) or 30-50% (aggressive) of account",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives maximum total exposure limits as 50% (conservative), 70% (moderate), and 85–90% (aggressive), but it never states a maximum capital deployed range of 30–40% (conservative) or 30–50% (aggressive). Those specific 30–40% / 30–50% figures are absent."
+      },
+      {
+        "id": "weekly-loss-limit",
+        "requirement": "States weekly stop-loss threshold of 15-25% of account ($105-175)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives weekly loss limits of 3–5% ($21–$35), 5–8% ($35–$56), and 8–12% ($56–$84), plus other drawdown thresholds, but it never states a weekly stop-loss threshold of 15–25% or the corresponding $105–$175 range. The specific 15–25% weekly stop-loss figure is absent."
+      },
+      {
+        "id": "account-preservation-threshold",
+        "requirement": "States stop trading if account drops below $400 or similar 40%+ drawdown threshold",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives drawdown-based stop rules (e.g., “20% Total Drawdown from Peak: Stop trading entirely”) but never states stopping trading if the account drops below $400 or an equivalent 40%+ drawdown threshold. There is no explicit or implicit $400 floor or ~40% drawdown halt rule included."
+      },
+      {
+        "id": "debit-spread-risk-reward-structure",
+        "requirement": "Describes debit spreads as risk equal to premium paid with max reward equal to width minus premium paid",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response’s debit spread section explicitly states “Max Risk: Premium paid (net debit)” and “Max Profit: (Spread width × 100) – net debit paid,” which matches the required description (width minus premium paid)."
+      },
+      {
+        "id": "debit-spread-premium-target",
+        "requirement": "States target paying 30-60% of spread width in net debit for debit spreads",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives a “Debit Spread (1-wide) $0.30–$0.70 debit” guideline and a 1–5% of account premium cap, but it never states a rule to pay 30–60% of the spread width as the net debit. The only explicit spread-width percentage rule mentioned is for credit spreads (the 33% rule)."
+      },
+      {
+        "id": "credit-spread-risk-reward-structure",
+        "requirement": "Describes credit spreads as risk equal to width minus credit received with max reward equal to credit received",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly defines credit spreads with max risk equal to spread width × 100 minus the net credit received, and max reward/profit equal to the net credit received. This appears in the “Credit Spreads” section under “Trade Metrics/Risk Limits.”"
+      },
+      {
+        "id": "credit-spread-premium-target",
+        "requirement": "States target collecting 25-45% of spread width in net credit for credit spreads",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends collecting about one-third of the spread width (e.g., “33% rule,” “1/3 the spread width”) for credit spreads. It does not state a target range of collecting 25–45% of spread width in net credit, nor mention that broader range explicitly."
+      },
+      {
+        "id": "credit-spread-probability-target",
+        "requirement": "States target probability of profit of 65-75% for credit spreads",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives probability-of-profit figures for credit spreads (e.g., ~70–84% based on 0.16–0.30 delta and an example PoP of ~78%), but it never states a target probability-of-profit range of 65–75% specifically for credit spreads."
+      },
+      {
+        "id": "single-leg-risk-specification",
+        "requirement": "States single-leg options have 100% loss risk (premium can go to zero) with maximum $50-70 per contract or 10% account weekly maximum",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response states that single-leg long calls/puts have a maximum risk of 100% of the premium paid (i.e., the premium can go to zero). However, it does not state a specific maximum of $50–70 per contract or a 10% weekly account maximum for single-leg options."
+      },
+      {
+        "id": "prohibited-strategies-list",
+        "requirement": "Lists prohibited strategies including naked options, iron condors, calendar/diagonal spreads, or multi-leg positions >2 legs due to undefined risk or high margin requirements",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes a “Prohibited Strategies” section that explicitly bans naked options and discusses iron condors, and it also flags multi-leg strategies (e.g., box spreads/ratio spreads/diagonals) as unsuitable due to margin/complexity. However, it does not clearly prohibit calendar spreads, and it mentions iron condors as permitted in some cases rather than prohibited."
+      },
+      {
+        "id": "stock-average-daily-volume",
+        "requirement": "Specifies minimum average daily volume of 500K-1M shares with preferred range of 5-10M+ shares",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response specifies stock volume thresholds as “Minimum (Absolute) 500,000 shares/day” and “Ideal 5,000,000+,” which implies a preferred 5M+ range. However, it does not state a preferred range of 5–10M+ shares, nor does it specify a minimum average daily volume range of 500K–1M."
+      },
+      {
+        "id": "stock-price-range",
+        "requirement": "States stock price range of $10-150 with optimal range $20-80 or $50-150",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives an “Optimal Stock Price Bands” table but only specifies $10–$50 as optimal and mentions $50–$80 as acceptable. It does not state a stock price range of $10–150, nor does it state an optimal range of $20–80 or $50–150."
+      },
+      {
+        "id": "average-true-range-requirement",
+        "requirement": "Requires Average True Range (ATR) >$1.50 daily movement to ensure sufficient price action",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses ATR-based position sizing and gives example ATR values (e.g., SPY ATR ≈ $8.00), but it never states a stock-selection requirement that ATR must be greater than $1.50. There is no explicit filter like “only trade underlyings with ATR > $1.50” to ensure sufficient daily movement."
+      },
+      {
+        "id": "relative-volume-requirement",
+        "requirement": "Requires relative volume (RVOL) >1.3-1.5x average with breakout signals >1.5-2.0x or volume surge >150% of moving average",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes explicit relative-volume thresholds, stating “Volume > 1.5× average” for breakout confirmation and “Volume > 2.0× average” for strong confirmation, and it uses an example with volume at 1.8× average. These satisfy the requirement for RVOL >1.3–1.5× with breakout signals >1.5–2.0×."
+      },
+      {
+        "id": "moving-average-bullish-setup",
+        "requirement": "Specifies bullish setup requires price above 20-EMA and 50-EMA with 20-EMA above 50-EMA",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response lists EMA rules like “Price above 20-day EMA” and separately mentions “Price bouncing off 50-day MA,” but it never states the combined bullish setup requiring price above both the 20-EMA and 50-EMA with the 20-EMA above the 50-EMA. The specific 20-EMA > 50-EMA condition is absent."
+      },
+      {
+        "id": "moving-average-bearish-setup",
+        "requirement": "Specifies bearish setup requires price below 20-EMA and 50-EMA with 20-EMA below 50-EMA",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives EMA rules like “Price below 20-day EMA” as bearish, but it does not state the full bearish setup requiring price below both the 20-EMA and 50-EMA with the 20-EMA below the 50-EMA. There is no explicit condition tying 20-EMA vs 50-EMA ordering (20 below 50) together with price being below both."
+      },
+      {
+        "id": "rsi-bullish-ranges",
+        "requirement": "States bullish RSI as 50-70 and rising or oversold recovery crossing above 30, avoiding RSI >75 extended levels",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response defines RSI ranges including 60–70 and mentions RSI emerging from oversold (20–30) and an example with RSI 38 bouncing. However, it does not state bullish RSI as 50–70 and rising, does not specify an oversold recovery crossing above 30, and it discusses RSI 70–80 and >80 without explicitly avoiding RSI >75 extended levels."
+      },
+      {
+        "id": "rsi-bearish-ranges",
+        "requirement": "States bearish RSI as 30-50 and falling or overbought reversal crossing below 70",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response defines RSI ranges but does not state a bearish RSI condition as “30–50 and falling,” nor does it describe an overbought reversal as “crossing below 70.” It instead labels 40–60 as neutral and uses bearish cues like “RSI > 60 turning downward” and “70–80 overbought,” without the specified thresholds/crossing language."
+      },
+      {
+        "id": "macd-confirmation-criteria",
+        "requirement": "Requires MACD bullish crossover (MACD line crossing above signal) or bearish crossover (crossing below) with fresh cross within 2 trading days",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response explains what MACD bullish and bearish crossovers are, but it does not require that a crossover be fresh within the last 2 trading days. It provides no rule like “only take trades if the MACD cross occurred within 2 days,” nor does it verify recency in the examples."
+      },
+      {
+        "id": "support-resistance-validation",
+        "requirement": "Requires clearly defined support/resistance levels with at least 3 prior touches and entry within 2-3% of key level",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response mentions support/resistance levels (e.g., SPY support at $528 and resistance at $535; AAPL support at $188), but it does not state that these levels were validated by at least 3 prior touches. It also does not specify that entries are within 2–3% of a key level as an explicit rule or check."
+      },
+      {
+        "id": "spread-placement-relative-to-levels",
+        "requirement": "States for credit spreads, position short strike at least 0.3-0.5 ATR beyond key support/resistance level",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses ATR-based position sizing and expected-move placement but does not state a rule that, for credit spreads, the short strike should be placed at least 0.3–0.5 ATR beyond a key support/resistance level. No explicit ATR buffer relative to support/resistance is provided for short-strike selection."
+      },
+      {
+        "id": "iv-rank-for-debit-strategies",
+        "requirement": "States IV rank preferred <30-50 for debit spreads (cheaper premiums) with avoid IV rank >70",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives an IV Rank table stating 0–30 is low and suitable for debit spreads (cheap premiums), 30–50 is moderate, and it recommends avoiding buying premium at high IV while using credit spreads at 50–70. It does not explicitly say to prefer IV rank 30–50 for debit spreads nor explicitly says to avoid IV rank >70 for debit spreads."
+      },
+      {
+        "id": "iv-rank-for-credit-strategies",
+        "requirement": "States IV rank preferred >40-50 for credit spreads (higher premiums) with less favorable if IV rank <20",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response recommends selling credit spreads when IV Rank is high, specifically citing “IV Rank 50% to 100%” and gives an example with IV Rank 62 as favorable. However, it does not state the specific preference of IV rank >40–50 nor explicitly say conditions are less favorable when IV rank <20."
+      },
+      {
+        "id": "expiration-short-duration-specs",
+        "requirement": "Specifies 3-7 DTE as short duration with accelerated time decay >10% per day and higher gamma risk",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses DTE bands (e.g., 0–7 DTE prohibited, 7–21 DTE advanced) and mentions theta acceleration and gamma risk increasing near expiration, but it does not specifically label 3–7 DTE as “short duration” nor state an accelerated time decay rate of >10% per day for that window. The required 3–7 DTE + “>10% per day” + higher gamma risk phrasing is missing."
+      },
+      {
+        "id": "expiration-medium-duration-specs",
+        "requirement": "Specifies 7-14 DTE as medium duration with moderate decay 5-8% per day as recommended primary range",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response classifies DTE ranges (e.g., 0–7, 7–21, 21–45) but does not specify 7–14 DTE as the recommended primary “medium duration” range. It also does not state that this range has moderate decay of 5–8% per day; the only 7–14 DTE mention labels decay as “Extreme” without the 5–8% figure."
+      },
+      {
+        "id": "expiration-longer-duration-specs",
+        "requirement": "Specifies 14-21 DTE as longer duration with slower decay 3-5% per day for high-probability credit spreads",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response classifies DTE ranges (e.g., 7–21 DTE and 21–45 DTE) but does not specify that 14–21 DTE is a longer-duration window with slower decay of 3–5% per day for high-probability credit spreads. It also does not provide the requested 3–5%/day decay figure tied to 14–21 DTE credit spreads."
+      },
+      {
+        "id": "expiration-avoid-ranges",
+        "requirement": "States avoid expiration >21 DTE (too much time risk) and <3 DTE (extreme gamma risk)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses DTE bands (e.g., 0–7 prohibited, 7–21 advanced, 21–45 optimal, 60+ capital-inefficient) and repeatedly emphasizes exiting by 21 DTE to reduce gamma risk. However, it does not explicitly state avoiding expirations greater than 21 DTE and less than 3 DTE; the “<3 DTE” threshold is never given."
+      },
+      {
+        "id": "debit-spread-long-strike-delta",
+        "requirement": "States debit spread long strike delta of 0.35-0.60 with conservative 0.50-0.60 (ATM/ITM), moderate 0.40-0.50 (ATM/1 OTM), aggressive 0.35-0.45 (slightly OTM)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives a debit spread long strike delta range of 0.30–0.50, but it does not state the required 0.35–0.60 range nor the conservative/moderate/aggressive sub-bands (0.50–0.60, 0.40–0.50, 0.35–0.45). It also does not tie those bands to ATM/ITM vs ATM/1 OTM vs slightly OTM as specified."
+      },
+      {
+        "id": "debit-spread-short-strike-placement",
+        "requirement": "States debit spread short strike placed 1-3 strikes beyond long strike depending on spread width",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives examples of debit spreads (e.g., SPY 530/531 bull call spread) but does not state a rule that the short strike should be placed 1–3 strikes beyond the long strike depending on spread width. It discusses spread width and delta bands, yet never specifies the required “1–3 strikes beyond” placement rule."
+      },
+      {
+        "id": "debit-spread-width-specifications",
+        "requirement": "Specifies spread widths of $1-wide for $20-50 stocks, $2-wide for $50-100 stocks, $5-wide for >$100 stocks (rarely used in $700 account)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response discusses spread widths by stock price but uses different tiers (e.g., $20–$50: $1–$2.50; $50–$100: $2.50–$5; $100+: $5–$10) and does not specify the required exact mapping of $1-wide for $20–50, $2-wide for $50–100, and $5-wide for >$100 (rarely used in a $700 account). It also emphasizes $1-wide spreads for the $700 account rather than the stated tiered widths."
+      },
+      {
+        "id": "debit-spread-risk-reward-ratio",
+        "requirement": "States minimum risk/reward ratio of 1:1.5 for debit spreads with target 1:2 or better",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state a minimum risk/reward ratio of 1:1.5 for debit spreads nor a target of 1:2 or better. In fact, its debit-spread example explicitly shows an unfavorable risk:reward of 1:0.43 and labels it below 1:1, with no rule establishing the required 1:1.5 minimum/1:2 target."
+      },
+      {
+        "id": "credit-spread-short-strike-delta",
+        "requirement": "States credit spread short strike delta of 0.15-0.35 with high probability 0.15-0.20 (80-85% PoP), moderate 0.20-0.30 (70-80% PoP), aggressive 0.30-0.35 (65-70% PoP)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives a delta range for credit spread short strikes (0.16–0.30) and lists example PoP values, but it does not provide the required tiered mapping: 0.15–0.20 (80–85% PoP), 0.20–0.30 (70–80% PoP), and 0.30–0.35 (65–70% PoP). It also omits the 0.30–0.35 aggressive band entirely."
+      },
+      {
+        "id": "credit-spread-width-specifications",
+        "requirement": "States credit spread width of $1-wide preferred or $2-wide maximum for $700 account",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly specifies using $1-wide spreads for a $700 account (e.g., “Only use $1 wide spreads” and examples using $1-wide spreads). However, it does not state a rule allowing “$1-wide preferred or $2-wide maximum” as a combined constraint; it largely discourages $2-wide spreads rather than setting them as a maximum."
+      },
+      {
+        "id": "single-leg-strike-delta-range",
+        "requirement": "States single-leg strike delta of 0.35-0.70 with aggressive 0.35-0.45 (OTM), balanced 0.45-0.55 (ATM), conservative 0.55-0.70 (ITM)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides delta ranges for several strategies (e.g., single-leg 0.25–0.40 and credit spreads 0.16–0.30) but does not state a single-leg strike delta range of 0.35–0.70 nor the aggressive/balanced/conservative sub-bands (0.35–0.45, 0.45–0.55, 0.55–0.70) tied to OTM/ATM/ITM."
+      },
+      {
+        "id": "single-leg-premium-cost-limits",
+        "requirement": "States single-leg target premium $0.50-$1.50 per contract with hard cap $70 total risk or avoid paying >$2.00 per contract",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response does not state a single-leg target premium of $0.50–$1.50 per contract. It also does not include a hard cap of $70 total risk for single-leg trades or an explicit rule to avoid paying more than $2.00 per contract."
+      },
+      {
+        "id": "open-interest-minimum",
+        "requirement": "Specifies minimum open interest of 100 contracts per strike with ideal 1,000-5,000+ contracts",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives open-interest thresholds (e.g., “Open Interest (contracts) Minimum 200 / Preferred 500 / Ideal 1,000+” and “Low OI strikes (< 200 contracts) Do not trade”). It does not specify a minimum of 100 contracts per strike nor state an ideal range of 1,000–5,000+ per strike."
+      },
+      {
+        "id": "daily-options-volume-minimum",
+        "requirement": "Specifies minimum daily options volume of 50 contracts per strike with ideal 200-500+ contracts",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response gives option-volume thresholds of 100 minimum, 500 preferred, and 1,000+ ideal, but it never specifies a minimum of 50 contracts per strike nor an ideal range of 200–500+ per strike. It also does not tie the volume requirement explicitly to “per strike” as stated in the criterion."
+      },
+      {
+        "id": "bid-ask-spread-requirements",
+        "requirement": "Requires bid-ask spread <$0.15 absolute for options <$2 or <10% of mid-price",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response specifies bid-ask spread thresholds of $0.15 maximum and 10% of mid-price in its liquidity tables (e.g., “Bid-Ask Spread ($) $0.15” and “Bid-Ask Spread (% of mid-price) 10%”). It also applies ≤$0.15 and ≤$0.10 checks in the example option chains, satisfying the required spread rule."
+      },
+      {
+        "id": "hypothetical-example-1-structure",
+        "requirement": "Provides first hypothetical example with bull call debit spread or similar directional momentum play including entry prices, strikes, expiry, position size, max loss, max gain, and breakeven",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response’s first worked example is a bull call debit spread on SPY and includes entry premiums, strikes, expiry, position size (1 contract implied by $70 debit), max loss ($70), max gain ($30), and breakeven ($530.70). These elements are explicitly listed in the “Worked Example 1” tables and metrics."
+      },
+      {
+        "id": "hypothetical-example-1-pnl-scenarios",
+        "requirement": "First example includes P/L table showing outcomes at multiple price levels (e.g., below breakeven, at breakeven, at target, at max profit)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The first example (SPY bull call spread) includes a P/L scenarios table at multiple underlying prices, including below breakeven, at breakeven, and at max profit. It does not explicitly label a separate “target” price level distinct from max profit, but it still shows outcomes across multiple price levels including breakeven and max profit."
+      },
+      {
+        "id": "hypothetical-example-2-structure",
+        "requirement": "Provides second hypothetical example with different strategy (e.g., single-leg put, credit spread) including entry prices, strikes, expiry, position size, max loss, max gain, and breakeven",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response includes two examples (SPY bull call spread and AAPL bull put credit spread) with entry prices, strikes, expiries, position size, max loss, max profit, and breakeven. However, it does not provide a second example using a different strategy type beyond spreads (e.g., a single-leg put/call), so the required “different strategy” second example is missing."
+      },
+      {
+        "id": "hypothetical-example-2-pnl-scenarios",
+        "requirement": "Second example includes P/L table showing outcomes at multiple price levels with different timing scenarios",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The second worked example (AAPL bull put credit spread) includes a P/L table with outcomes at multiple underlying prices at expiration. It also describes an additional timing-based management scenario (“Early Exit at 50% Profit … at 21 DTE”), providing different timing scenarios alongside the price-level outcomes."
+      },
+      {
+        "id": "win-rate-probability-analysis",
+        "requirement": "Calculates required win rate to achieve $200-300/week target using expected value formulas with specific percentages (e.g., 70-82% win rate required)",
+        "weight": 12,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses expected value formulas to model weekly targets, but it does not calculate a specific required win-rate range (e.g., 70–82%) to hit $200–300/week under the stated sizing rules. It provides example win rates (55%, 60%, 65%) and deltas/PoP figures, yet never derives the required win rate percentage for the target."
+      },
+      {
+        "id": "probability-distribution-scenarios",
+        "requirement": "Provides probability distribution showing likelihood of weekly outcomes using binomial distribution or similar analysis with specific percentages for different win/loss combinations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a dedicated “Binomial Distribution Modeling for Weekly Targets” section that uses binomial formulas and reports specific probabilities (e.g., ~62.3%, ~37.7%, ~68.3%, ~71.8%) for weekly win-count outcomes across different trade-count/win-rate scenarios. This constitutes a probability distribution-style likelihood analysis for weekly outcomes tied to win/loss combinations."
+      },
+      {
+        "id": "risk-of-ruin-assessment",
+        "requirement": "Discusses risk of ruin or account survival probability with specific percentages (e.g., probability of 30-50% drawdown, account depletion timeline)",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes a dedicated “Risk of Ruin Calculations” section with explicit RoR percentages (e.g., 1.56%, 12.4%, 51.3%, 100%) tied to risk-per-trade and win-rate assumptions. It also quantifies drawdown-related probabilities/levels (e.g., mentions 40–60% drawdowns under full Kelly and provides scenario volatility as % of account)."
+      }
+    ],
+    "breadth-and-depth-of-analysis": [
+      {
+        "id": "extreme-target-difficulty-acknowledgment",
+        "requirement": "Explicitly acknowledges 28-43% weekly return target is extremely aggressive and high-risk compared to professional benchmarks (e.g., hedge funds targeting 15-20% annually)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly states that $200–300/week on $700 is a 28–43% weekly return and calls it “extremely aggressive” and requiring “significant risk.” It also benchmarks this against professional targets, noting pros aim for ~20–50% per year (and cites CBOE indices around ~10–12% annualized), clearly framing the weekly target as far beyond professional norms."
+      },
+      {
+        "id": "account-survival-probability",
+        "requirement": "States realistic account survival probability or time-to-failure estimates (e.g., <5% survival beyond one year, 90% loss within 3 months)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response provides explicit survival/ruin estimates via “Risk of Ruin” calculations, including probabilities of total loss such as 12.4% at 10% risk/trade and 51.3% at 20% risk/trade. It also states that achieving the $200–300/week target implies unacceptably high ruin probabilities (12–51%), which functions as a time-to-failure/survival realism estimate."
+      },
+      {
+        "id": "professional-benchmarking",
+        "requirement": "Compares framework requirements to professional trader win rates (e.g., retail 40-45%, pro 50-60%, framework needs 70-82%)",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response provides benchmark win-rate ranges for professionals and retail traders (e.g., “55–75% for professional options sellers” and mentions 61% backtested win rate), but it does not explicitly compare these to a stated framework-required win-rate band like 70–82% or give the example retail 40–45% vs pro 50–60% vs framework 70–82% comparison."
+      },
+      {
+        "id": "modified-realistic-framework",
+        "requirement": "Provides alternative realistic target (e.g., $50-100/week instead of $200-300) with corresponding adjusted parameters and achievable win rates",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response explicitly reframes expectations by proposing a realistic target of $14–$35/week (2–5%) for a $700 account and explains why $200–$300/week is excessively aggressive. It also ties this to adjusted risk parameters (e.g., 1–2% risk per trade, quarter-Kelly sizing) and discusses achievable win-rate/probability assumptions for those lower-risk approaches."
+      },
+      {
+        "id": "variance-and-drawdown-implications",
+        "requirement": "Analyzes variance implications showing week-to-week swings and probability of consecutive losing weeks or significant drawdowns",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response quantifies variance via binomial modeling and weekly standard deviation estimates, explicitly noting large week-to-week swings (e.g., 25–32% of account as 1σ). It also discusses drawdown/ruin implications through risk-of-ruin calculations and drawdown stop rules, implying the likelihood of consecutive losing weeks and significant drawdowns under aggressive sizing."
+      },
+      {
+        "id": "overtrading-psychological-risks",
+        "requirement": "Discusses psychological pressure to hit weekly targets leading to forced trades, overtrading, revenge trading, or FOMO",
+        "weight": 8,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response warns that the $200–300/week goal is extremely aggressive and discusses drawdowns and over-leverage, but it does not address psychological pressure from weekly targets causing forced trades, overtrading, revenge trading, or FOMO. Those specific behavioral dynamics are not mentioned or discussed."
+      },
+      {
+        "id": "martingale-sizing",
+        "requirement": "Recommends increasing position size after losses or averaging down on losing options positions",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response does not recommend increasing position size after losses or averaging down on losing options positions. It repeatedly emphasizes reducing risk during drawdowns, using hard stops, and avoiding “hold and hope,” with no guidance to add to losing trades."
+      },
+      {
+        "id": "ignores-transaction-costs",
+        "requirement": "Calculates expected weekly profits without accounting for commissions, fees, or bid-ask slippage impact on small positions",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response computes weekly target scenarios and expected returns (e.g., “To achieve $200/week… R = $80 risk per trade”) without incorporating commissions, per-contract fees, or bid-ask/slippage costs into those profit calculations. While it discusses slippage conceptually and mentions commissions in passing, it does not adjust the expected weekly profit math for these frictions, which is especially material for small positions."
+      }
+    ],
+    "presentation-quality": [
+      {
+        "id": "numbered-sections-structure",
+        "requirement": "Organizes content with numbered sections (1-5) matching query outline for position sizing, strategies, stock selection, strike/expiry, liquidity",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "UNMET",
+        "explanation": "The response uses numbered sections, but it does not organize the core framework into exactly five numbered sections (1–5) matching the query outline. Instead it includes many additional sections (e.g., 1–11) and splits liquidity into section 6, so the requested 1–5 structure is not followed."
+      },
+      {
+        "id": "professional-trading-terminology",
+        "requirement": "Uses precise options terminology (delta, IV rank, theta decay, Greeks) without over-explaining basic concepts to intermediate traders",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response uses intermediate options terminology throughout, including delta bands, IV Rank/percentile, theta decay, gamma risk, probability of touch, and portfolio Greeks like delta dollars/theta. It generally presents these terms in a matter-of-fact way aimed at traders rather than explaining basics from scratch."
+      },
+      {
+        "id": "calculation-methodology-shown",
+        "requirement": "Shows calculation formulas explicitly (e.g., \"EV = Win% × Reward - Loss% × Risk\") not just stating final numbers",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response includes explicit calculation formulas, such as “Position Size ($ at risk) = Account Balance × Risk %,” “EV per trade = (Win% × Reward) + (Loss% × (−Risk)),” binomial formulas (μ, σ, P(x)), Sharpe ratio, Kelly criterion, and risk-of-ruin equations."
+      },
+      {
+        "id": "objective-analytical-tone",
+        "requirement": "Maintains objective analytical tone focusing on risk metrics and probability calculations",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response maintains an objective, analytical tone throughout, emphasizing quantified risk limits, PoP/POT, delta bands, binomial modeling, Sharpe/Kelly, and risk-of-ruin calculations. It repeatedly frames the $200–300/week goal in probabilistic terms and uses scenario-based probability distributions to assess feasibility."
+      },
+      {
+        "id": "warning-language-for-risks",
+        "requirement": "Uses appropriate warning language when discussing aggressive targets, high-risk strategies, or account-depleting scenarios",
+        "weight": 10,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response repeatedly flags the $200–300/week goal as “extremely aggressive,” “mathematically achievable only” with high blow-up risk, and warns of “high probability of total account loss” and “account wipe out.” It also uses cautionary language around oversizing, 0DTE as gambling, and high risk of ruin/account-depleting drawdowns."
+      },
+      {
+        "id": "promotional-language-penalty",
+        "requirement": "Uses promotional or get-rich-quick language suggesting the aggressive weekly targets are easily achievable",
+        "weight": -20,
+        "is_negative": true,
+        "verdict": "UNMET",
+        "explanation": "The response repeatedly emphasizes that $200–300/week on a $700 account is “extremely aggressive,” “only mathematically achievable” with high risk, and likely to lead to total loss. It frames the target as unrealistic and warns against chasing it rather than using promotional or easy-achievability language."
+      },
+      {
+        "id": "repetitive-content",
+        "requirement": "Restates the same risk warnings, position sizing rules, or probability conclusions multiple times without adding new analysis",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response repeatedly restates similar risk warnings and position-sizing cautions (e.g., the $200–300/week target being extremely aggressive, 2% max-risk guidance being exceeded, and “not recommended/prohibited” risk notes) across multiple sections and again within both example trades without materially new analysis each time."
+      }
+    ],
+    "citation-quality": [
+      {
+        "id": "educational-trading-resources",
+        "requirement": "Cites educational options trading resources such as CBOE, OCC options education materials, or established trading methodology books if sources are included",
+        "weight": 5,
+        "is_negative": false,
+        "verdict": "MET",
+        "explanation": "The response cites multiple established options education sources, including Cboe/CBOE materials and OCC/OIC options education references, and also cites an established methodology book (McMillan’s “Options As A Strategic Investment”)."
+      },
+      {
+        "id": "informal-sources",
+        "requirement": "Cites Reddit, Discord, YouTube influencers, or trading promotional sites as authoritative sources for strategy parameters or win rates",
+        "weight": -10,
+        "is_negative": true,
+        "verdict": "MET",
+        "explanation": "The response cites Reddit as a source multiple times (e.g., “Reddit r/options,” “Reddit Options Community,” “Reddit r/thetagang,” “Reddit r/Optionswheel”) for specific strategy parameters like loss limits, bid-ask spread thresholds, and delta/PoP ranges. It also cites YouTube (“YouTube - Kelly Criterion Explained”) as support for a strategy-related claim. These are presented as authoritative sources for parameters."
+      }
+    ]
+  }
+}

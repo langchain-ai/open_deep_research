@@ -87,7 +87,8 @@ async def tavily_search(
         model=configurable.summarization_model,
         max_tokens=configurable.summarization_model_max_tokens,
         api_key=model_api_key,
-        tags=["langsmith:nostream"]
+        tags=["langsmith:nostream"],
+        **get_model_extra_kwargs(configurable.summarization_model),
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
@@ -824,6 +825,9 @@ MODEL_TOKEN_LIMITS = {
     "bedrock:us.amazon.nova-micro-v1:0": 128000,
     "bedrock:us.anthropic.claude-3-7-sonnet-20250219-v1:0": 200000,
     "bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0": 200000,
+    "bedrock:us.anthropic.claude-sonnet-4-5-20250929-v1:0": 200000,
+    "anthropic:claude-haiku-4-5-20251001": 200000,
+    "claude-haiku-4-5-20251001": 200000,
     "bedrock:us.anthropic.claude-opus-4-20250514-v1:0": 200000,
     "anthropic.claude-opus-4-1-20250805-v1:0": 200000,
 }
@@ -844,6 +848,20 @@ def get_model_token_limit(model_string):
     
     # Model not found in lookup table
     return None
+
+def get_model_extra_kwargs(model_string: str) -> dict:
+    """Return extra kwargs needed for specific model providers.
+
+    DeepSeek V4 Flash has thinking mode ON by default, which is incompatible
+    with tool_choice (used by bind_tools / with_structured_output).  Passing
+    ``thinking: disabled`` via extra_body turns it off so tool calling works.
+    The OpenAI Python client rejects unknown top-level kwargs, so the parameter
+    must go through extra_body which merges directly into the raw request body.
+    """
+    if "deepseek" in model_string.lower():
+        return {"model_kwargs": {"extra_body": {"thinking": {"type": "disabled"}}}}
+    return {}
+
 
 def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> list[MessageLikeRepresentation]:
     """Truncate message history by removing up to the last AI message.
