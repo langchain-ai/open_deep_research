@@ -172,6 +172,167 @@ async def tavily_search_async(
     search_results = await asyncio.gather(*search_tasks)
     return search_results
 
+##########################
+# fastCRW Search Tool Utils
+##########################
+# fastCRW is a Firecrawl-compatible web data engine shipped as a single binary.
+# Self-host (free, AGPL) or use the managed cloud at https://fastcrw.com.
+# The /v1/search endpoint returns Firecrawl-compatible results, optionally with
+# page markdown when the "markdown" format is requested.
+CRW_SEARCH_DESCRIPTION = (
+    "A search engine optimized for comprehensive, accurate, and trusted results. "
+    "Useful for when you need to answer questions about current events."
+)
+@tool(description=CRW_SEARCH_DESCRIPTION)
+async def crw_search(
+    queries: List[str],
+    max_results: Annotated[int, InjectedToolArg] = 5,
+    config: RunnableConfig = None
+) -> str:
+    """Fetch and summarize search results from the fastCRW search API.
+
+    Args:
+        queries: List of search queries to execute
+        max_results: Maximum number of results to return per query
+        config: Runtime configuration for API keys and model settings
+
+    Returns:
+        Formatted string containing summarized search results
+    """
+    # Step 1: Execute search queries asynchronously
+    search_results = await crw_search_async(
+        queries,
+        max_results=max_results,
+        config=config
+    )
+
+    # Step 2: Deduplicate results by URL to avoid processing the same content multiple times
+    unique_results = {}
+    for response in search_results:
+        for result in response['results']:
+            url = result['url']
+            if url not in unique_results:
+                unique_results[url] = {**result, "query": response['query']}
+
+    # Step 3: Set up the summarization model with configuration
+    configurable = Configuration.from_runnable_config(config)
+
+    # Character limit to stay within model token limits (configurable)
+    max_char_to_include = configurable.max_content_length
+
+    # Initialize summarization model with retry logic
+    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
+    summarization_model = init_chat_model(
+        model=configurable.summarization_model,
+        max_tokens=configurable.summarization_model_max_tokens,
+        api_key=model_api_key,
+        tags=["langsmith:nostream"]
+    ).with_structured_output(Summary).with_retry(
+        stop_after_attempt=configurable.max_structured_output_retries
+    )
+
+    # Step 4: Create summarization tasks (skip empty content)
+    async def noop():
+        """No-op function for results without raw content."""
+        return None
+
+    summarization_tasks = [
+        noop() if not result.get("raw_content")
+        else summarize_webpage(
+            summarization_model,
+            result['raw_content'][:max_char_to_include]
+        )
+        for result in unique_results.values()
+    ]
+
+    # Step 5: Execute all summarization tasks in parallel
+    summaries = await asyncio.gather(*summarization_tasks)
+
+    # Step 6: Combine results with their summaries
+    summarized_results = {
+        url: {
+            'title': result['title'],
+            'content': result['content'] if summary is None else summary
+        }
+        for url, result, summary in zip(
+            unique_results.keys(),
+            unique_results.values(),
+            summaries
+        )
+    }
+
+    # Step 7: Format the final output
+    if not summarized_results:
+        return "No valid search results found. Please try different search queries or use a different search API."
+
+    formatted_output = "Search results: \n\n"
+    for i, (url, result) in enumerate(summarized_results.items()):
+        formatted_output += f"\n\n--- SOURCE {i+1}: {result['title']} ---\n"
+        formatted_output += f"URL: {url}\n\n"
+        formatted_output += f"SUMMARY:\n{result['content']}\n\n"
+        formatted_output += "\n\n" + "-" * 80 + "\n"
+
+    return formatted_output
+
+async def crw_search_async(
+    search_queries,
+    max_results: int = 5,
+    config: RunnableConfig = None
+):
+    """Execute multiple fastCRW search queries asynchronously.
+
+    Args:
+        search_queries: List of search query strings to execute
+        max_results: Maximum number of results per query
+        config: Runtime configuration for API key access
+
+    Returns:
+        List of search result dictionaries normalized to a Tavily-like shape
+    """
+    # Resolve the fastCRW base URL (cloud by default, self-host override) and key
+    base_url = get_crw_base_url(config).rstrip("/")
+    api_key = get_crw_api_key(config)
+
+    # Self-hosted fastCRW may run without auth, so the key is optional
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    async def search_single(query: str):
+        """Execute a single fastCRW search query and normalize its results."""
+        payload = {
+            "query": query,
+            "limit": max_results,
+            # Request markdown so results can be summarized like other providers
+            "scrapeOptions": {"formats": ["markdown"]},
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{base_url}/v1/search", json=payload, headers=headers
+            ) as response:
+                response.raise_for_status()
+                data = await response.json()
+
+        # fastCRW envelope: {success, error, data: [{title, url, description, markdown?}]}
+        if not data.get("success", True):
+            raise ToolException(data.get("error", "fastCRW search request failed"))
+
+        results = [
+            {
+                "title": item.get("title", ""),
+                "url": item.get("url", ""),
+                "content": item.get("description", ""),
+                "raw_content": item.get("markdown"),
+            }
+            for item in data.get("data", [])
+        ]
+        return {"query": query, "results": results}
+
+    # Execute all search queries in parallel and return results
+    search_tasks = [search_single(query) for query in search_queries]
+    search_results = await asyncio.gather(*search_tasks)
+    return search_results
+
 async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
     """Summarize webpage content using AI model with timeout protection.
     
@@ -553,12 +714,22 @@ async def get_search_tool(search_api: SearchAPI):
         # Configure Tavily search tool with metadata
         search_tool = tavily_search
         search_tool.metadata = {
-            **(search_tool.metadata or {}), 
-            "type": "search", 
+            **(search_tool.metadata or {}),
+            "type": "search",
             "name": "web_search"
         }
         return [search_tool]
-        
+
+    elif search_api == SearchAPI.CRW:
+        # Configure fastCRW search tool with metadata
+        search_tool = crw_search
+        search_tool.metadata = {
+            **(search_tool.metadata or {}),
+            "type": "search",
+            "name": "web_search"
+        }
+        return [search_tool]
+
     elif search_api == SearchAPI.NONE:
         # No search functionality configured
         return []
@@ -923,3 +1094,32 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+# Default fastCRW cloud base URL (note the /api suffix); override for self-host.
+CRW_DEFAULT_BASE_URL = "https://fastcrw.com/api"
+
+def get_crw_api_key(config: RunnableConfig):
+    """Get fastCRW API key from environment or config.
+
+    Optional for self-hosted fastCRW instances that run without auth.
+    """
+    should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
+    if should_get_from_config.lower() == "true":
+        api_keys = config.get("configurable", {}).get("apiKeys", {})
+        if not api_keys:
+            return None
+        return api_keys.get("CRW_API_KEY")
+    else:
+        return os.getenv("CRW_API_KEY")
+
+def get_crw_base_url(config: RunnableConfig):
+    """Get fastCRW base URL from environment or config.
+
+    Defaults to the managed cloud; set CRW_API_URL to point at a self-hosted server.
+    """
+    should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
+    if should_get_from_config.lower() == "true":
+        api_keys = config.get("configurable", {}).get("apiKeys", {})
+        return (api_keys or {}).get("CRW_API_URL") or CRW_DEFAULT_BASE_URL
+    else:
+        return os.getenv("CRW_API_URL", CRW_DEFAULT_BASE_URL)
