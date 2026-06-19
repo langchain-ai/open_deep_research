@@ -89,7 +89,7 @@ You have access to three main tools:
 2. **ResearchComplete**: Indicate that research is complete
 3. **think_tool**: For reflection and strategic planning during research
 
-**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**
+**CRITICAL: Prefer calling ConductResearch directly. Use think_tool only when the task is ambiguous or when you need one brief reflection before finishing. Do not call think_tool repeatedly.**
 </Available Tools>
 
 <Instructions>
@@ -97,7 +97,7 @@ Think like a research manager with limited time and resources. Follow these step
 
 1. **Read the question carefully** - What specific information does the user need?
 2. **Decide how to delegate the research** - Carefully consider the question and decide how to delegate the research. Are there multiple independent directions that can be explored simultaneously?
-3. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?
+3. **After each call to ConductResearch, decide quickly** - either delegate one more focused task or call ResearchComplete.
 </Instructions>
 
 <Hard Limits>
@@ -110,14 +110,7 @@ Think like a research manager with limited time and resources. Follow these step
 </Hard Limits>
 
 <Show Your Thinking>
-Before you call ConductResearch tool call, use think_tool to plan your approach:
-- Can the task be broken down into smaller sub-tasks?
-
-After each ConductResearch tool call, use think_tool to analyze the results:
-- What key information did I find?
-- What's missing?
-- Do I have enough to answer the question comprehensively?
-- Should I delegate more research or call ResearchComplete?
+Prefer to call ConductResearch immediately with a clear standalone task. Use think_tool at most once if the task is ambiguous. After ConductResearch returns, either delegate one more narrowly scoped task or call ResearchComplete without extra reflection.
 </Show Your Thinking>
 
 <Scaling Rules>
@@ -148,7 +141,7 @@ You have access to two main tools:
 2. **think_tool**: For reflection and strategic planning during research
 {mcp_prompt}
 
-**CRITICAL: Use think_tool after each search to reflect on results and plan next steps. Do not call think_tool with the tavily_search or any other tools. It should be to reflect on the results of the search.**
+**CRITICAL: Prefer direct tavily_search calls. Use think_tool only if search results conflict or if one brief reflection is needed before the final answer. Do not use think_tool after every search.**
 </Available Tools>
 
 <Instructions>
@@ -156,9 +149,9 @@ Think like a human researcher with limited time. Follow these steps:
 
 1. **Read the question carefully** - What specific information does the user need?
 2. **Start with broader searches** - Use broad, comprehensive queries first
-3. **After each search, pause and assess** - Do I have enough to answer? What's still missing?
-4. **Execute narrower searches as you gather information** - Fill in the gaps
-5. **Stop when you can answer confidently** - Don't keep searching for perfection
+3. **After each search, decide quickly** - either run one narrower search or move to the answer
+4. **Execute only the minimum additional searches needed** - Fill obvious gaps only
+5. **Stop early when you can answer confidently** - Do not search for perfection
 </Instructions>
 
 <Hard Limits>
@@ -174,11 +167,7 @@ Think like a human researcher with limited time. Follow these steps:
 </Hard Limits>
 
 <Show Your Thinking>
-After each search tool call, use think_tool to analyze the results:
-- What key information did I find?
-- What's missing?
-- Do I have enough to answer the question comprehensively?
-- Should I search more or provide my answer?
+Do not use think_tool by default. After each search, either run one more targeted search or finish with the answer.
 </Show Your Thinking>
 """
 
