@@ -169,8 +169,13 @@ async def tavily_search_async(
     ]
     
     # Execute all search queries in parallel and return results
-    search_results = await asyncio.gather(*search_tasks)
-    return search_results
+    configurable = Configuration.from_runnable_config(config)
+    try:
+        search_results = await asyncio.wait_for(asyncio.gather(*search_tasks), timeout=configurable.tavily_timeout)
+        return search_results
+    except asyncio.TimeoutError:
+        logging.warning(f"Tavily search timed out after {configurable.tavily_timeout} seconds")
+        return []
 
 async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
     """Summarize webpage content using AI model with timeout protection.
