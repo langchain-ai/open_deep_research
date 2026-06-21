@@ -213,37 +213,6 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         return webpage_content
 
 ##########################
-# Reflection Tool Utils
-##########################
-
-@tool(description="Strategic reflection tool for research planning")
-def think_tool(reflection: str) -> str:
-    """Tool for strategic reflection on research progress and decision-making.
-
-    Use this tool after each search to analyze results and plan next steps systematically.
-    This creates a deliberate pause in the research workflow for quality decision-making.
-
-    When to use:
-    - After receiving search results: What key information did I find?
-    - Before deciding next steps: Do I have enough to answer comprehensively?
-    - When assessing research gaps: What specific information am I still missing?
-    - Before concluding research: Can I provide a complete answer now?
-
-    Reflection should address:
-    1. Analysis of current findings - What concrete information have I gathered?
-    2. Gap assessment - What crucial information is still missing?
-    3. Quality evaluation - Do I have sufficient evidence/examples for a good answer?
-    4. Strategic decision - Should I continue searching or provide my answer?
-
-    Args:
-        reflection: Your detailed reflection on research progress, findings, gaps, and next steps
-
-    Returns:
-        Confirmation that reflection was recorded for decision-making
-    """
-    return f"Reflection recorded: {reflection}"
-
-##########################
 # MCP Utils
 ##########################
 
@@ -446,6 +415,38 @@ def wrap_mcp_authenticate_tool(tool: StructuredTool) -> StructuredTool:
     tool.coroutine = authentication_wrapper
     return tool
 
+def load_custom_tools(config: RunnableConfig, existing_tool_names: set[str]) -> List[BaseTool]:
+    """Load custom Python functions as tools"""
+    configurable = Configuration.from_runnable_config(config)
+    if not configurable.custom_tools:
+        return []
+    
+    tools = []
+    for tool_func in configurable.custom_tools:
+        # Check if tool already exists
+        tool_name = getattr(tool_func, 'name', str(tool_func))
+        if tool_name in existing_tool_names:
+            warnings.warn(f"Tool {tool_name} already exists, skipping")
+            continue
+        
+        # Ensure it's a proper LangChain tool
+        if isinstance(tool_func, BaseTool):
+            tools.append(tool_func)
+        elif callable(tool_func):
+            # If it's a callable but not a BaseTool, wrap it
+            try:
+                # If it's already decorated with @tool, it should be a BaseTool
+                if hasattr(tool_func, 'name') and hasattr(tool_func, 'description'):
+                    tools.append(tool_func)
+                else:
+                    warnings.warn(f"Tool {tool_name} is not properly decorated with @tool decorator, skipping")
+            except Exception as e:
+                warnings.warn(f"Error processing custom tool {tool_name}: {e}")
+        else:
+            warnings.warn(f"Invalid tool type for {tool_name}, must be callable or BaseTool")
+    
+    return tools
+
 async def load_mcp_tools(
     config: RunnableConfig,
     existing_tool_names: set[str],
@@ -576,7 +577,7 @@ async def get_all_tools(config: RunnableConfig):
         List of all configured and available tools for research operations
     """
     # Start with core research tools
-    tools = [tool(ResearchComplete), think_tool]
+    tools = [tool(ResearchComplete)]
     
     # Add configured search tools
     configurable = Configuration.from_runnable_config(config)
@@ -589,6 +590,11 @@ async def get_all_tools(config: RunnableConfig):
         tool.name if hasattr(tool, "name") else tool.get("name", "web_search") 
         for tool in tools
     }
+    
+    # Add custom tools
+    custom_tools = load_custom_tools(config, existing_tool_names)
+    tools.extend(custom_tools)
+    existing_tool_names.update({tool.name for tool in custom_tools if hasattr(tool, "name")})
     
     # Add MCP tools if configured
     mcp_tools = await load_mcp_tools(config, existing_tool_names)
