@@ -57,6 +57,39 @@ This will open the LangGraph Studio UI in your browser.
 
 Ask a question in the `messages` input field and click `Submit`. Select different configuration in the "Manage Assistants" tab.
 
+### What This Version Adds (Fork Highlights)
+
+This branch extends the original Open Deep Research with a practical "personalized research assistant" workflow. The key additions are:
+
+- Local knowledge retrieval (RAG) with Chroma, including ingestion for `md/txt/pdf/docx`
+- Session memory (short-term) for turn-to-turn preference carryover
+- Long-term memory with explicit confirmation before write
+- Unified evidence appendices and citation ids for traceability
+- Runtime controls for API use (`user_id`, memory mode, RAG scope)
+- Expanded evaluation suite (quality + personalization + memory usefulness + source diversity)
+
+If you are reviewing this project as an interviewer, the implementation demonstrates:
+
+- End-to-end product thinking (feature design -> acceptance tests -> regression checks)
+- Config-driven architecture instead of hardcoded behavior
+- Safety and observability defaults (explicit memory confirmation, traceable sources)
+- Practical evaluation engineering with matrix comparisons and baseline summaries
+
+### 5-Minute Demo (For Interviewers)
+
+1. Start server:
+
+```bash
+uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --allow-blocking
+```
+
+2. Open Studio and ask: "Please answer in Chinese, concise style, and avoid tables."
+3. Ask a second question in the same thread to verify preference carryover.
+4. If memory is enabled, send: "确认记忆" (or "confirm memory") and start a new thread to check persistent preference reuse.
+5. Ask a local-doc question (after ingestion) and confirm report citations include local evidence.
+
+Expected outcome: style personalization works, local retrieval works, and critical conclusions can be traced to evidence.
+
 ### ⚙️ Configurations
 
 #### LLM :brain:
@@ -80,6 +113,93 @@ Open Deep Research supports a wide range of search tools. By default it uses the
 
 See the fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) for various other settings to customize the behavior of Open Deep Research. 
 
+### 🧠 Personalized Q&A Foundation (RAG + Memory)
+
+This repository now includes the configuration foundation for a personalized assistant workflow with:
+
+- Local knowledge base retrieval (RAG)
+- Session memory (short-term)
+- User memory (long-term)
+
+You can configure these fields in LangGraph Studio (Manage Assistants) or via `.env` / `configurable` values:
+
+- `rag_enabled` - Enable local knowledge retrieval
+- `local_knowledge_base_path` - Source folder for local files (md/txt/pdf/docx)
+- `vector_store_provider` - Current default: `chroma`
+- `chroma_persist_directory` - Local Chroma persistence folder
+- `embedding_model` - Embedding model for indexing/search
+- `rag_top_k` - Number of retrieved chunks per query
+- `memory_enabled` - Enable memory features
+- `memory_write_policy` - Default is `explicit_confirmation`
+- `memory_max_candidates_per_turn` - Max memory candidates proposed per turn
+- `memory_namespace_prefix` - Prefix for persistent memory namespaces
+- `user_id` - Optional local fallback user id (when metadata owner is unavailable)
+
+Example `.env` additions:
+
+```bash
+RAG_ENABLED=false
+LOCAL_KNOWLEDGE_BASE_PATH=./knowledge
+VECTOR_STORE_PROVIDER=chroma
+CHROMA_PERSIST_DIRECTORY=.chroma
+EMBEDDING_MODEL=openai:text-embedding-3-small
+RAG_TOP_K=5
+MEMORY_ENABLED=false
+MEMORY_WRITE_POLICY=explicit_confirmation
+MEMORY_MAX_CANDIDATES_PER_TURN=3
+MEMORY_NAMESPACE_PREFIX=memory
+```
+
+These settings are implemented in this branch and remain backward compatible with existing deep research flows.
+
+#### Typical User Workflow (Non-Technical Friendly)
+
+1. Put your files under a folder (example: `./documents`).
+2. Build local index once:
+
+```bash
+python -m open_deep_research.ingestion --source ./documents --rebuild
+```
+
+3. Start server:
+
+```bash
+uvx --refresh --from "langgraph-cli[inmem]" --with-editable . --python 3.11 langgraph dev --allow-blocking
+```
+
+4. Open Studio and ask your question.
+5. Add new files later? Re-run ingestion without rebuild:
+
+```bash
+python -m open_deep_research.ingestion --source ./documents
+```
+
+Notes:
+
+- `--rebuild` clears existing local index first.
+- Ingestion is idempotent at file level (same source path is replaced, not duplicated).
+- Supported file types: `md`, `txt`, `pdf`, `docx`.
+
+#### Build Local Knowledge Base (Chroma)
+
+After configuring `.env`, build your local index:
+
+```bash
+python -m open_deep_research.ingestion --source ./knowledge --rebuild
+```
+
+This indexes `md`, `txt`, `pdf`, and `docx` files into the configured `CHROMA_PERSIST_DIRECTORY`.
+
+Then set:
+
+```bash
+RAG_ENABLED=true
+MEMORY_ENABLED=true
+MEMORY_WRITE_POLICY=explicit_confirmation
+```
+
+With this enabled, the researcher toolchain can call `rag_search` to retrieve local context alongside web research.
+
 ### 📊 Evaluation
 
 Open Deep Research is configured for evaluation with [Deep Research Bench](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard). This benchmark has 100 PhD-level research tasks (50 English, 50 Chinese), crafted by domain experts across 22 fields (e.g., Science & Tech, Business & Finance) to mirror real-world deep-research needs. It has 2 evaluation metrics, but the leaderboard is based on the RACE score. This uses LLM-as-a-judge (Gemini) to evaluate research reports against a golden set of reports compiled by experts across a set of metrics.
@@ -94,6 +214,32 @@ The dataset is available on [LangSmith via this link](https://smith.langchain.co
 # Run comprehensive evaluation on LangSmith datasets
 python tests/run_evaluate.py
 ```
+
+To run matrix evaluation for regression comparison (RAG on/off x Memory on/off), set:
+
+```bash
+ODR_PR8_MATRIX=true
+```
+
+Then execute:
+
+```bash
+python tests/run_evaluate.py
+```
+
+This produces per-variant outputs and regression summaries (including P50/P95 latency and token cost baselines).
+
+#### Local Acceptance Checks (Fast)
+
+Before sharing/demoing, run these checks:
+
+```bash
+python tests/pr8_acceptance/validate_pr8.py
+python tests/pr1_pr3_acceptance/validate_pr1_pr3.py
+python tests/pr4_acceptance/validate_pr4.py
+```
+
+These validate core configuration, ingestion/RAG behavior, session-memory behavior, and PR-8 evaluator extensions.
 
 This will provide a link to a LangSmith experiment, which will have a name `YOUR_EXPERIMENT_NAME`. Once this is done, extract the results to a JSONL file that can be submitted to the Deep Research Bench.
 
