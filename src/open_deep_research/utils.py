@@ -40,6 +40,11 @@ TAVILY_SEARCH_DESCRIPTION = (
     "A search engine optimized for comprehensive, accurate, and trusted results. "
     "Useful for when you need to answer questions about current events."
 )
+YOU_SEARCH_DESCRIPTION = (
+    "A web search engine powered by You.com that can live-crawl sources and return web"
+    " and news results with markdown content. Use it to gather fresh information from"
+    " across the public internet."
+)
 @tool(description=TAVILY_SEARCH_DESCRIPTION)
 async def tavily_search(
     queries: List[str],
@@ -123,16 +128,25 @@ async def tavily_search(
     }
     
     # Step 7: Format the final output
+    return format_search_results(summarized_results)
+
+def format_search_results(summarized_results: Dict[str, Dict[str, str]]) -> str:
+    """Format summarized search results into a structured string."""
     if not summarized_results:
-        return "No valid search results found. Please try different search queries or use a different search API."
-    
+        return (
+            "No valid search results found. Please try different search queries or use a "
+            "different search API."
+        )
+
     formatted_output = "Search results: \n\n"
-    for i, (url, result) in enumerate(summarized_results.items()):
-        formatted_output += f"\n\n--- SOURCE {i+1}: {result['title']} ---\n"
+    for i, (url, result) in enumerate(summarized_results.items(), start=1):
+        title = result.get("title") or "Untitled Source"
+        content = result.get("content") or "No summary available."
+        formatted_output += f"\n\n--- SOURCE {i}: {title} ---\n"
         formatted_output += f"URL: {url}\n\n"
-        formatted_output += f"SUMMARY:\n{result['content']}\n\n"
+        formatted_output += f"SUMMARY:\n{content}\n\n"
         formatted_output += "\n\n" + "-" * 80 + "\n"
-    
+
     return formatted_output
 
 async def tavily_search_async(
@@ -171,6 +185,182 @@ async def tavily_search_async(
     # Execute all search queries in parallel and return results
     search_results = await asyncio.gather(*search_tasks)
     return search_results
+
+@tool(description=YOU_SEARCH_DESCRIPTION)
+async def you_search(
+    queries: List[str],
+    max_results: Annotated[int, InjectedToolArg] = 5,
+    config: RunnableConfig = None,
+) -> str:
+    """Fetch and summarize search results from the You.com search API."""
+    if not queries:
+        raise ToolException("Please provide at least one search query.")
+
+    search_results = await you_search_async(
+        queries,
+        max_results=max_results,
+        config=config,
+    )
+
+    if not search_results:
+        return (
+            "No valid search results found. Please try different search queries or use "
+            "a different search API."
+        )
+
+    # Deduplicate results across queries
+    unique_results: Dict[str, Dict[str, Any]] = {}
+    for response in search_results:
+        if not response:
+            continue
+        you_results = response.get("results") or {}
+        combined_results: List[Dict[str, Any]] = []
+        web_results = you_results.get("web") or []
+        if isinstance(web_results, list):
+            combined_results.extend(web_results)
+        news_results = you_results.get("news") or []
+        if isinstance(news_results, list):
+            combined_results.extend(news_results)
+
+        for result in combined_results:
+            url = result.get("url")
+            if not url or url in unique_results:
+                continue
+            unique_results[url] = {**result, "query": response.get("query")}
+
+    if not unique_results:
+        return (
+            "No valid search results found. Please try different search queries or use "
+            "a different search API."
+        )
+
+    configurable = Configuration.from_runnable_config(config)
+    max_char_to_include = configurable.max_content_length
+
+    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
+    summarization_model = init_chat_model(
+        model=configurable.summarization_model,
+        max_tokens=configurable.summarization_model_max_tokens,
+        api_key=model_api_key,
+        tags=["langsmith:nostream"],
+    ).with_structured_output(Summary).with_retry(
+        stop_after_attempt=configurable.max_structured_output_retries
+    )
+
+    async def noop():
+        return None
+
+    def _extract_markdown(result: Dict[str, Any]) -> Optional[str]:
+        contents = result.get("contents") or {}
+        if isinstance(contents, dict):
+            markdown_content = contents.get("markdown")
+            if isinstance(markdown_content, str) and markdown_content.strip():
+                return markdown_content
+        return None
+
+    def _fallback_content(result: Dict[str, Any]) -> str:
+        contents = result.get("contents") or {}
+        if isinstance(contents, dict):
+            markdown_content = contents.get("markdown")
+            if isinstance(markdown_content, str) and markdown_content.strip():
+                return markdown_content[:max_char_to_include]
+
+        snippets = result.get("snippets")
+        if isinstance(snippets, list) and snippets:
+            joined = " ".join(snippets)
+            return joined[:max_char_to_include]
+
+        snippet = result.get("snippet")
+        if isinstance(snippet, str) and snippet.strip():
+            return snippet[:max_char_to_include]
+
+        return "No summary available for this source."
+
+    summarization_tasks = []
+    for result in unique_results.values():
+        markdown_content = _extract_markdown(result)
+        if markdown_content:
+            summarization_tasks.append(
+                summarize_webpage(
+                    summarization_model,
+                    markdown_content[:max_char_to_include],
+                )
+            )
+        else:
+            summarization_tasks.append(noop())
+
+    summaries = await asyncio.gather(*summarization_tasks)
+
+    summarized_results = {}
+    for url, result, summary in zip(
+        unique_results.keys(), unique_results.values(), summaries
+    ):
+        summarized_results[url] = {
+            "title": result.get("title") or (result.get("query") or "Unknown Source"),
+            "content": summary if summary else _fallback_content(result),
+        }
+
+    return format_search_results(summarized_results)
+
+async def you_search_async(
+    search_queries: List[str],
+    max_results: int = 5,
+    livecrawl: str = "all",
+    config: RunnableConfig = None,
+):
+    """Execute multiple You.com search queries asynchronously."""
+    if not search_queries:
+        raise ToolException("Please provide at least one search query.")
+
+    api_key = get_you_search_api_key(config)
+    if not api_key:
+        raise ToolException(
+            "YouSearch API key is not configured. Set YOU_API_KEY or provide it via apiKeys."
+        )
+
+    headers = {"x-api-key": api_key}
+    base_url = "https://api.ydc-index.io/v1/search"
+    timeout = aiohttp.ClientTimeout(total=60)
+
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        async def fetch(query: str):
+            params = {
+                "query": query,
+                "count": max(1, max_results),
+                "livecrawl": livecrawl,
+                "livecrawl_formats": "markdown",
+            }
+            try:
+                async with session.get(base_url, headers=headers, params=params) as response:
+                    if response.status != 200:
+                        error_text = await response.text()
+                        raise ToolException(
+                            f"YouSearch request failed for '{query}' (status {response.status}): {error_text[:200]}"
+                        )
+                    return await response.json()
+            except aiohttp.ClientError as exc:
+                raise ToolException(
+                    f"YouSearch request failed for '{query}': {str(exc)}"
+                ) from exc
+
+        responses = await asyncio.gather(
+            *[fetch(query) for query in search_queries], return_exceptions=True
+        )
+
+    successful_results = []
+    errors = []
+    for query, response in zip(search_queries, responses):
+        if isinstance(response, Exception):
+            logging.warning("YouSearch query '%s' failed: %s", query, response)
+            errors.append(response)
+            continue
+        response["query"] = query
+        successful_results.append(response)
+
+    if not successful_results and errors:
+        raise ToolException(str(errors[-1]))
+
+    return successful_results
 
 async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
     """Summarize webpage content using AI model with timeout protection.
@@ -559,6 +749,16 @@ async def get_search_tool(search_api: SearchAPI):
         }
         return [search_tool]
         
+    elif search_api == SearchAPI.YOUSEARCH:
+        # Configure You.com search tool with metadata
+        search_tool = you_search
+        search_tool.metadata = {
+            **(search_tool.metadata or {}),
+            "type": "search",
+            "name": "web_search"
+        }
+        return [search_tool]
+        
     elif search_api == SearchAPI.NONE:
         # No search functionality configured
         return []
@@ -923,3 +1123,15 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+def get_you_search_api_key(config: RunnableConfig):
+    """Get You.com search API key from environment or config."""
+    should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
+    if should_get_from_config.lower() == "true":
+        config_dict = config or {}
+        api_keys = config_dict.get("configurable", {}).get("apiKeys", {})
+        if not api_keys:
+            return None
+        return api_keys.get("YOU_API_KEY")
+    else:
+        return os.getenv("YOU_API_KEY")
