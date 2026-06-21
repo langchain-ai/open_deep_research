@@ -14,6 +14,7 @@ from langchain_core.messages import (
     AIMessage,
     HumanMessage,
     MessageLikeRepresentation,
+    ToolMessage,
     filter_messages,
 )
 from langchain_core.runnables import RunnableConfig
@@ -923,3 +924,20 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+
+def has_mixed_think_tool_calls(tool_calls: list[dict]) -> bool:
+    """Return True if think_tool is mixed with other tools in the same turn."""
+    has_think = any(call["name"] == "think_tool" for call in tool_calls)
+    has_other = any(call["name"] != "think_tool" for call in tool_calls)
+    return has_think and has_other
+
+def get_previous_tool_name(messages: list[object]) -> str | None:
+    """Return the name of the most recent tool message before the latest message. If there is no previous tool message, return None."""
+    # Skip the most recent message (typically the current AI reply with tool calls)
+    for i in range(len(messages) - 1, -1, -1):
+        if isinstance(messages[i], ToolMessage):
+            return messages[i].name
+        if isinstance(messages[i], dict) and messages[i].get("type") == "tool":
+            return messages[i].get("name")
+    return None
