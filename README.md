@@ -132,6 +132,10 @@ You can also deploy your own instance of OAP, and make your own custom agents (l
 1. [Deploy Open Agent Platform](https://docs.oap.langchain.com/quickstart)
 2. [Add Deep Researcher to OAP](https://docs.oap.langchain.com/setup/agents)
 
+#### Dev Container
+
+This repo includes a [Dev Container](https://containers.dev/) setup so you can run it instantly in the browser with [GitHub Codespaces](https://github.com/features/codespaces), or locally in VS Code with the Dev Containers extension. This ensures a consistent environment with all dependencies pre-installed.
+
 ### Legacy Implementations 🏛️
 
 The `src/legacy/` folder contains two earlier implementations that provide alternative approaches to automated research. They are less performant than the current implementation, but provide alternative ideas understanding the different approaches to deep research.
