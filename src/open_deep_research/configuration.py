@@ -138,6 +138,16 @@ class Configuration(BaseModel):
             }
         }
     )
+    summarization_timeout: float = Field(
+        default=60.0,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "number",
+                "default": 60.0,
+                "description": "Timeout in seconds for webpage summarization"
+            }
+        }
+    )
     max_content_length: int = Field(
         default=50000,
         metadata={
