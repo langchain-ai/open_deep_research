@@ -2,10 +2,10 @@
 
 import os
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from langchain_core.runnables import RunnableConfig
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class SearchAPI(Enum):
@@ -15,6 +15,66 @@ class SearchAPI(Enum):
     OPENAI = "openai"
     TAVILY = "tavily"
     NONE = "none"
+
+class ModelPreset(Enum):
+    """Enumeration of available model presets for quick configuration."""
+    
+    DEEPSEEK_OPENROUTER = "deepseek_openrouter"
+    GPT4_OPENAI = "gpt4_openai"
+    CLAUDE_ANTHROPIC = "claude_anthropic"
+    GEMINI_GOOGLE = "gemini_google"
+    CUSTOM = "custom"
+
+# Model preset configurations
+MODEL_PRESETS: Dict[ModelPreset, Dict[str, Any]] = {
+    ModelPreset.DEEPSEEK_OPENROUTER: {
+        "summarization_model": "openai:gpt-4o-mini",
+        "research_model": "openai:deepseek/deepseek-chat", 
+        "compression_model": "openai:deepseek/deepseek-chat",
+        "final_report_model": "openai:deepseek/deepseek-chat",
+        "summarization_model_max_tokens": 8192,
+        "research_model_max_tokens": 10000,
+        "compression_model_max_tokens": 8192,
+        "final_report_model_max_tokens": 10000,
+        "description": "使用 OpenRouter API 的 DeepSeek 模型，成本效益高"
+    },
+    ModelPreset.GPT4_OPENAI: {
+        "summarization_model": "openai:gpt-4o-mini",
+        "research_model": "openai:gpt-4o",
+        "compression_model": "openai:gpt-4o",
+        "final_report_model": "openai:gpt-4o",
+        "summarization_model_max_tokens": 8192,
+        "research_model_max_tokens": 8192,
+        "compression_model_max_tokens": 8192,
+        "final_report_model_max_tokens": 8192,
+        "description": "使用 OpenAI GPT-4o 模型，性能优秀但成本较高"
+    },
+    ModelPreset.CLAUDE_ANTHROPIC: {
+        "summarization_model": "anthropic:claude-3-5-haiku",
+        "research_model": "anthropic:claude-3-5-sonnet",
+        "compression_model": "anthropic:claude-3-5-sonnet",
+        "final_report_model": "anthropic:claude-3-5-sonnet",
+        "summarization_model_max_tokens": 8192,
+        "research_model_max_tokens": 8192,
+        "compression_model_max_tokens": 8192,
+        "final_report_model_max_tokens": 8192,
+        "description": "使用 Anthropic Claude 模型，擅长推理和分析"
+    },
+    ModelPreset.GEMINI_GOOGLE: {
+        "summarization_model": "google:gemini-1.5-flash",
+        "research_model": "google:gemini-1.5-pro",
+        "compression_model": "google:gemini-1.5-pro",
+        "final_report_model": "google:gemini-1.5-pro",
+        "summarization_model_max_tokens": 8192,
+        "research_model_max_tokens": 8192,
+        "compression_model_max_tokens": 8192,
+        "final_report_model_max_tokens": 8192,
+        "description": "使用 Google Gemini 模型，支持长上下文"
+    },
+    ModelPreset.CUSTOM: {
+        "description": "自定义模型配置，需要手动设置各个模型参数"
+    }
+}
 
 class MCPConfig(BaseModel):
     """Configuration for Model Context Protocol (MCP) servers."""
@@ -37,6 +97,25 @@ class MCPConfig(BaseModel):
 
 class Configuration(BaseModel):
     """Main configuration class for the Deep Research agent."""
+    
+    # Model Preset Selection
+    model_preset: ModelPreset = Field(
+        default=ModelPreset.DEEPSEEK_OPENROUTER,
+        metadata={
+            "x_oap_ui_config": {
+                "type": "select",
+                "default": ModelPreset.DEEPSEEK_OPENROUTER.value,
+                "description": "Choose a model preset for quick configuration. When not CUSTOM, individual model settings will be overridden.",
+                "options": [
+                    {"label": "DeepSeek (OpenRouter) - 成本效益", "value": ModelPreset.DEEPSEEK_OPENROUTER.value},
+                    {"label": "GPT-4o (OpenAI) - 高性能", "value": ModelPreset.GPT4_OPENAI.value},
+                    {"label": "Claude (Anthropic) - 善于推理", "value": ModelPreset.CLAUDE_ANTHROPIC.value},
+                    {"label": "Gemini (Google) - 长上下文", "value": ModelPreset.GEMINI_GOOGLE.value},
+                    {"label": "Custom - 自定义配置", "value": ModelPreset.CUSTOM.value}
+                ]
+            }
+        }
+    )
     
     # General Configuration
     max_structured_output_retries: int = Field(
@@ -151,12 +230,12 @@ class Configuration(BaseModel):
         }
     )
     research_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:deepseek/deepseek-chat",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
-                "description": "Model for conducting research. NOTE: Make sure your Researcher Model supports the selected search API."
+                "default": "openai:deepseek/deepseek-chat",
+                "description": "Model for conducting research. Use 'openai:model_name' format for OpenRouter models to explicitly use OpenAI provider."
             }
         }
     )
@@ -171,12 +250,12 @@ class Configuration(BaseModel):
         }
     )
     compression_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:deepseek/deepseek-chat",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
-                "description": "Model for compressing research findings from sub-agents. NOTE: Make sure your Compression Model supports the selected search API."
+                "default": "openai:deepseek/deepseek-chat",
+                "description": "Model for compressing research findings from sub-agents. Use 'openai:model_name' format for OpenRouter models."
             }
         }
     )
@@ -191,12 +270,12 @@ class Configuration(BaseModel):
         }
     )
     final_report_model: str = Field(
-        default="openai:gpt-4.1",
+        default="openai:deepseek/deepseek-chat",
         metadata={
             "x_oap_ui_config": {
                 "type": "text",
-                "default": "openai:gpt-4.1",
-                "description": "Model for writing the final report from all research findings"
+                "default": "openai:deepseek/deepseek-chat",
+                "description": "Model for writing the final report from all research findings. Use 'openai:model_name' format for OpenRouter models."
             }
         }
     )
@@ -231,6 +310,61 @@ class Configuration(BaseModel):
             }
         }
     )
+    apiKeys: Optional[dict[str, str]] = Field(
+        default={
+            "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY"),
+            "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY"),
+            "GOOGLE_API_KEY": os.environ.get("GOOGLE_API_KEY"),
+            "OPENROUTER_API_KEY": os.environ.get("OPENROUTER_API_KEY"),
+            "TAVILY_API_KEY": os.environ.get("TAVILY_API_KEY")
+        },
+        optional=True
+    )
+
+    @model_validator(mode='before')
+    @classmethod
+    def apply_model_preset(cls, data: Any) -> Any:
+        """Apply model preset configuration if not using custom preset."""
+        if not isinstance(data, dict):
+            return data
+            
+        # Get the model preset from the data
+        model_preset = data.get('model_preset', ModelPreset.DEEPSEEK_OPENROUTER)
+        
+        # If using custom preset, don't override the values
+        if model_preset == ModelPreset.CUSTOM:
+            return data
+        
+        # Ensure model_preset is a ModelPreset enum
+        if isinstance(model_preset, str):
+            try:
+                model_preset = ModelPreset(model_preset)
+            except ValueError:
+                model_preset = ModelPreset.DEEPSEEK_OPENROUTER
+        
+        # Apply preset configuration
+        preset_config = MODEL_PRESETS.get(model_preset, {})
+        
+        # Create a copy of data to modify
+        result = data.copy()
+        
+        # Apply preset values for model fields
+        model_fields = [
+            'summarization_model', 'research_model', 'compression_model', 'final_report_model',
+            'summarization_model_max_tokens', 'research_model_max_tokens', 
+            'compression_model_max_tokens', 'final_report_model_max_tokens'
+        ]
+        
+        for field_name in model_fields:
+            if field_name in preset_config:
+                # Only apply preset if the field is not explicitly set by user
+                if field_name not in data or data[field_name] is None:
+                    result[field_name] = preset_config[field_name]
+                # For non-custom presets, always apply the preset (override user values)
+                else:
+                    result[field_name] = preset_config[field_name]
+        
+        return result
 
 
     @classmethod
@@ -245,6 +379,31 @@ class Configuration(BaseModel):
             for field_name in field_names
         }
         return cls(**{k: v for k, v in values.items() if v is not None})
+    
+    def get_preset_description(self) -> str:
+        """Get the description of the current model preset."""
+        preset_config = MODEL_PRESETS.get(self.model_preset, {})
+        return preset_config.get("description", "Unknown preset")
+    
+    def get_preset_info(self) -> Dict[str, Any]:
+        """Get detailed information about the current model preset."""
+        preset_config = MODEL_PRESETS.get(self.model_preset, {})
+        return {
+            "preset": self.model_preset.value,
+            "description": preset_config.get("description", "Unknown preset"),
+            "models": {
+                "summarization": self.summarization_model,
+                "research": self.research_model,
+                "compression": self.compression_model,
+                "final_report": self.final_report_model
+            },
+            "max_tokens": {
+                "summarization": self.summarization_model_max_tokens,
+                "research": self.research_model_max_tokens,
+                "compression": self.compression_model_max_tokens,
+                "final_report": self.final_report_model_max_tokens
+            }
+        }
 
     class Config:
         """Pydantic configuration."""
