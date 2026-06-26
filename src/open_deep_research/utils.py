@@ -82,13 +82,13 @@ async def tavily_search(
     max_char_to_include = configurable.max_content_length
     
     # Initialize summarization model with retry logic
-    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model = init_chat_model(
-        model=configurable.summarization_model,
-        max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
-    ).with_structured_output(Summary).with_retry(
+    summarization_model_config = get_model_config(
+        configurable.summarization_model,
+        configurable.summarization_model_max_tokens,
+        config,
+        configurable
+    )
+    summarization_model = init_chat_model(**summarization_model_config).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
     
@@ -657,6 +657,28 @@ def openai_websearch_called(response):
     
     return False
 
+def azure_openai_websearch_called(response):
+    """Detect if Azure OpenAI's web search functionality was used in the response.
+    
+    Args:
+        response: The response object from Azure OpenAI's API
+        
+    Returns:
+        True if web search was called, False otherwise
+    """
+    # Azure OpenAI uses the same web search mechanism as OpenAI
+    # Check for tool outputs in the response metadata
+    tool_outputs = response.additional_kwargs.get("tool_outputs")
+    if not tool_outputs:
+        return False
+    
+    # Look for web search calls in the tool outputs
+    for tool_output in tool_outputs:
+        if tool_output.get("type") == "web_search_call":
+            return True
+    
+    return False
+
 
 ##########################
 # Token Limit Exceeded Utils
@@ -797,6 +819,17 @@ MODEL_TOKEN_LIMITS = {
     "openai:o3-pro": 200000,
     "openai:o1": 200000,
     "openai:o1-pro": 200000,
+    "azure_openai:gpt-4.1-mini": 1047576,
+    "azure_openai:gpt-4.1-nano": 1047576,
+    "azure_openai:gpt-4.1": 1047576,
+    "azure_openai:gpt-4o-mini": 128000,
+    "azure_openai:gpt-4o": 128000,
+    "azure_openai:o4-mini": 200000,
+    "azure_openai:o3-mini": 200000,
+    "azure_openai:o3": 200000,
+    "azure_openai:o3-pro": 200000,
+    "azure_openai:o1": 200000,
+    "azure_openai:o1-pro": 200000,
     "anthropic:claude-opus-4": 200000,
     "anthropic:claude-sonnet-4": 200000,
     "anthropic:claude-3-7-sonnet": 200000,
@@ -899,6 +932,8 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return None
         if model_name.startswith("openai:"):
             return api_keys.get("OPENAI_API_KEY")
+        elif model_name.startswith("azure_openai:"):
+            return api_keys.get("AZURE_OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return api_keys.get("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
@@ -907,6 +942,8 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
     else:
         if model_name.startswith("openai:"): 
             return os.getenv("OPENAI_API_KEY")
+        elif model_name.startswith("azure_openai:"):
+            return os.getenv("AZURE_OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
@@ -923,3 +960,33 @@ def get_tavily_api_key(config: RunnableConfig):
         return api_keys.get("TAVILY_API_KEY")
     else:
         return os.getenv("TAVILY_API_KEY")
+
+def get_model_config(model_name: str, max_tokens: int, config: RunnableConfig, configurable: "Configuration") -> dict:
+    """Get properly configured model parameters based on model type.
+    
+    Args:
+        model_name: The model identifier (e.g., "azure_openai:gpt-4", "openai:gpt-4")
+        max_tokens: Maximum tokens for the model
+        config: Runtime configuration
+        configurable: Configuration object with Azure settings
+        
+    Returns:
+        Dictionary with properly configured model parameters
+    """
+    model_config = {
+        "model": model_name,
+        "max_tokens": max_tokens,
+        "api_key": get_api_key_for_model(model_name, config),
+        "tags": ["langsmith:nostream"]
+    }
+    
+    # Only add Azure-specific parameters for Azure OpenAI models
+    if model_name.startswith("azure_openai:"):
+        if configurable.azure_endpoint:
+            model_config["azure_endpoint"] = configurable.azure_endpoint
+        if configurable.deployment_name:
+            model_config["deployment_name"] = configurable.deployment_name
+        if configurable.api_version:
+            model_config["api_version"] = configurable.api_version
+    
+    return model_config
