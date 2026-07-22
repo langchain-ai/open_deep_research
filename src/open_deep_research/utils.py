@@ -250,17 +250,27 @@ async def firecrawl_search(
     # Step 2: Deduplicate results by URL to avoid processing the same content multiple times
     unique_results = {}
     for query, response in zip(queries, search_results):
-        # With scrape_options set, results are Documents grouped by source (web/news)
+        # Results are grouped by source (web/news) and mix two shapes even when
+        # scrape_options is set: scraped Documents (with .metadata / .markdown) and
+        # un-scraped search results (with .url / .title, no .metadata / .markdown).
         documents = (response.web or []) + (response.news or [])
         for doc in documents:
-            metadata = doc.metadata
-            url = getattr(metadata, "source_url", None) or getattr(metadata, "url", None)
+            metadata = getattr(doc, "metadata", None)
+            if metadata is not None:
+                url = getattr(metadata, "source_url", None) or getattr(metadata, "url", None)
+                title = getattr(metadata, "title", None) or url
+                content = getattr(doc, "markdown", None)
+            else:
+                url = getattr(doc, "url", None)
+                title = getattr(doc, "title", None) or url
+                # Fall back to the result snippet when the page wasn't scraped
+                content = getattr(doc, "description", None) or getattr(doc, "snippet", None)
             if not url or url in unique_results:
                 continue
             unique_results[url] = {
-                "title": getattr(metadata, "title", None) or url,
-                "content": doc.markdown or "",
-                "raw_content": doc.markdown,
+                "title": title,
+                "content": content or "",
+                "raw_content": content,
                 "query": query,
             }
 
