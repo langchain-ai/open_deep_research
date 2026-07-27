@@ -28,11 +28,24 @@ uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
+```bash
+git clone https://github.com/langchain-ai/open_deep_research.git
+cd open_deep_research
+
+conda create -n open-deep-research python=3.11 -y
+conda activate open-deep-research
+python -m pip install --upgrade pip setuptools wheel
+```
+
 2. Install dependencies:
 ```bash
 uv sync
 # or
 uv pip install -r pyproject.toml
+```
+
+```bash
+pip install -e . # 可编辑模式安装当前目录中的项目，并基于pyproject.toml进行依赖解析
 ```
 
 3. Set up your `.env` file to customize the environment variables (for model selection, search tools, and other configuration settings):
