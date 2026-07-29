@@ -82,12 +82,10 @@ async def tavily_search(
     max_char_to_include = configurable.max_content_length
     
     # Initialize summarization model with retry logic
-    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
     summarization_model = init_chat_model(
-        model=configurable.summarization_model,
         max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
+        tags=["langsmith:nostream"],
+        **get_model_config_for_provider(configurable.summarization_model, config),
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
@@ -826,6 +824,8 @@ MODEL_TOKEN_LIMITS = {
     "bedrock:us.anthropic.claude-sonnet-4-20250514-v1:0": 200000,
     "bedrock:us.anthropic.claude-opus-4-20250514-v1:0": 200000,
     "anthropic.claude-opus-4-1-20250805-v1:0": 200000,
+    "minimax:MiniMax-M3": 1000000,
+    "minimax:MiniMax-M2.7": 204800,
 }
 
 def get_model_token_limit(model_string):
@@ -889,6 +889,55 @@ def get_config_value(value):
     else:
         return value.value
 
+# MiniMax exposes an OpenAI-compatible chat completions API, so its models are
+# initialized through the OpenAI client with a MiniMax base URL. The base URL is
+# selected by region (the default global endpoint or the mainland China endpoint)
+# and can be overridden directly with the MINIMAX_API_BASE environment variable.
+MINIMAX_OPENAI_BASE_URLS = {
+    "global_en": "https://api.minimax.io/v1",
+    "cn_zh": "https://api.minimaxi.com/v1",
+}
+DEFAULT_MINIMAX_REGION = "global_en"
+
+def get_model_name_for_init(model_name: str) -> str:
+    """Normalize a model string into a provider prefix understood by init_chat_model.
+
+    MiniMax models are served through the OpenAI-compatible client, so a ``minimax:``
+    prefix is rewritten to ``openai:`` while the MiniMax base URL is supplied separately.
+    """
+    if model_name.lower().startswith("minimax:"):
+        return "openai:" + model_name.split(":", 1)[1]
+    return model_name
+
+def get_base_url_for_model(model_name: str, config: RunnableConfig):
+    """Get the API base URL for a model that requires a custom endpoint.
+
+    Returns the region-appropriate MiniMax base URL for ``minimax:`` models and None
+    for models that use their provider's default endpoint.
+    """
+    if not model_name.lower().startswith("minimax:"):
+        return None
+    explicit_base_url = os.getenv("MINIMAX_API_BASE")
+    if explicit_base_url:
+        return explicit_base_url
+    region = os.getenv("MINIMAX_API_REGION", DEFAULT_MINIMAX_REGION)
+    return MINIMAX_OPENAI_BASE_URLS.get(region, MINIMAX_OPENAI_BASE_URLS[DEFAULT_MINIMAX_REGION])
+
+def get_model_config_for_provider(model_name: str, config: RunnableConfig) -> dict:
+    """Build init_chat_model overrides (model id, API key, and base URL) for a model.
+
+    Handles OpenAI-compatible providers such as MiniMax that are exposed through a
+    dedicated prefix but initialized via the OpenAI-compatible client.
+    """
+    model_config = {
+        "model": get_model_name_for_init(model_name),
+        "api_key": get_api_key_for_model(model_name, config),
+    }
+    base_url = get_base_url_for_model(model_name, config)
+    if base_url:
+        model_config["base_url"] = base_url
+    return model_config
+
 def get_api_key_for_model(model_name: str, config: RunnableConfig):
     """Get API key for a specific model from environment or config."""
     should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
@@ -903,14 +952,18 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return api_keys.get("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return api_keys.get("GOOGLE_API_KEY")
+        elif model_name.startswith("minimax:"):
+            return api_keys.get("MINIMAX_API_KEY")
         return None
     else:
-        if model_name.startswith("openai:"): 
+        if model_name.startswith("openai:"):
             return os.getenv("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
         elif model_name.startswith("google"):
             return os.getenv("GOOGLE_API_KEY")
+        elif model_name.startswith("minimax:"):
+            return os.getenv("MINIMAX_API_KEY")
         return None
 
 def get_tavily_api_key(config: RunnableConfig):
