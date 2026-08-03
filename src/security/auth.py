@@ -62,11 +62,13 @@ async def get_current_user(authorization: str | None) -> Auth.types.MinimalUserD
         return {
             "identity": user.id,
         }
+    except Auth.exceptions.HTTPException:
+        raise
     except Exception as e:
-        # Handle any errors from Supabase
+        # Do not expose provider or infrastructure details to clients.
         raise Auth.exceptions.HTTPException(
-            status_code=401, detail=f"Authentication error: {str(e)}"
-        )
+            status_code=401, detail="Authentication failed"
+        ) from e
 
 
 @auth.on.threads.create
