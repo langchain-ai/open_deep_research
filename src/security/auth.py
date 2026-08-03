@@ -31,8 +31,12 @@ async def get_current_user(authorization: str | None) -> Auth.types.MinimalUserD
     # Parse the authorization header
     try:
         scheme, token = authorization.split()
-        assert scheme.lower() == "bearer"
-    except (ValueError, AssertionError):
+    except ValueError:
+        raise Auth.exceptions.HTTPException(
+            status_code=401, detail="Invalid authorization header format"
+        )
+
+    if scheme.lower() != "bearer":
         raise Auth.exceptions.HTTPException(
             status_code=401, detail="Invalid authorization header format"
         )
