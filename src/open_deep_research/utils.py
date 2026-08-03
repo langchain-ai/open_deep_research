@@ -723,12 +723,10 @@ def _check_openai_token_limit(exception: Exception, error_str: str) -> bool:
             return True
     
     # Check for specific OpenAI error codes
-    if hasattr(exception, 'code') and hasattr(exception, 'type'):
+    if hasattr(exception, 'code'):
         error_code = getattr(exception, 'code', '')
-        error_type = getattr(exception, 'type', '')
         
-        if (error_code == 'context_length_exceeded' or
-            error_type == 'invalid_request_error'):
+        if error_code == 'context_length_exceeded':
             return True
     
     return False
