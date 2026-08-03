@@ -24,12 +24,12 @@ def _format_input_query(inputs: dict) -> str:
 
 class OverallQualityScore(BaseModel):
     """Score the overall quality of the report against specific criteria."""
-    research_depth: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
-    source_quality: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
-    analytical_rigor: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
-    practical_value: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
-    balance_and_objectivity: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
-    writing_quality: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    research_depth: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    source_quality: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    analytical_rigor: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    practical_value: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    balance_and_objectivity: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
+    writing_quality: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria (1 = doesn't meet at all, 5 = meets all criteria).")
 
 def eval_overall_quality(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
@@ -58,7 +58,7 @@ def eval_overall_quality(inputs: dict, outputs: dict):
 class RelevanceScore(BaseModel):
     """Score the report relevance against specific criteria."""
     reasoning: str = Field(description="The reason for the score, including specific examples from the report.")
-    score: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria for relevance (1 = doesn't meet at all, 5 = meets all criteria).")
+    score: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria for relevance (1 = doesn't meet at all, 5 = meets all criteria).")
 
 def eval_relevance(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
@@ -81,7 +81,7 @@ def eval_relevance(inputs: dict, outputs: dict):
 class StructureScore(BaseModel):
     """Score the report structure against specific criteria."""
     reasoning: str = Field(description="The reason for the score, including specific examples from the report.")
-    score: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria for structure and flow (1 = doesn't meet at all, 5 = meets all criteria).")
+    score: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria for structure and flow (1 = doesn't meet at all, 5 = meets all criteria).")
 
 def eval_structure(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
@@ -103,7 +103,7 @@ def eval_structure(inputs: dict, outputs: dict):
 class CorrectnessScore(BaseModel):
     """Score the report correctness against specific criteria."""
     reasoning: str = Field(description="The reason for the score, including specific examples from the report.")
-    score: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria for correctness (1 = doesn't meet at all, 5 = meets all criteria).")
+    score: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria for correctness (1 = doesn't meet at all, 5 = meets all criteria).")
 
 def eval_correctness(inputs: dict, outputs: dict, reference_outputs: dict):
     query = _format_input_query(inputs)
@@ -154,7 +154,7 @@ def eval_groundedness(inputs: dict, outputs: dict):
 class CompletenessScore(BaseModel):
     """Score the report completeness against specific criteria."""
     reasoning: str = Field(description="The reason for the score, including specific examples from the report.")
-    score: int = Field(description="Integer score 1-5 showing whether the report meets the provided criteria for completeness (1 = doesn't meet at all, 5 = meets all criteria).")
+    score: int = Field(ge=1, le=5, description="Integer score 1-5 showing whether the report meets the provided criteria for completeness (1 = doesn't meet at all, 5 = meets all criteria).")
 
 def eval_completeness(inputs: dict, outputs: dict):
     query = _format_input_query(inputs)
