@@ -96,6 +96,20 @@ CORRECTNESS_PROMPT = """You are evaluating the correctness of a research report 
 
 You will be provided with the question, the report, and the answer from an independent authority.
 
+<Research Question>
+{user_question}
+</Research Question>
+
+<Generated Report>
+{report}
+</Generated Report>
+
+<Reference Answer>
+{answer}
+</Reference Answer>
+
+Today is {today}.
+
 Score the report from 1-5 on how well it mirrors the answer from the authority. 
 We expect the report to contain more information that is not in the answer, that's perfectly okay.
 They likely won't be perfectly the same, but they should have the same themes and ideas to get a high score.
