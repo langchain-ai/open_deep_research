@@ -471,7 +471,7 @@ def initiate_final_section_writing(state: ReportState):
 # Report section sub-graph -- 
 
 # Add nodes 
-section_builder = StateGraph(SectionState, output=SectionOutputState)
+section_builder = StateGraph(SectionState, output_schema=SectionOutputState)
 section_builder.add_node("generate_queries", generate_queries)
 section_builder.add_node("search_web", search_web)
 section_builder.add_node("write_section", write_section)
@@ -484,7 +484,12 @@ section_builder.add_edge("search_web", "write_section")
 # Outer graph for initial report plan compiling results from each section -- 
 
 # Add nodes
-builder = StateGraph(ReportState, input=ReportStateInput, output=ReportStateOutput, config_schema=Configuration)
+builder = StateGraph(
+    ReportState,
+    input_schema=ReportStateInput,
+    output_schema=ReportStateOutput,
+    context_schema=Configuration,
+)
 builder.add_node("generate_report_plan", generate_report_plan)
 builder.add_node("human_feedback", human_feedback)
 builder.add_node("build_section_with_web_research", section_builder.compile())

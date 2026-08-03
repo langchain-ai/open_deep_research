@@ -459,7 +459,11 @@ async def research_agent_should_continue(state: SectionState) -> str:
 """Build the multi-agent workflow"""
 
 # Research agent workflow
-research_builder = StateGraph(SectionState, output=SectionOutputState, config_schema=MultiAgentConfiguration)
+research_builder = StateGraph(
+    SectionState,
+    output_schema=SectionOutputState,
+    context_schema=MultiAgentConfiguration,
+)
 research_builder.add_node("research_agent", research_agent)
 research_builder.add_node("research_agent_tools", research_agent_tools)
 research_builder.add_edge(START, "research_agent") 
@@ -471,7 +475,12 @@ research_builder.add_conditional_edges(
 research_builder.add_edge("research_agent_tools", "research_agent")
 
 # Supervisor workflow
-supervisor_builder = StateGraph(ReportState, input=MessagesState, output=ReportStateOutput, config_schema=MultiAgentConfiguration)
+supervisor_builder = StateGraph(
+    ReportState,
+    input_schema=MessagesState,
+    output_schema=ReportStateOutput,
+    context_schema=MultiAgentConfiguration,
+)
 supervisor_builder.add_node("supervisor", supervisor)
 supervisor_builder.add_node("supervisor_tools", supervisor_tools)
 supervisor_builder.add_node("research_team", research_builder.compile())
