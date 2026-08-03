@@ -1512,7 +1512,9 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
     Raises:
         ValueError: If an unsupported search API is specified
     """
-    if search_api == "tavily":
+    if search_api == "none":
+        return ""
+    elif search_api == "tavily":
         # Tavily search tool used with both workflow and agent 
         # and returns a formatted source string
         return await tavily_search.ainvoke({'queries': query_list, **params_to_pass})
