@@ -206,7 +206,7 @@ Only these fully comprehensive cleaned findings are going to be returned to the 
 The report should be structured like this:
 **List of Queries and Tool Calls Made**
 **Fully Comprehensive Findings**
-**List of All Relevant Sources (with citations in the report)**
+### Sources
 </Output Format>
 
 <Citation Rules>
