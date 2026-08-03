@@ -152,5 +152,6 @@ async def authorize_store(ctx: Auth.types.AuthContext, value: dict):
         return
 
     # The "namespace" field for each store item is a tuple you can think of as the directory of an item.
-    namespace: tuple = value["namespace"]
-    assert namespace[0] == ctx.user.identity, "Not authorized"
+    namespace: tuple = value.get("namespace", ())
+    if not namespace or namespace[0] != ctx.user.identity:
+        raise Auth.exceptions.HTTPException(status_code=403, detail="Not authorized")
