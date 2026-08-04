@@ -37,13 +37,23 @@ def extract_langsmith_data(project_name, model_name, dataset_name, api_key):
     for run in output_runs:
         if run.outputs is not None and run.outputs.get("final_report") is not None:
             runs.append(run)
+
+    matched_runs = [
+        run for run in runs
+        if run.reference_example_id in examples_dict
+    ]
+    skipped_runs = len(runs) - len(matched_runs)
+    if skipped_runs:
+        print(
+            f"Skipped {skipped_runs} run(s) without a matching reference example"
+        )
     
     output_jsonl = [
         {
             "id": examples_dict[run.reference_example_id].metadata["id"],
             "prompt": run.inputs["inputs"]["messages"][0]["content"],
             "article": run.outputs["final_report"],
-        } for run in runs
+        } for run in matched_runs
     ]
     
     # Write output_jsonl to JSONL file in tests/expt_results directory
