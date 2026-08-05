@@ -14,6 +14,7 @@ from langchain_core.messages import (
     AIMessage,
     HumanMessage,
     MessageLikeRepresentation,
+    ToolMessage,
     filter_messages,
 )
 from langchain_core.runnables import RunnableConfig
@@ -845,25 +846,40 @@ def get_model_token_limit(model_string):
     # Model not found in lookup table
     return None
 
-def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> list[MessageLikeRepresentation]:
-    """Truncate message history by removing up to the last AI message.
-    
-    This is useful for handling token limit exceeded errors by removing recent context.
-    
+def remove_oldest_research_turn(messages: list[MessageLikeRepresentation]) -> list[MessageLikeRepresentation]:
+    """Remove the oldest complete research turn from the message history.
+
+    Research transcripts alternate between AI messages (tool calls or
+    reflection) and their corresponding ToolMessage results, after an initial
+    HumanMessage describing the research topic. When the context window is
+    exceeded, dropping the oldest complete turn frees the most tokens while
+    preserving the most recent findings.
+
     Args:
         messages: List of message objects to truncate
-        
+
     Returns:
-        Truncated message list up to (but not including) the last AI message
+        Message list with the oldest research turn removed and the leading
+        HumanMessage topic preserved. If no AI message is found, the original
+        list is returned.
     """
-    # Search backwards through messages to find the last AI message
-    for i in range(len(messages) - 1, -1, -1):
-        if isinstance(messages[i], AIMessage):
-            # Return everything up to (but not including) the last AI message
-            return messages[:i]
-    
-    # No AI messages found, return original list
-    return messages
+    first_ai_index = next(
+        (i for i, message in enumerate(messages) if isinstance(message, AIMessage)),
+        None,
+    )
+    if first_ai_index is None:
+        return messages
+
+    # A research turn spans the first AI message and the ToolMessage results
+    # that immediately follow it.
+    turn_end = first_ai_index
+    for i in range(first_ai_index + 1, len(messages)):
+        if isinstance(messages[i], ToolMessage):
+            turn_end = i
+        else:
+            break
+
+    return messages[:first_ai_index] + messages[turn_end + 1:]
 
 ##########################
 # Misc Utils

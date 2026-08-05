@@ -48,7 +48,7 @@ from open_deep_research.utils import (
     get_today_str,
     is_token_limit_exceeded,
     openai_websearch_called,
-    remove_up_to_last_ai_message,
+    remove_oldest_research_turn,
     think_tool,
 )
 
@@ -565,9 +565,9 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
         except Exception as e:
             synthesis_attempts += 1
             
-            # Handle token limit exceeded by removing older messages
-            if is_token_limit_exceeded(e, configurable.research_model):
-                researcher_messages = remove_up_to_last_ai_message(researcher_messages)
+            # Handle token limit exceeded by removing the oldest research turns
+            if is_token_limit_exceeded(e, configurable.compression_model):
+                researcher_messages = remove_oldest_research_turn(researcher_messages)
                 continue
             
             # For other errors, continue retrying
