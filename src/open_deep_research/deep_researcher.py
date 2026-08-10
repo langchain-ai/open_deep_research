@@ -532,7 +532,7 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
     })
     
     # Step 2: Prepare messages for compression
-    researcher_messages = state.get("researcher_messages", [])
+    researcher_messages = list(state.get("researcher_messages", []))
     
     # Add instruction to switch from research mode to compression mode
     researcher_messages.append(HumanMessage(content=compress_research_simple_human_message))
@@ -566,7 +566,7 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
             synthesis_attempts += 1
             
             # Handle token limit exceeded by removing older messages
-            if is_token_limit_exceeded(e, configurable.research_model):
+            if is_token_limit_exceeded(e, configurable.compression_model):
                 researcher_messages = remove_up_to_last_ai_message(researcher_messages)
                 continue
             
