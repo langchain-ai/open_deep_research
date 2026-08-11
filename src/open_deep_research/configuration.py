@@ -244,6 +244,8 @@ class Configuration(BaseModel):
             field_name: os.environ.get(field_name.upper(), configurable.get(field_name))
             for field_name in field_names
         }
+        if isinstance(values.get("mcp_config"), str):
+            values["mcp_config"] = MCPConfig.model_validate_json(values["mcp_config"])
         return cls(**{k: v for k, v in values.items() if v is not None})
 
     class Config:
