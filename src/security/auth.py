@@ -31,8 +31,12 @@ async def get_current_user(authorization: str | None) -> Auth.types.MinimalUserD
     # Parse the authorization header
     try:
         scheme, token = authorization.split()
-        assert scheme.lower() == "bearer"
-    except (ValueError, AssertionError):
+    except ValueError:
+        raise Auth.exceptions.HTTPException(
+            status_code=401, detail="Invalid authorization header format"
+        )
+
+    if scheme.lower() != "bearer":
         raise Auth.exceptions.HTTPException(
             status_code=401, detail="Invalid authorization header format"
         )
@@ -152,5 +156,6 @@ async def authorize_store(ctx: Auth.types.AuthContext, value: dict):
         return
 
     # The "namespace" field for each store item is a tuple you can think of as the directory of an item.
-    namespace: tuple = value["namespace"]
-    assert namespace[0] == ctx.user.identity, "Not authorized"
+    namespace: tuple = value.get("namespace", ())
+    if not namespace or namespace[0] != ctx.user.identity:
+        raise Auth.exceptions.HTTPException(status_code=403, detail="Not authorized")
