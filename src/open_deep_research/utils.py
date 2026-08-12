@@ -14,6 +14,7 @@ from langchain_core.messages import (
     AIMessage,
     HumanMessage,
     MessageLikeRepresentation,
+    ToolMessage,
     filter_messages,
 )
 from langchain_core.runnables import RunnableConfig
@@ -846,21 +847,27 @@ def get_model_token_limit(model_string):
     return None
 
 def remove_up_to_last_ai_message(messages: list[MessageLikeRepresentation]) -> list[MessageLikeRepresentation]:
-    """Truncate message history by removing up to the last AI message.
+    """Remove the oldest AI message and its associated tool messages to free context.
     
-    This is useful for handling token limit exceeded errors by removing recent context.
+    When token limits are exceeded, this removes the earliest AI→Tool exchange
+    from the message history, preserving the most recent research findings
+    which are typically the most relevant.
     
     Args:
         messages: List of message objects to truncate
         
     Returns:
-        Truncated message list up to (but not including) the last AI message
+        Truncated message list with the oldest AI exchange removed
     """
-    # Search backwards through messages to find the last AI message
-    for i in range(len(messages) - 1, -1, -1):
+    # Search forwards to find the first AI message (oldest exchange)
+    for i in range(len(messages)):
         if isinstance(messages[i], AIMessage):
-            # Return everything up to (but not including) the last AI message
-            return messages[:i]
+            # Skip past any ToolMessages that follow this AI message
+            j = i + 1
+            while j < len(messages) and isinstance(messages[j], ToolMessage):
+                j += 1
+            # Return everything after the removed AI→Tool exchange
+            return messages[j:]
     
     # No AI messages found, return original list
     return messages
@@ -889,6 +896,19 @@ def get_config_value(value):
     else:
         return value.value
 
+# Mapping from model provider prefix to (env var name, config key name)
+_PROVIDER_API_KEY_MAP = {
+    "openai:": ("OPENAI_API_KEY", "OPENAI_API_KEY"),
+    "anthropic:": ("ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+    "google": ("GOOGLE_API_KEY", "GOOGLE_API_KEY"),
+    "groq:": ("GROQ_API_KEY", "GROQ_API_KEY"),
+    "deepseek:": ("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY"),
+    "mistral:": ("MISTRAL_API_KEY", "MISTRAL_API_KEY"),
+    "cohere:": ("COHERE_API_KEY", "COHERE_API_KEY"),
+    "fireworks:": ("FIREWORKS_API_KEY", "FIREWORKS_API_KEY"),
+    "bedrock:": ("AWS_ACCESS_KEY_ID", "AWS_ACCESS_KEY_ID"),
+}
+
 def get_api_key_for_model(model_name: str, config: RunnableConfig):
     """Get API key for a specific model from environment or config."""
     should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
@@ -897,20 +917,14 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
         api_keys = config.get("configurable", {}).get("apiKeys", {})
         if not api_keys:
             return None
-        if model_name.startswith("openai:"):
-            return api_keys.get("OPENAI_API_KEY")
-        elif model_name.startswith("anthropic:"):
-            return api_keys.get("ANTHROPIC_API_KEY")
-        elif model_name.startswith("google"):
-            return api_keys.get("GOOGLE_API_KEY")
+        for prefix, (_, config_key) in _PROVIDER_API_KEY_MAP.items():
+            if model_name.startswith(prefix):
+                return api_keys.get(config_key)
         return None
     else:
-        if model_name.startswith("openai:"): 
-            return os.getenv("OPENAI_API_KEY")
-        elif model_name.startswith("anthropic:"):
-            return os.getenv("ANTHROPIC_API_KEY")
-        elif model_name.startswith("google"):
-            return os.getenv("GOOGLE_API_KEY")
+        for prefix, (env_var, _) in _PROVIDER_API_KEY_MAP.items():
+            if model_name.startswith(prefix):
+                return os.getenv(env_var)
         return None
 
 def get_tavily_api_key(config: RunnableConfig):
