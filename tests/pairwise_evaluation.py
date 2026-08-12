@@ -115,14 +115,13 @@ multi_agent_supervisor_v2 = "DR Supervisor: Multi Agent - Tavily (v2) #-40967f53
 multi_agent_workflow = "DR MAW - Tavily #-c6818a83"
 
 
-# evaluate_comparative(
-#     (single_agent_experiment_name, multi_agent_supervisor_experiment_name, multi_agent_workflow_experiment_name),  # Replace with the names/IDs of your experiments
-#     evaluators=[free_for_all_evaluator],
-#     randomize_order=True,
-# )
+def main():
+    evaluate_comparative(
+        (single_agent, multi_agent_supervisor_v2),
+        evaluators=[head_to_head_evaluator],
+        randomize_order=True,
+    )
 
-evaluate_comparative(
-    (single_agent, multi_agent_supervisor_v2),  # Replace with the names/IDs of your experiments
-    evaluators=[head_to_head_evaluator],
-    randomize_order=True,
-)
+
+if __name__ == "__main__":
+    main()
