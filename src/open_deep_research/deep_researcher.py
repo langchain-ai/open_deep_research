@@ -350,7 +350,7 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
 
 # Supervisor Subgraph Construction
 # Creates the supervisor workflow that manages research delegation and coordination
-supervisor_builder = StateGraph(SupervisorState, config_schema=Configuration)
+supervisor_builder = StateGraph(SupervisorState, context_schema=Configuration)
 
 # Add supervisor nodes for research management
 supervisor_builder.add_node("supervisor", supervisor)           # Main supervisor logic
@@ -587,9 +587,9 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
 # Researcher Subgraph Construction
 # Creates individual researcher workflow for conducting focused research on specific topics
 researcher_builder = StateGraph(
-    ResearcherState, 
-    output=ResearcherOutputState, 
-    config_schema=Configuration
+    ResearcherState,
+    output_schema=ResearcherOutputState,
+    context_schema=Configuration
 )
 
 # Add researcher nodes for research execution and compression
@@ -699,9 +699,9 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
 # Main Deep Researcher Graph Construction
 # Creates the complete deep research workflow from user input to final report
 deep_researcher_builder = StateGraph(
-    AgentState, 
-    input=AgentInputState, 
-    config_schema=Configuration
+    AgentState,
+    input_schema=AgentInputState,
+    context_schema=Configuration
 )
 
 # Add main workflow nodes for the complete research process
