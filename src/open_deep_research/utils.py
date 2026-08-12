@@ -760,7 +760,6 @@ def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
     """Check if exception indicates Google/Gemini token limit exceeded."""
     # Analyze exception metadata
     exception_type = str(type(exception))
-    class_name = exception.__class__.__name__
     module_name = getattr(exception.__class__, '__module__', '')
     
     # Check if this is a Google/Gemini exception
@@ -769,20 +768,37 @@ def _check_gemini_token_limit(exception: Exception, error_str: str) -> bool:
         'google' in module_name.lower()
     )
     
-    # Check for Google-specific resource exhaustion errors
-    is_resource_exhausted = class_name in [
-        'ResourceExhausted', 
-        'GoogleGenerativeAIFetchError'
+    if not is_google_exception:
+        return False
+
+    quota_indicators = [
+        'quota',
+        'rate limit',
+        'requests per minute',
+        'tokens per minute',
     ]
-    
-    if is_google_exception and is_resource_exhausted:
-        return True
-    
-    # Check for specific Google API resource exhaustion patterns
-    if 'google.api_core.exceptions.resourceexhausted' in exception_type.lower():
-        return True
-    
-    return False
+    if any(indicator in error_str for indicator in quota_indicators):
+        return False
+
+    input_indicators = [
+        'input token',
+        'prompt token',
+        'context length',
+        'context window',
+        'input is too long',
+        'prompt is too long',
+    ]
+    overflow_indicators = [
+        'exceed',
+        'maximum',
+        'limit',
+        'too long',
+        'too many',
+    ]
+    return (
+        any(indicator in error_str for indicator in input_indicators)
+        and any(indicator in error_str for indicator in overflow_indicators)
+    )
 
 # NOTE: This may be out of date or not applicable to your models. Please update this as needed.
 MODEL_TOKEN_LIMITS = {
