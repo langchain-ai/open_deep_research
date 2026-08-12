@@ -129,8 +129,8 @@ Open Agent Platform (OAP) is a UI from which non-technical users can build and c
 We've deployed Open Deep Research to our public demo instance of OAP. All you need to do is add your API Keys, and you can test out the Deep Researcher for yourself! Try it out [here](https://oap.langchain.com)
 
 You can also deploy your own instance of OAP, and make your own custom agents (like Deep Researcher) available on it to your users.
-1. [Deploy Open Agent Platform](https://docs.oap.langchain.com/quickstart)
-2. [Add Deep Researcher to OAP](https://docs.oap.langchain.com/setup/agents)
+1. [Deploy Open Agent Platform](https://github.com/langchain-ai/open-agent-platform/blob/main/apps/docs/quickstart.mdx)
+2. [Add Deep Researcher to OAP](https://github.com/langchain-ai/open-agent-platform/blob/main/apps/docs/setup/agents.mdx)
 
 ### Legacy Implementations 🏛️
 
