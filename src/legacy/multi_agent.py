@@ -198,8 +198,13 @@ async def supervisor(state: ReportState, config: RunnableConfig):
     # Initialize the model
     llm = init_chat_model(model=supervisor_model)
     
-    # If sections have been completed, but we don't yet have the final report, then we need to initiate writing the introduction and conclusion
-    if state.get("completed_sections") and not state.get("final_report"):
+    # Wait until every dispatched researcher has returned before writing the final sections.
+    planned_section_count = len(state.get("sections", []))
+    if (
+        planned_section_count
+        and len(state.get("completed_sections", [])) >= planned_section_count
+        and not state.get("final_report")
+    ):
         research_complete_message = {"role": "user", "content": "Research is complete. Now write the introduction and conclusion for the report. Here are the completed main body sections: \n\n" + "\n\n".join([s.content for s in state["completed_sections"]])}
         messages = messages + [research_complete_message]
 
@@ -303,7 +308,10 @@ async def supervisor_tools(state: ReportState, config: RunnableConfig)  -> Comma
     # After processing all tool calls, decide what to do next
     if sections_list:
         # Send the sections to the research agents
-        return Command(goto=[Send("research_team", {"section": s}) for s in sections_list], update={"messages": result})
+        return Command(
+            goto=[Send("research_team", {"section": s}) for s in sections_list],
+            update={"messages": result, "sections": sections_list},
+        )
     elif intro_content:
         # Store introduction while waiting for conclusion
         # Append to messages to guide the LLM to write conclusion next
