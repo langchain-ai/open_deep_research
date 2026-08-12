@@ -1,9 +1,40 @@
 import os
-from enum import Enum
 from dataclasses import dataclass, fields
-from typing import Any, Optional, Dict, Literal
+from enum import Enum
+from typing import Any, Dict, Literal, Optional, TypeVar
 
 from langchain_core.runnables import RunnableConfig
+from pydantic import TypeAdapter, ValidationError
+
+ConfigT = TypeVar("ConfigT")
+
+
+def _coerce_value(annotation: Any, value: Any) -> Any:
+    adapter = TypeAdapter(annotation)
+    if isinstance(value, str):
+        try:
+            return adapter.validate_json(value)
+        except ValidationError:
+            return adapter.validate_python(value)
+    return adapter.validate_python(value)
+
+
+def _from_runnable_config(
+    cls: type[ConfigT],
+    config: RunnableConfig | None,
+) -> ConfigT:
+    configurable = config.get("configurable", {}) if config else {}
+    values: dict[str, Any] = {}
+    for field in fields(cls):
+        if not field.init:
+            continue
+        value = os.environ.get(
+            field.name.upper(),
+            configurable.get(field.name),
+        )
+        if value is not None:
+            values[field.name] = _coerce_value(field.type, value)
+    return cls(**values)
 
 DEFAULT_REPORT_STRUCTURE = """Use this structure to create a report on the user-provided topic:
 
@@ -56,15 +87,7 @@ class Configuration:
         cls, config: Optional[RunnableConfig] = None
     ) -> "Configuration":
         """Create a Configuration instance from a RunnableConfig."""
-        configurable = (
-            config["configurable"] if config and "configurable" in config else {}
-        )
-        values: dict[str, Any] = {
-            f.name: os.environ.get(f.name.upper(), configurable.get(f.name))
-            for f in fields(cls)
-            if f.init
-        }
-        return cls(**{k: v for k, v in values.items() if v})
+        return _from_runnable_config(cls, config)
 
 @dataclass(kw_only=True)
 class MultiAgentConfiguration:
@@ -92,15 +115,7 @@ class MultiAgentConfiguration:
         cls, config: Optional[RunnableConfig] = None
     ) -> "MultiAgentConfiguration":
         """Create a MultiAgentConfiguration instance from a RunnableConfig."""
-        configurable = (
-            config["configurable"] if config and "configurable" in config else {}
-        )
-        values: dict[str, Any] = {
-            f.name: os.environ.get(f.name.upper(), configurable.get(f.name))
-            for f in fields(cls)
-            if f.init
-        }
-        return cls(**{k: v for k, v in values.items() if v})
+        return _from_runnable_config(cls, config)
 
 # Keep the old Configuration class for backward compatibility
 Configuration = Configuration
