@@ -202,7 +202,7 @@ Use the following format for your evaluation:
 {{
    "claims": [
       {{
-         "text": "string – the extracted claim",
+         "claim": "string – the extracted claim",
          "grounded": true | false
       }},
       ...
