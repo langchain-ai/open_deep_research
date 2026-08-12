@@ -148,7 +148,12 @@ def eval_groundedness(inputs: dict, outputs: dict):
     ]))
     # normalize to 0-1
     grounded_claims = [claim for claim in eval_result.claims if claim.grounded]
-    return {"key": "groundedness_score", "score": len(grounded_claims) / len(eval_result.claims), "comment": str(eval_result.claims)}
+    score = (
+        len(grounded_claims) / len(eval_result.claims)
+        if eval_result.claims
+        else 0.0
+    )
+    return {"key": "groundedness_score", "score": score, "comment": str(eval_result.claims)}
 
 
 class CompletenessScore(BaseModel):
