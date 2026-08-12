@@ -436,12 +436,11 @@ def compile_final_report(state: ReportState, config: RunnableConfig):
     sections = state["sections"]
     completed_sections = {s.name: s.content for s in state["completed_sections"]}
 
-    # Update sections with completed content while maintaining original order
-    for section in sections:
-        section.content = completed_sections[section.name]
-
-    # Compile final report
-    all_sections = "\n\n".join([s.content for s in sections])
+    # Compile completed content in the original plan order.
+    all_sections = "\n\n".join(
+        completed_sections[section.name]
+        for section in sections
+    )
 
     if configurable.include_source_str:
         return {"final_report": all_sections, "source_str": state["source_str"]}
