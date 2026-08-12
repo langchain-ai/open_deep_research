@@ -331,7 +331,7 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
                 
         except Exception as e:
             # Handle research execution errors
-            if is_token_limit_exceeded(e, configurable.research_model) or True:
+            if is_token_limit_exceeded(e, configurable.research_model):
                 # Token limit exceeded or other error - end research phase
                 return Command(
                     goto=END,
