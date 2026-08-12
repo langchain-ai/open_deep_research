@@ -397,15 +397,23 @@ def wrap_mcp_authenticate_tool(tool: StructuredTool) -> StructuredTool:
         """Enhanced coroutine with MCP error handling and user-friendly messages."""
         
         def _find_mcp_error_in_exception_chain(exc: BaseException) -> McpError | None:
-            """Recursively search for MCP errors in exception chains."""
-            if isinstance(exc, McpError):
-                return exc
-            
-            # Handle ExceptionGroup (Python 3.11+) by checking attributes
-            if hasattr(exc, 'exceptions'):
-                for sub_exception in exc.exceptions:
-                    if found_error := _find_mcp_error_in_exception_chain(sub_exception):
-                        return found_error
+            """Search exception groups and chained causes for MCP errors."""
+            pending = [exc]
+            seen = set()
+            while pending:
+                current = pending.pop()
+                if id(current) in seen:
+                    continue
+                seen.add(id(current))
+
+                if isinstance(current, McpError):
+                    return current
+
+                pending.extend(getattr(current, "exceptions", ()))
+                if current.__cause__ is not None:
+                    pending.append(current.__cause__)
+                if current.__context__ is not None:
+                    pending.append(current.__context__)
             return None
         
         try:
