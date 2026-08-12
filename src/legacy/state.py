@@ -22,7 +22,7 @@ class Sections(BaseModel):
     )
 
 class SearchQuery(BaseModel):
-    search_query: str = Field(None, description="Query for web search.")
+    search_query: str = Field(description="Query for web search.")
 
 class Queries(BaseModel):
     queries: List[SearchQuery] = Field(
