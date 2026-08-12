@@ -43,6 +43,9 @@ from legacy.state import Section
 from legacy.prompts import SUMMARIZATION_PROMPT
 
 
+DEFAULT_HTTP_TIMEOUT = 30
+
+
 def get_config_value(value):
     """
     Helper function to handle string, dict, and enum cases of configuration values
@@ -328,7 +331,8 @@ def perplexity_search(search_queries):
         response = requests.post(
             "https://api.perplexity.ai/chat/completions",
             headers=headers,
-            json=payload
+            json=payload,
+            timeout=DEFAULT_HTTP_TIMEOUT,
         )
         response.raise_for_status()  # Raise exception for bad status codes
         
@@ -1047,7 +1051,8 @@ async def google_search_async(search_queries: Union[str, List[str]], max_results
                                     cookies = {
                                         'CONSENT': 'PENDING+987',  # Bypasses the consent page
                                         'SOCS': 'CAESHAgBEhIaAB',
-                                    }
+                                    },
+                                    timeout=DEFAULT_HTTP_TIMEOUT,
                                 )
                                 resp.raise_for_status()
                                 
@@ -1520,7 +1525,11 @@ async def select_and_execute_search(search_api: str, query_list: list[str], para
         # DuckDuckGo search tool used with both workflow and agent 
         return await duckduckgo_search.ainvoke({'search_queries': query_list})
     elif search_api == "perplexity":
-        search_results = perplexity_search(query_list, **params_to_pass)
+        search_results = await asyncio.to_thread(
+            perplexity_search,
+            query_list,
+            **params_to_pass,
+        )
     elif search_api == "exa":
         search_results = await exa_search(query_list, **params_to_pass)
     elif search_api == "arxiv":
