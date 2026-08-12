@@ -1,12 +1,22 @@
-from langsmith import Client
-from tests.evaluators import eval_overall_quality, eval_relevance, eval_structure, eval_correctness, eval_groundedness, eval_completeness
-from dotenv import load_dotenv
 import asyncio
-from open_deep_research.deep_researcher import deep_researcher_builder
-from langgraph.checkpoint.memory import MemorySaver
 import uuid
+from pathlib import Path
 
-load_dotenv("../.env")
+from dotenv import load_dotenv
+from langgraph.checkpoint.memory import MemorySaver
+from langsmith import Client
+
+from open_deep_research.deep_researcher import deep_researcher_builder
+from tests.evaluators import (
+    eval_completeness,
+    eval_correctness,
+    eval_groundedness,
+    eval_overall_quality,
+    eval_relevance,
+    eval_structure,
+)
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 client = Client()
 
