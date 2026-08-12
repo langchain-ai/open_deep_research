@@ -41,6 +41,8 @@ class Configuration(BaseModel):
     # General Configuration
     max_structured_output_retries: int = Field(
         default=3,
+        ge=1,
+        le=10,
         metadata={
             "x_oap_ui_config": {
                 "type": "number",
@@ -63,6 +65,8 @@ class Configuration(BaseModel):
     )
     max_concurrent_research_units: int = Field(
         default=5,
+        ge=1,
+        le=20,
         metadata={
             "x_oap_ui_config": {
                 "type": "slider",
@@ -93,6 +97,8 @@ class Configuration(BaseModel):
     )
     max_researcher_iterations: int = Field(
         default=6,
+        ge=1,
+        le=10,
         metadata={
             "x_oap_ui_config": {
                 "type": "slider",
@@ -106,6 +112,8 @@ class Configuration(BaseModel):
     )
     max_react_tool_calls: int = Field(
         default=10,
+        ge=1,
+        le=30,
         metadata={
             "x_oap_ui_config": {
                 "type": "slider",
@@ -140,6 +148,8 @@ class Configuration(BaseModel):
     )
     max_content_length: int = Field(
         default=50000,
+        ge=1000,
+        le=200000,
         metadata={
             "x_oap_ui_config": {
                 "type": "number",
