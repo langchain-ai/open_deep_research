@@ -72,6 +72,28 @@ Open Deep Research supports a wide range of LLM providers via the [init_chat_mod
 
 > Note: For OpenRouter: Follow [this guide](https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408) and for local models via Ollama  see [setup instructions](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318).
 
+##### OrcaRouter
+
+[OrcaRouter](https://www.orcarouter.ai) is an OpenAI-compatible model routing gateway, so it needs no code changes: keep the `openai:` prefix that `get_api_key_for_model` already recognizes and point the OpenAI base URL at the gateway.
+
+```bash
+OPENAI_API_KEY=sk-orca-...                       # your OrcaRouter key
+OPENAI_API_BASE=https://api.orcarouter.ai/v1
+```
+
+Then set the four model fields to any model in the [catalog](https://www.orcarouter.ai/models), keeping the `openai:` prefix and using the gateway's namespaced IDs:
+
+```
+summarization_model = openai:openai/gpt-5.4-mini
+research_model      = openai:openai/gpt-5.5
+compression_model   = openai:openai/gpt-5.5
+final_report_model  = openai:anthropic/claude-opus-5
+```
+
+This lets the four roles above run on models from different vendors under one key, which is useful when you want a cheap summarizer and a stronger final-report writer. `openai:orcarouter/auto` also works and picks an upstream per request, but for these roles a pinned model is safer because the router's candidate pool is not guaranteed to support structured outputs.
+
+It also runs gateway-level, zero-trust security for AI agents on the same endpoint — screening every prompt/response and governing every tool call on a default-deny basis, with no application code changes.
+
 #### Search API :mag:
 
 Open Deep Research supports a wide range of search tools. By default it uses the [Tavily](https://www.tavily.com/) search API. Has full MCP compatibility and work native web search for Anthropic and OpenAI. See the `search_api` and `mcp_config` fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) file for more details. This can be accessed via the LangGraph Studio UI. 
