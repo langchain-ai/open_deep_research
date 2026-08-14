@@ -101,7 +101,8 @@ async def tavily_search(
         noop() if not result.get("raw_content") 
         else summarize_webpage(
             summarization_model, 
-            result['raw_content'][:max_char_to_include]
+            result['raw_content'][:max_char_to_include],
+            timeout=configurable.summarization_timeout
         )
         for result in unique_results.values()
     ]
@@ -172,12 +173,13 @@ async def tavily_search_async(
     search_results = await asyncio.gather(*search_tasks)
     return search_results
 
-async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
+async def summarize_webpage(model: BaseChatModel, webpage_content: str, timeout: float = 60.0) -> str:
     """Summarize webpage content using AI model with timeout protection.
     
     Args:
         model: The chat model configured for summarization
         webpage_content: Raw webpage content to be summarized
+        timeout: Timeout in seconds for the summarization
         
     Returns:
         Formatted summary with key excerpts, or original content if summarization fails
@@ -192,7 +194,7 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         # Execute summarization with timeout to prevent hanging
         summary = await asyncio.wait_for(
             model.ainvoke([HumanMessage(content=prompt_content)]),
-            timeout=60.0  # 60 second timeout for summarization
+            timeout=timeout
         )
         
         # Format the summary with structured sections
@@ -205,12 +207,13 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         
     except asyncio.TimeoutError:
         # Timeout during summarization - return original content
-        logging.warning("Summarization timed out after 60 seconds, returning original content")
+        logging.warning(f"Summarization timed out after {timeout} seconds, returning original content")
         return webpage_content
     except Exception as e:
         # Other errors during summarization - log and return original content
         logging.warning(f"Summarization failed with error: {str(e)}, returning original content")
         return webpage_content
+
 
 ##########################
 # Reflection Tool Utils
