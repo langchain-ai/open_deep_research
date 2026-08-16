@@ -1,9 +1,32 @@
 import re
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
+from typing import Any
+
+import httpx
 
 from open_deep_research.paper_research.models import PaperRecord
 
 ATOM = "{http://www.w3.org/2005/Atom}"
+ARXIV_QUERY_URL = "https://export.arxiv.org/api/query"
+ArxivFetcher = Callable[[str, dict[str, Any]], str]
+
+
+def fetch_arxiv_papers(
+    query: str,
+    *,
+    fetcher: ArxivFetcher | None = None,
+    max_results: int = 10,
+) -> list[PaperRecord]:
+    params = {
+        "search_query": f"all:{query}",
+        "start": 0,
+        "max_results": max_results,
+        "sortBy": "relevance",
+        "sortOrder": "descending",
+    }
+    raw_xml = (fetcher or _httpx_fetch)(ARXIV_QUERY_URL, params)
+    return parse_arxiv_feed(raw_xml)
 
 
 def parse_arxiv_feed(xml: str) -> list[PaperRecord]:
@@ -51,3 +74,9 @@ def _year(value: str) -> int | None:
         return int(value[:4])
     except ValueError:
         return None
+
+
+def _httpx_fetch(url: str, params: dict[str, Any]) -> str:
+    response = httpx.get(url, params=params, timeout=20.0)
+    response.raise_for_status()
+    return response.text

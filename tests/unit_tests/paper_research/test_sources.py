@@ -1,5 +1,6 @@
-from open_deep_research.paper_research.arxiv_source import parse_arxiv_feed
+from open_deep_research.paper_research.arxiv_source import fetch_arxiv_papers, parse_arxiv_feed
 from open_deep_research.paper_research.semantic_scholar_source import (
+    fetch_semantic_scholar_papers,
     parse_semantic_scholar_results,
 )
 
@@ -31,6 +32,30 @@ def test_parse_arxiv_feed_normalizes_paper():
     assert papers[0].pdf_url == "https://arxiv.org/pdf/2401.00001"
 
 
+def test_fetch_arxiv_papers_uses_injected_fetcher_and_parser():
+    calls = []
+
+    def fetcher(url, params):
+        calls.append((url, params))
+        return ARXIV_XML
+
+    papers = fetch_arxiv_papers("long-term memory for LLM agents", fetcher=fetcher)
+
+    assert calls == [
+        (
+            "https://export.arxiv.org/api/query",
+            {
+                "search_query": "all:long-term memory for LLM agents",
+                "start": 0,
+                "max_results": 10,
+                "sortBy": "relevance",
+                "sortOrder": "descending",
+            },
+        )
+    ]
+    assert papers[0].paper_id == "arxiv:2401.00001"
+
+
 def test_parse_semantic_scholar_results_uses_venue_and_citation_count():
     payload = {
         "data": [
@@ -56,3 +81,46 @@ def test_parse_semantic_scholar_results_uses_venue_and_citation_count():
     assert papers[0].venue == "ICLR"
     assert papers[0].venue_source == "semantic_scholar"
     assert papers[0].citation_count == 42
+
+
+def test_fetch_semantic_scholar_papers_uses_injected_fetcher_and_parser():
+    calls = []
+    payload = {
+        "data": [
+            {
+                "paperId": "abc123",
+                "title": "Memory for LLM Agents",
+                "abstract": "We study memory.",
+                "year": 2024,
+                "authors": [{"name": "Ada Lovelace"}],
+                "venue": "",
+                "citationCount": 42,
+                "externalIds": {"ArXiv": "2401.00001"},
+                "openAccessPdf": {"url": "https://example.com/paper.pdf"},
+            }
+        ]
+    }
+
+    def fetcher(url, params, headers):
+        calls.append((url, params, headers))
+        return payload
+
+    papers = fetch_semantic_scholar_papers(
+        "long-term memory for LLM agents",
+        fetcher=fetcher,
+        api_key="test-key",
+    )
+
+    assert calls == [
+        (
+            "https://api.semanticscholar.org/graph/v1/paper/search",
+            {
+                "query": "long-term memory for LLM agents",
+                "limit": 10,
+                "fields": "paperId,title,abstract,year,authors,venue,citationCount,externalIds,openAccessPdf,url",
+            },
+            {"x-api-key": "test-key"},
+        )
+    ]
+    assert papers[0].paper_id == "s2:abc123"
+    assert papers[0].venue == "unknown"

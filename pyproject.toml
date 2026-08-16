@@ -53,13 +53,12 @@ dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
 requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["open_deep_research", "legacy", "tests"]
-
 [tool.setuptools.package-dir]
-"open_deep_research" = "src/open_deep_research"
-"legacy" = "src/legacy"
-"tests" = "tests"
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["open_deep_research*", "legacy*"]
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]

@@ -14,5 +14,18 @@ def evaluate_report(report: PaperResearchReport) -> dict[str, bool]:
         >= 3,
         "has_required_sections": all(section in report.markdown for section in REQUIRED_SECTIONS),
         "has_evidence": any(analysis.evidence for analysis in report.analyses),
-        "missing_venue_marked_unknown": all(item.paper.venue != "" for item in report.ranked_papers),
+        "missing_venue_marked_unknown": all(
+            _has_valid_venue_marker(item.paper.venue) for item in report.ranked_papers
+        ),
     }
+
+
+def _has_valid_venue_marker(venue: str | None) -> bool:
+    if venue is None:
+        return True
+    normalized = venue.strip().lower()
+    if normalized == "unknown":
+        return True
+    if normalized in {"", "n/a", "na", "none", "null", "not available"}:
+        return False
+    return True
