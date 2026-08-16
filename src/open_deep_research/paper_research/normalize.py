@@ -33,7 +33,7 @@ def _dedupe_keys(paper: PaperRecord) -> list[str]:
         keys.append(f"arxiv:{paper.arxiv_id.lower()}")
     if paper.semantic_scholar_id:
         keys.append(f"s2:{paper.semantic_scholar_id.lower()}")
-    title_key = _normalize_title(paper.title)
+    title_key = _normalize_title(paper.title) if not keys else ""
     if title_key:
         keys.append(f"title:{title_key}")
     return keys
