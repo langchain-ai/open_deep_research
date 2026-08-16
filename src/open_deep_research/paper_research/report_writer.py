@@ -14,22 +14,37 @@ REQUIRED_SECTIONS = [
 ]
 
 
+def _display_venue(venue: str | None) -> str:
+    if not venue or not venue.strip() or venue.strip().lower() == "unknown":
+        return "unknown"
+    return venue.strip()
+
+
+def _analysis_evidence_numbers(analyses: list[PaperAnalysis]) -> dict[int, int]:
+    first_evidence_numbers: dict[int, int] = {}
+    evidence_index = 1
+    for analysis_index, analysis in enumerate(analyses):
+        if analysis.evidence:
+            first_evidence_numbers[analysis_index] = evidence_index
+            evidence_index += len(analysis.evidence)
+    return first_evidence_numbers
+
+
 def write_chinese_report(
     question: str,
     planned_queries: list[str],
     ranked_papers: list[RankedPaper],
     analyses: list[PaperAnalysis],
 ) -> str:
+    first_evidence_numbers = _analysis_evidence_numbers(analyses)
     candidates = "\n".join(
-        f"- {item.paper.title} ({item.paper.year or 'unknown'}, {item.paper.venue}) "
+        f"- {item.paper.title} ({item.paper.year or 'unknown'}, {_display_venue(item.paper.venue)}) "
         f"score={item.score}: {item.reason}"
         for item in ranked_papers
     )
     deep_reads = "\n".join(
-        f"- {analysis.paper.title}: {analysis.contribution} "
-        f"[Paper: {analysis.paper.title}, {analysis.paper.year or 'unknown'}, "
-        f"{analysis.paper.venue}, Evidence #1]"
-        for analysis in analyses
+        _format_deep_read(analysis, first_evidence_numbers.get(analysis_index))
+        for analysis_index, analysis in enumerate(analyses)
     )
     methods = "\n".join(f"- {analysis.method}" for analysis in analyses)
     limitations = "\n".join(f"- {analysis.limitation}" for analysis in analyses)
@@ -39,7 +54,7 @@ def write_chinese_report(
         for snippet in analysis.evidence:
             evidence_lines.append(
                 f"- Evidence #{evidence_index}: {snippet.paper_title} "
-                f"({snippet.year or 'unknown'}, {snippet.venue}, {snippet.section_hint})\n"
+                f"({snippet.year or 'unknown'}, {_display_venue(snippet.venue)}, {snippet.section_hint})\n"
                 f"  原文: {snippet.excerpt}\n"
                 f"  解读: {snippet.chinese_interpretation}"
             )
@@ -58,3 +73,15 @@ def write_chinese_report(
         f"## 后续研究方向\n建议继续关注带长期记忆的 agent planning、工具使用评测和多智能体协同机制。\n\n"
         f"## Evidence Appendix\n{evidence}\n"
     )
+
+
+def _format_deep_read(analysis: PaperAnalysis, first_evidence_number: int | None) -> str:
+    citation_parts = [
+        f"Paper: {analysis.paper.title}",
+        str(analysis.paper.year or "unknown"),
+        _display_venue(analysis.paper.venue),
+    ]
+    if first_evidence_number is not None:
+        citation_parts.append(f"Evidence #{first_evidence_number}")
+    citation = ", ".join(citation_parts)
+    return f"- {analysis.paper.title}: {analysis.contribution} [{citation}]"
