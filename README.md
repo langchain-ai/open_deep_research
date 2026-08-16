@@ -153,3 +153,17 @@ The `src/legacy/` folder contains two earlier implementations that provide alter
 - **Parallel Processing**: Multiple researchers work simultaneously
 - **Speed Optimized**: Faster report generation through concurrency
 - **MCP Support**: Extensive Model Context Protocol integration
+
+## PaperDeepResearcher Mode
+
+This fork adds a computer science literature research mode on top of Open Deep Research.
+
+The first version focuses on:
+
+- arXiv and Semantic Scholar paper metadata
+- query planning for CS literature search
+- deduplication and explainable reranking
+- top-paper PDF evidence extraction
+- Chinese literature review reports with evidence references
+
+The mode intentionally avoids Google Scholar scraping and a new frontend in the first version.
