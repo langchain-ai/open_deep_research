@@ -124,6 +124,83 @@ def test_run_paper_research_from_sources_retrieves_from_both_sources_without_net
     assert "研究问题概述" in report.markdown
 
 
+def test_run_paper_research_from_sources_deep_reads_top_pdf_papers_with_injected_fetcher():
+    source_calls = []
+    fetched_paper_ids = []
+
+    def arxiv_client(query):
+        source_calls.append(("arxiv", query))
+        return [
+            PaperRecord(
+                paper_id="arxiv:2401.00001",
+                title="LLM Agent Memory Planning Alpha",
+                authors=["Ada"],
+                abstract="This paper studies memory planning for LLM agents.",
+                year=2024,
+                source="arxiv",
+                arxiv_id="2401.00001",
+                citation_count=100,
+                pdf_url="https://arxiv.org/pdf/2401.00001",
+            ),
+            PaperRecord(
+                paper_id="arxiv:2401.00002",
+                title="LLM Agent Memory Planning Beta",
+                authors=["Grace"],
+                abstract="This paper studies memory planning for LLM agents.",
+                year=2024,
+                source="arxiv",
+                arxiv_id="2401.00002",
+                citation_count=80,
+                pdf_url="https://arxiv.org/pdf/2401.00002",
+            ),
+        ]
+
+    def semantic_scholar_client(query):
+        source_calls.append(("semantic_scholar", query))
+        return [
+            PaperRecord(
+                paper_id="s2:gamma",
+                title="LLM Agent Memory Planning Gamma",
+                authors=["Lin"],
+                abstract="This paper studies memory planning for LLM agents.",
+                year=2023,
+                source="semantic_scholar",
+                semantic_scholar_id="gamma",
+                citation_count=60,
+                pdf_url="https://example.com/gamma.pdf",
+            ),
+            PaperRecord(
+                paper_id="s2:abstract-only",
+                title="LLM Agent Memory Planning Abstract Only",
+                authors=["Turing"],
+                abstract="This paper studies memory planning for LLM agents.",
+                year=2024,
+                source="semantic_scholar",
+                semantic_scholar_id="abstract-only",
+                citation_count=200,
+            ),
+        ]
+
+    def pdf_text_fetcher(paper):
+        fetched_paper_ids.append(paper.paper_id)
+        return f"Method Full PDF text for {paper.paper_id}. Result Detailed evidence."
+
+    report = run_paper_research_from_sources(
+        "LLM agent memory planning",
+        arxiv_client=arxiv_client,
+        semantic_scholar_client=semantic_scholar_client,
+        pdf_text_fetcher=pdf_text_fetcher,
+    )
+
+    assert ("arxiv", report.planned_queries[0]) in source_calls
+    assert ("semantic_scholar", report.planned_queries[0]) in source_calls
+    assert fetched_paper_ids == [
+        analysis.paper.paper_id for analysis in report.analyses
+    ] == ["arxiv:2401.00001", "arxiv:2401.00002", "s2:gamma"]
+    assert [analysis.evidence_quality for analysis in report.analyses] == ["pdf", "pdf", "pdf"]
+    assert all("Full PDF text" in analysis.evidence[0].excerpt for analysis in report.analyses)
+
+
 def test_evaluate_report_requires_missing_venue_marker_for_missing_values():
     valid_unknown = PaperRecord(
         paper_id="p1",
