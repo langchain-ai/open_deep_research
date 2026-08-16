@@ -127,3 +127,19 @@ def test_rank_papers_prefers_relevant_recent_pdf_paper():
     assert ranked[0].paper.paper_id == "p1"
     assert ranked[0].score > ranked[1].score
     assert "memory" in ranked[0].reason.lower()
+
+
+def test_rank_papers_treats_none_venue_as_missing_metadata():
+    paper = PaperRecord.model_construct(
+        paper_id="p1",
+        title="Memory for LLM Agents",
+        abstract="This paper studies memory and planning in autonomous agents.",
+        authors=[],
+        year=2024,
+        source="test",
+        venue=None,
+    )
+
+    ranked = rank_papers("LLM agent memory planning", [paper])
+
+    assert "venue metadata" not in ranked[0].reason

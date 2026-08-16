@@ -46,3 +46,16 @@
   - python -m pytest tests/unit_tests/paper_research/test_normalize_and_ranker.py -q: PASS after implementation, 4 passed in 0.27s.
   - git diff --check: PASS, no whitespace errors; emitted LF-to-CRLF working-copy warnings.
 - Concerns: None
+
+## Fix report
+
+- Files changed:
+  - src/open_deep_research/paper_research/ranker.py
+  - tests/unit_tests/paper_research/test_normalize_and_ranker.py
+  - .superpowers/sdd/task-5-report.md
+- Commit hash: see final response for the created commit hash.
+- Commands run and results:
+  - python -m pytest tests/unit_tests/paper_research/test_normalize_and_ranker.py -q: RED before implementation, 1 failed and 4 passed; regression showed `venue metadata: None`.
+  - python -m pytest tests/unit_tests/paper_research/test_normalize_and_ranker.py -q: PASS after implementation, 5 passed in 0.26s.
+  - git diff --check: PASS, no whitespace errors; emitted LF-to-CRLF working-copy warnings.
+- Concerns: None

@@ -17,7 +17,8 @@ def _rank_one(question: str, paper: PaperRecord) -> RankedPaper:
     recency = 2.0 if paper.year and paper.year >= 2021 else 0.0
     citations = math.log1p(paper.citation_count or 0)
     pdf = 1.5 if paper.pdf_url else 0.0
-    venue = 1.0 if paper.venue != "unknown" else 0.0
+    has_venue = _has_venue_metadata(paper.venue)
+    venue = 1.0 if has_venue else 0.0
     abstract_penalty = -2.0 if not paper.abstract else 0.0
     score = relevance + recency + citations + pdf + venue + abstract_penalty
     reason_parts = []
@@ -27,7 +28,7 @@ def _rank_one(question: str, paper: PaperRecord) -> RankedPaper:
         reason_parts.append("recent paper")
     if paper.pdf_url:
         reason_parts.append("PDF available")
-    if paper.venue != "unknown":
+    if has_venue:
         reason_parts.append(f"venue metadata: {paper.venue}")
     if paper.citation_count:
         reason_parts.append(f"{paper.citation_count} citations")
@@ -42,3 +43,7 @@ def _terms(text: str) -> set[str]:
     raw_terms = re.findall(r"[a-zA-Z][a-zA-Z0-9-]{2,}", text.lower())
     stopwords = {"the", "and", "for", "with", "how", "does", "this", "that"}
     return {term for term in raw_terms if term not in stopwords}
+
+
+def _has_venue_metadata(venue: str | None) -> bool:
+    return bool(venue and venue.strip() and venue.strip().lower() != "unknown")
