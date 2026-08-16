@@ -44,6 +44,9 @@ from open_deep_research.utils import (
     get_all_tools,
     get_api_key_for_model,
     get_model_token_limit,
+    get_provider_extra_body,
+    invoke_structured_with_fallback,
+    think_tool_enabled,
     get_notes_from_tool_calls,
     get_today_str,
     is_token_limit_exceeded,
@@ -54,7 +57,9 @@ from open_deep_research.utils import (
 
 # Initialize a configurable model that we will use throughout the agent
 configurable_model = init_chat_model(
+    model="openai:gpt-4.1-mini",
     configurable_fields=("model", "max_tokens", "api_key"),
+    extra_body=get_provider_extra_body(),
 )
 
 async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["write_research_brief", "__end__"]]:
@@ -86,19 +91,19 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     }
     
     # Configure model with structured output and retry logic
-    clarification_model = (
-        configurable_model
-        .with_structured_output(ClarifyWithUser)
-        .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
-        .with_config(model_config)
-    )
-    
+    clarification_model = configurable_model.with_config(model_config)
+
     # Step 3: Analyze whether clarification is needed
     prompt_content = clarify_with_user_instructions.format(
         messages=get_buffer_string(messages), 
         date=get_today_str()
     )
-    response = await clarification_model.ainvoke([HumanMessage(content=prompt_content)])
+    response = await invoke_structured_with_fallback(
+        clarification_model,
+        ClarifyWithUser,
+        [HumanMessage(content=prompt_content)],
+        max_retries=configurable.max_structured_output_retries,
+    )
     
     # Step 4: Route based on clarification analysis
     if response.need_clarification:
@@ -139,19 +144,19 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     }
     
     # Configure model for structured research question generation
-    research_model = (
-        configurable_model
-        .with_structured_output(ResearchQuestion)
-        .with_retry(stop_after_attempt=configurable.max_structured_output_retries)
-        .with_config(research_model_config)
-    )
-    
+    research_model = configurable_model.with_config(research_model_config)
+
     # Step 2: Generate structured research brief from user messages
     prompt_content = transform_messages_into_research_topic_prompt.format(
         messages=get_buffer_string(state.get("messages", [])),
         date=get_today_str()
     )
-    response = await research_model.ainvoke([HumanMessage(content=prompt_content)])
+    response = await invoke_structured_with_fallback(
+        research_model,
+        ResearchQuestion,
+        [HumanMessage(content=prompt_content)],
+        max_retries=configurable.max_structured_output_retries,
+    )
     
     # Step 3: Initialize supervisor with research brief and instructions
     supervisor_system_prompt = lead_researcher_prompt.format(
@@ -199,7 +204,9 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
     }
     
     # Available tools: research delegation, completion signaling, and strategic thinking
-    lead_researcher_tools = [ConductResearch, ResearchComplete, think_tool]
+    lead_researcher_tools = [ConductResearch, ResearchComplete]
+    if think_tool_enabled():
+        lead_researcher_tools.append(think_tool)
     
     # Configure model with tools, retry logic, and model settings
     research_model = (

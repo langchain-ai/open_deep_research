@@ -1,6 +1,7 @@
 """Utility functions and helpers for the Deep Research agent."""
 
 import asyncio
+import json
 import logging
 import os
 import warnings
@@ -28,10 +29,118 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.config import get_store
 from mcp import McpError
 from tavily import AsyncTavilyClient
+from pydantic import BaseModel
 
 from open_deep_research.configuration import Configuration, SearchAPI
 from open_deep_research.prompts import summarize_webpage_prompt
 from open_deep_research.state import ResearchComplete, Summary
+
+def _message_text(message: Any) -> str:
+    content = getattr(message, "content", message)
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict):
+                if item.get("type") == "text":
+                    parts.append(item.get("text", ""))
+                elif "text" in item:
+                    parts.append(str(item.get("text", "")))
+                else:
+                    parts.append(str(item))
+            else:
+                parts.append(str(item))
+        return "\n".join(part for part in parts if part)
+    return str(content)
+
+
+def _extract_json_object(raw_text: str) -> Optional[str]:
+    if not raw_text:
+        return None
+    stripped = raw_text.strip()
+    if stripped.startswith("```"):
+        chunks = stripped.split("```")
+        for chunk in chunks:
+            candidate = chunk.strip()
+            if candidate.startswith("json"):
+                candidate = candidate[4:].strip()
+            if candidate.startswith("{") and candidate.endswith("}"):
+                return candidate
+    start = stripped.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    for index in range(start, len(stripped)):
+        char = stripped[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return stripped[start:index + 1]
+    return None
+
+
+def coerce_structured_response(schema: type[BaseModel], raw_text: str) -> BaseModel:
+    candidate = _extract_json_object(raw_text)
+    if candidate:
+        try:
+            return schema.model_validate_json(candidate)
+        except Exception:
+            pass
+
+    cleaned = (raw_text or "").strip()
+    name = schema.__name__
+
+    if name == "ResearchQuestion":
+        return schema(research_brief=cleaned)
+    if name == "Summary":
+        return schema(summary=cleaned, key_excerpts="")
+    if name == "ClarifyWithUser":
+        lowered = cleaned.lower()
+        needs_clarification = any(token in lowered for token in ["clarify", "need more information", "need more detail", "missing information", "which", "what specific"])
+        if needs_clarification:
+            return schema(need_clarification=True, question=cleaned or "Could you clarify the scope of the research request?", verification="")
+        return schema(need_clarification=False, question="", verification=cleaned or "Starting research.")
+
+    raise ValueError(f"Unable to coerce structured response for schema {name}: {cleaned[:400]}")
+
+
+async def invoke_structured_with_fallback(
+    model: BaseChatModel,
+    schema: type[BaseModel],
+    messages: List[MessageLikeRepresentation],
+    max_retries: int = 2,
+) -> BaseModel:
+    direct_model = model.with_retry(stop_after_attempt=max_retries)
+    direct_response = await direct_model.ainvoke(messages)
+
+    try:
+        return coerce_structured_response(schema, _message_text(direct_response))
+    except Exception as exc:
+        logging.warning("Direct coercion failed for %s: %s", schema.__name__, exc)
+
+    schema_json = json.dumps(schema.model_json_schema(), ensure_ascii=False)
+    original_task = "\n\n".join(_message_text(message) for message in messages if _message_text(message).strip())
+    fallback_messages = [
+        HumanMessage(content=(
+            "Return only valid JSON. Do not include markdown fences, commentary, or prose outside the JSON object.\n\n"
+            f"JSON schema:\n{schema_json}\n\nOriginal task:\n{original_task}"
+        )),
+    ]
+
+    fallback_response = await direct_model.ainvoke(fallback_messages)
+    return coerce_structured_response(schema, _message_text(fallback_response))
+
+
+def get_provider_extra_body() -> Optional[dict[str, Any]]:
+    base_url = (os.environ.get("OPENAI_API_BASE") or "").strip().lower()
+    explicit_disable = (os.environ.get("ZAI_DISABLE_THINKING") or "1").strip().lower() in {"1", "true", "yes", "on"}
+    if "api.z.ai" in base_url and explicit_disable:
+        return {"thinking": {"type": "disabled"}, "clear_thinking": True}
+    return None
+
 
 ##########################
 # Tavily Search Tool Utils
@@ -59,9 +168,10 @@ async def tavily_search(
         Formatted string containing summarized search results
     """
     # Step 1: Execute search queries asynchronously
+    effective_max_results = min(max_results, int(os.environ.get("TAVILY_MAX_RESULTS", "3")))
     search_results = await tavily_search_async(
         queries,
-        max_results=max_results,
+        max_results=effective_max_results,
         topic=topic,
         include_raw_content=True,
         config=config
@@ -75,39 +185,35 @@ async def tavily_search(
             if url not in unique_results:
                 unique_results[url] = {**result, "query": response['query']}
     
-    # Step 3: Set up the summarization model with configuration
+    # Step 3: Set up optional webpage summarization
     configurable = Configuration.from_runnable_config(config)
-    
-    # Character limit to stay within model token limits (configurable)
     max_char_to_include = configurable.max_content_length
-    
-    # Initialize summarization model with retry logic
-    model_api_key = get_api_key_for_model(configurable.summarization_model, config)
-    summarization_model = init_chat_model(
-        model=configurable.summarization_model,
-        max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
-    ).with_structured_output(Summary).with_retry(
-        stop_after_attempt=configurable.max_structured_output_retries
-    )
-    
-    # Step 4: Create summarization tasks (skip empty content)
+    disable_webpage_summarization = os.environ.get("DISABLE_WEBPAGE_SUMMARIZATION", "1").lower() in {"1", "true", "yes", "on"}
+
     async def noop():
-        """No-op function for results without raw content."""
+        """No-op function for results without raw content or when summarization is disabled."""
         return None
-    
-    summarization_tasks = [
-        noop() if not result.get("raw_content") 
-        else summarize_webpage(
-            summarization_model, 
-            result['raw_content'][:max_char_to_include]
+
+    if disable_webpage_summarization:
+        summaries = [None for _ in unique_results.values()]
+    else:
+        model_api_key = get_api_key_for_model(configurable.summarization_model, config)
+        summarization_model = init_chat_model(
+            model=configurable.summarization_model,
+            max_tokens=configurable.summarization_model_max_tokens,
+            api_key=model_api_key,
+            extra_body=get_provider_extra_body(),
+            tags=["langsmith:nostream"]
         )
-        for result in unique_results.values()
-    ]
-    
-    # Step 5: Execute all summarization tasks in parallel
-    summaries = await asyncio.gather(*summarization_tasks)
+        summarization_tasks = [
+            noop() if not result.get("raw_content")
+            else summarize_webpage(
+                summarization_model,
+                result['raw_content'][:max_char_to_include]
+            )
+            for result in unique_results.values()
+        ]
+        summaries = await asyncio.gather(*summarization_tasks)
     
     # Step 6: Combine results with their summaries
     summarized_results = {
@@ -191,10 +297,15 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         
         # Execute summarization with timeout to prevent hanging
         summary = await asyncio.wait_for(
-            model.ainvoke([HumanMessage(content=prompt_content)]),
+            invoke_structured_with_fallback(
+                model,
+                Summary,
+                [HumanMessage(content=prompt_content)],
+                max_retries=2,
+            ),
             timeout=60.0  # 60 second timeout for summarization
         )
-        
+
         # Format the summary with structured sections
         formatted_summary = (
             f"<summary>\n{summary.summary}\n</summary>\n\n"
@@ -211,6 +322,10 @@ async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
         # Other errors during summarization - log and return original content
         logging.warning(f"Summarization failed with error: {str(e)}, returning original content")
         return webpage_content
+
+def think_tool_enabled() -> bool:
+    return (os.environ.get("DISABLE_THINK_TOOL") or "0").strip().lower() not in {"1", "true", "yes", "on"}
+
 
 ##########################
 # Reflection Tool Utils
@@ -576,7 +691,9 @@ async def get_all_tools(config: RunnableConfig):
         List of all configured and available tools for research operations
     """
     # Start with core research tools
-    tools = [tool(ResearchComplete), think_tool]
+    tools = [tool(ResearchComplete)]
+    if think_tool_enabled():
+        tools.append(think_tool)
     
     # Add configured search tools
     configurable = Configuration.from_runnable_config(config)
