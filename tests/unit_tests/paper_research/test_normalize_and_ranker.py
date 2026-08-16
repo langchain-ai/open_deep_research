@@ -36,6 +36,41 @@ def test_deduplicate_merges_arxiv_and_semantic_scholar_metadata():
     assert merged[0].pdf_url == "https://arxiv.org/pdf/2401.00001"
 
 
+def test_deduplicate_merges_doi_record_with_arxiv_only_alias():
+    doi_and_arxiv = PaperRecord(
+        paper_id="doi:10.1234/memory-agents",
+        title="Memory for LLM Agents",
+        authors=["Ada"],
+        abstract="Memory for agents.",
+        year=2024,
+        source="crossref",
+        doi="10.1234/MEMORY-AGENTS",
+        arxiv_id="2401.00001",
+        citation_count=20,
+    )
+    arxiv_only = PaperRecord(
+        paper_id="arxiv:2401.00001",
+        title="Memory for LLM Agents",
+        authors=["Ada"],
+        abstract="Memory for agents.",
+        year=2024,
+        source="arxiv",
+        arxiv_id="2401.00001",
+        pdf_url="https://arxiv.org/pdf/2401.00001",
+        citation_count=35,
+    )
+
+    merged = deduplicate_papers([doi_and_arxiv, arxiv_only])
+
+    assert len(merged) == 1
+    assert merged[0].doi == "10.1234/MEMORY-AGENTS"
+    assert merged[0].arxiv_id == "2401.00001"
+    assert merged[0].pdf_url == "https://arxiv.org/pdf/2401.00001"
+    assert merged[0].citation_count == 35
+    assert merged[0].venue == "unknown"
+    assert merged[0].venue_source == "unknown"
+
+
 def test_rank_papers_prefers_relevant_recent_pdf_paper():
     relevant = PaperRecord(
         paper_id="p1",

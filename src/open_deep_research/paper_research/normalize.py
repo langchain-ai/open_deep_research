@@ -4,24 +4,52 @@ from open_deep_research.paper_research.models import PaperRecord
 
 
 def deduplicate_papers(papers: list[PaperRecord]) -> list[PaperRecord]:
-    merged: dict[str, PaperRecord] = {}
-    for paper in papers:
-        key = _dedupe_key(paper)
-        if key not in merged:
-            merged[key] = paper
+    parent = list(range(len(papers)))
+    key_owner: dict[str, int] = {}
+
+    for index, paper in enumerate(papers):
+        for key in _dedupe_keys(paper):
+            owner = key_owner.get(key)
+            if owner is None:
+                key_owner[key] = index
+            else:
+                _union(parent, owner, index)
+
+    merged: dict[int, PaperRecord] = {}
+    for index, paper in enumerate(papers):
+        root = _find(parent, index)
+        if root not in merged:
+            merged[root] = paper
         else:
-            merged[key] = _merge_records(merged[key], paper)
+            merged[root] = _merge_records(merged[root], paper)
     return list(merged.values())
 
 
-def _dedupe_key(paper: PaperRecord) -> str:
+def _dedupe_keys(paper: PaperRecord) -> list[str]:
+    keys = []
     if paper.doi:
-        return f"doi:{paper.doi.lower()}"
+        keys.append(f"doi:{paper.doi.lower()}")
     if paper.arxiv_id:
-        return f"arxiv:{paper.arxiv_id.lower()}"
+        keys.append(f"arxiv:{paper.arxiv_id.lower()}")
     if paper.semantic_scholar_id:
-        return f"s2:{paper.semantic_scholar_id.lower()}"
-    return f"title:{_normalize_title(paper.title)}"
+        keys.append(f"s2:{paper.semantic_scholar_id.lower()}")
+    title_key = _normalize_title(paper.title)
+    if title_key:
+        keys.append(f"title:{title_key}")
+    return keys
+
+
+def _find(parent: list[int], index: int) -> int:
+    if parent[index] != index:
+        parent[index] = _find(parent, parent[index])
+    return parent[index]
+
+
+def _union(parent: list[int], left: int, right: int) -> None:
+    left_root = _find(parent, left)
+    right_root = _find(parent, right)
+    if left_root != right_root:
+        parent[right_root] = left_root
 
 
 def _normalize_title(title: str) -> str:
