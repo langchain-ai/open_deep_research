@@ -1,0 +1,578 @@
+[{
+    "name": "langchain_core.language_models.chat_models.BaseChatModel.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "5be37b9d086679b0",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "66290799b6d52945",
+    "start_time": "2026-07-09T19:17:42.468589Z",
+    "end_time": "2026-07-09T19:17:44.049165Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langchain_core/runnables/base.py:6017",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "inference.openai",
+        "entity.1.provider_name": "api.openai.com",
+        "entity.1.inference_endpoint": "https://api.openai.com/v1/",
+        "entity.2.name": "gpt-4.1-nano",
+        "entity.2.type": "model.llm.gpt-4.1-nano",
+        "span.type": "inference.framework",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "9392a700e2ec09b772ec50979479c251",
+        "entity.count": 2,
+        "span.subtype": "turn_end"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:42.468667Z",
+            "attributes": {
+                "input": "You will be given a set of messages that have been exchanged so far between yourself and the user. \nYour job is to translate these messages into a more detailed and concrete research question that will be used to guide the research.\n\nThe messages that have been exchanged so far between yourself and the user are:\n<Messages>\nHuman: What are the main differences between TCP and UDP?\n</Messages>\n\nToday's date is Thu Jul 9, 2026.\n\nYou will return a single research question that will be used to guide the research.\n\nGuidelines:\n1. Maximize Specificity and Detail\n- Include all known user preferences and explicitly list key attributes or dimensions to consider.\n- It is important that all details from the user are included in the instructions.\n\n2. Fill in Unstated But Necessary Dimensions as Open-Ended\n- If certain attributes are essential for a meaningful output but the user has not provided them, explicitly state that they are open-ended or default to no specific constraint.\n\n3. Avoid Unwarranted Assumptions\n- If the user has not provided a particular detail, do not invent one.\n- Instead, state the lack of specification and guide the researcher to treat it as flexible or accept all possible options.\n\n4. Use the First Person\n- Phrase the request from the perspective of the user.\n\n5. Sources\n- If specific sources should be prioritized, specify them in the research question.\n- For product and travel research, prefer linking directly to official or primary websites (e.g., official brand sites, manufacturer pages, or reputable e-commerce platforms like Amazon for user reviews) rather than aggregator sites or SEO-heavy blogs.\n- For academic or scientific queries, prefer linking directly to the original paper or official journal publication rather than survey papers or secondary summaries.\n- For people, try linking directly to their LinkedIn profile, or their personal website if they have one.\n- If the query is in a specific language, prioritize sources published in that language.\n"
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:17:44.049035Z",
+            "attributes": {
+                "response": "{\"ai\": \"{\\\"research_brief\\\":\\\"I want a detailed comparison of TCP and UDP that covers their core differences, specifically focusing on aspects such as connection orientation, reliability, data ordering, flow control, congestion control, and typical use cases. Please include considerations of their performance characteristics, advantages, disadvantages, and scenarios where each protocol is preferred. If applicable, include references to official documentation or authoritative sources for further reading.\\\"}\"}"
+            }
+        },
+        {
+            "name": "metadata",
+            "timestamp": "2026-07-09T19:17:44.049090Z",
+            "attributes": {
+                "completion_tokens": 81,
+                "prompt_tokens": 468,
+                "total_tokens": 549,
+                "finish_reason": "stop",
+                "finish_type": "success"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "openai.resources.chat.completions.AsyncCompletions.create",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "1b9131b2b8103c1f",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "f792b97aeee393e9",
+    "start_time": "2026-07-09T19:17:44.066241Z",
+    "end_time": "2026-07-09T19:17:45.483030Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/openai/_legacy_response.py:384",
+        "workflow.name": "open-deep-research",
+        "span.type": "inference.modelapi",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "64f4b78efe5d3933448b9d7cfdaddd87"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langchain_core.language_models.chat_models.BaseChatModel.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "f792b97aeee393e9",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "9d6db60de48bf299",
+    "start_time": "2026-07-09T19:17:44.063108Z",
+    "end_time": "2026-07-09T19:17:45.485188Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langchain_core/runnables/base.py:6017",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "inference.openai",
+        "entity.1.provider_name": "api.openai.com",
+        "entity.1.inference_endpoint": "https://api.openai.com/v1/",
+        "entity.2.name": "gpt-4.1-nano",
+        "entity.2.type": "model.llm.gpt-4.1-nano",
+        "span.type": "inference.framework",
+        "entity.3.name": "think_tool",
+        "entity.3.type": "tool.function",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "64f4b78efe5d3933448b9d7cfdaddd87",
+        "entity.count": 3,
+        "span.subtype": "tool_call"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:44.063281Z",
+            "attributes": {
+                "input": [
+                    "{\"system\": \"You are a research supervisor. Your job is to conduct research by calling the \\\"ConductResearch\\\" tool. For context, today's date is Thu Jul 9, 2026.\\n\\n<Task>\\nYour focus is to call the \\\"ConductResearch\\\" tool to conduct research against the overall research question passed in by the user. \\nWhen you are completely satisfied with the research findings returned from the tool calls, then you should call the \\\"ResearchComplete\\\" tool to indicate that you are done with your research.\\n</Task>\\n\\n<Available Tools>\\nYou have access to three main tools:\\n1. **ConductResearch**: Delegate research tasks to specialized sub-agents\\n2. **ResearchComplete**: Indicate that research is complete\\n3. **think_tool**: For reflection and strategic planning during research\\n\\n**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**\\n</Available Tools>\\n\\n<Instructions>\\nThink like a research manager with limited time and resources. Follow these steps:\\n\\n1. **Read the question carefully** - What specific information does the user need?\\n2. **Decide how to delegate the research** - Carefully consider the question and decide how to delegate the research. Are there multiple independent directions that can be explored simultaneously?\\n3. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?\\n</Instructions>\\n\\n<Hard Limits>\\n**Task Delegation Budgets** (Prevent excessive delegation):\\n- **Bias towards single agent** - Use single agent for simplicity unless the user request has clear opportunity for parallelization\\n- **Stop when you can answer confidently** - Don't keep delegating research for perfection\\n- **Limit tool calls** - Always stop after 1 tool calls to ConductResearch and think_tool if you cannot find the right sources\\n\\n**Maximum 1 parallel agents per iteration**\\n</Hard Limits>\\n\\n<Show Your Thinking>\\nBefore you call ConductResearch tool call, use think_tool to plan your approach:\\n- Can the task be broken down into smaller sub-tasks?\\n\\nAfter each ConductResearch tool call, use think_tool to analyze the results:\\n- What key information did I find?\\n- What's missing?\\n- Do I have enough to answer the question comprehensively?\\n- Should I delegate more research or call ResearchComplete?\\n</Show Your Thinking>\\n\\n<Scaling Rules>\\n**Simple fact-finding, lists, and rankings** can use a single sub-agent:\\n- *Example*: List the top 10 coffee shops in San Francisco \\u2192 Use 1 sub-agent\\n\\n**Comparisons presented in the user request** can use a sub-agent for each element of the comparison:\\n- *Example*: Compare OpenAI vs. Anthropic vs. DeepMind approaches to AI safety \\u2192 Use 3 sub-agents\\n- Delegate clear, distinct, non-overlapping subtopics\\n\\n**Important Reminders:**\\n- Each ConductResearch call spawns a dedicated research agent for that specific topic\\n- A separate agent will write the final report - you just need to gather information\\n- When calling ConductResearch, provide complete standalone instructions - sub-agents can't see other agents' work\\n- Do NOT use acronyms or abbreviations in your research questions, be very clear and specific\\n</Scaling Rules>\"}",
+                    "{\"human\": \"I want a detailed comparison of TCP and UDP that covers their core differences, specifically focusing on aspects such as connection orientation, reliability, data ordering, flow control, congestion control, and typical use cases. Please include considerations of their performance characteristics, advantages, disadvantages, and scenarios where each protocol is preferred. If applicable, include references to official documentation or authoritative sources for further reading.\"}"
+                ]
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:17:45.485122Z",
+            "attributes": {
+                "response": "{\"ai\": {\"name\": \"think_tool\", \"args\": {\"reflection\": \"The user's request involves a comprehensive comparison of TCP and UDP. Key aspects include connection orientation, reliability, data ordering, flow control, congestion control, performance, advantages, disadvantages, and typical use cases. To effectively cover all these points, I should break down the research into several parts and possibly gather authoritative sources such as RFCs and networking texts. I will start by planning the research approach.\"}, \"id\": \"call_5ztI5RppHA9Q0EW6Tz0DBL38\", \"type\": \"tool_call\"}}"
+            }
+        },
+        {
+            "name": "metadata",
+            "timestamp": "2026-07-09T19:17:45.485160Z",
+            "attributes": {
+                "completion_tokens": 92,
+                "prompt_tokens": 864,
+                "total_tokens": 956,
+                "finish_reason": "tool_calls",
+                "finish_type": "tool_call"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "openai.resources.chat.completions.AsyncCompletions.create",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "ceaef0b61fad492f",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "77128fefa1878817",
+    "start_time": "2026-07-09T19:17:45.489672Z",
+    "end_time": "2026-07-09T19:17:46.756907Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/openai/_legacy_response.py:384",
+        "workflow.name": "open-deep-research",
+        "span.type": "inference.modelapi",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "64f4b78efe5d3933448b9d7cfdaddd87"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langchain_core.language_models.chat_models.BaseChatModel.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "77128fefa1878817",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "9d6db60de48bf299",
+    "start_time": "2026-07-09T19:17:45.488722Z",
+    "end_time": "2026-07-09T19:17:46.759766Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langchain_core/runnables/base.py:6017",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "inference.openai",
+        "entity.1.provider_name": "api.openai.com",
+        "entity.1.inference_endpoint": "https://api.openai.com/v1/",
+        "entity.2.name": "gpt-4.1-nano",
+        "entity.2.type": "model.llm.gpt-4.1-nano",
+        "span.type": "inference.framework",
+        "entity.3.name": "ConductResearch",
+        "entity.3.type": "tool.function",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "64f4b78efe5d3933448b9d7cfdaddd87",
+        "entity.count": 3,
+        "span.subtype": "tool_call"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:45.488903Z",
+            "attributes": {
+                "input": [
+                    "{\"system\": \"You are a research supervisor. Your job is to conduct research by calling the \\\"ConductResearch\\\" tool. For context, today's date is Thu Jul 9, 2026.\\n\\n<Task>\\nYour focus is to call the \\\"ConductResearch\\\" tool to conduct research against the overall research question passed in by the user. \\nWhen you are completely satisfied with the research findings returned from the tool calls, then you should call the \\\"ResearchComplete\\\" tool to indicate that you are done with your research.\\n</Task>\\n\\n<Available Tools>\\nYou have access to three main tools:\\n1. **ConductResearch**: Delegate research tasks to specialized sub-agents\\n2. **ResearchComplete**: Indicate that research is complete\\n3. **think_tool**: For reflection and strategic planning during research\\n\\n**CRITICAL: Use think_tool before calling ConductResearch to plan your approach, and after each ConductResearch to assess progress. Do not call think_tool with any other tools in parallel.**\\n</Available Tools>\\n\\n<Instructions>\\nThink like a research manager with limited time and resources. Follow these steps:\\n\\n1. **Read the question carefully** - What specific information does the user need?\\n2. **Decide how to delegate the research** - Carefully consider the question and decide how to delegate the research. Are there multiple independent directions that can be explored simultaneously?\\n3. **After each call to ConductResearch, pause and assess** - Do I have enough to answer? What's still missing?\\n</Instructions>\\n\\n<Hard Limits>\\n**Task Delegation Budgets** (Prevent excessive delegation):\\n- **Bias towards single agent** - Use single agent for simplicity unless the user request has clear opportunity for parallelization\\n- **Stop when you can answer confidently** - Don't keep delegating research for perfection\\n- **Limit tool calls** - Always stop after 1 tool calls to ConductResearch and think_tool if you cannot find the right sources\\n\\n**Maximum 1 parallel agents per iteration**\\n</Hard Limits>\\n\\n<Show Your Thinking>\\nBefore you call ConductResearch tool call, use think_tool to plan your approach:\\n- Can the task be broken down into smaller sub-tasks?\\n\\nAfter each ConductResearch tool call, use think_tool to analyze the results:\\n- What key information did I find?\\n- What's missing?\\n- Do I have enough to answer the question comprehensively?\\n- Should I delegate more research or call ResearchComplete?\\n</Show Your Thinking>\\n\\n<Scaling Rules>\\n**Simple fact-finding, lists, and rankings** can use a single sub-agent:\\n- *Example*: List the top 10 coffee shops in San Francisco \\u2192 Use 1 sub-agent\\n\\n**Comparisons presented in the user request** can use a sub-agent for each element of the comparison:\\n- *Example*: Compare OpenAI vs. Anthropic vs. DeepMind approaches to AI safety \\u2192 Use 3 sub-agents\\n- Delegate clear, distinct, non-overlapping subtopics\\n\\n**Important Reminders:**\\n- Each ConductResearch call spawns a dedicated research agent for that specific topic\\n- A separate agent will write the final report - you just need to gather information\\n- When calling ConductResearch, provide complete standalone instructions - sub-agents can't see other agents' work\\n- Do NOT use acronyms or abbreviations in your research questions, be very clear and specific\\n</Scaling Rules>\"}",
+                    "{\"human\": \"I want a detailed comparison of TCP and UDP that covers their core differences, specifically focusing on aspects such as connection orientation, reliability, data ordering, flow control, congestion control, and typical use cases. Please include considerations of their performance characteristics, advantages, disadvantages, and scenarios where each protocol is preferred. If applicable, include references to official documentation or authoritative sources for further reading.\"}",
+                    "{\"ai\": \"[{\\\"name\\\": \\\"think_tool\\\", \\\"args\\\": {\\\"reflection\\\": \\\"The user's request involves a comprehensive comparison of TCP and UDP. Key aspects include connection orientation, reliability, data ordering, flow control, congestion control, performance, advantages, disadvantages, and typical use cases. To effectively cover all these points, I should break down the research into several parts and possibly gather authoritative sources such as RFCs and networking texts. I will start by planning the research approach.\\\"}, \\\"id\\\": \\\"call_5ztI5RppHA9Q0EW6Tz0DBL38\\\", \\\"type\\\": \\\"tool_call\\\"}]\"}",
+                    "{\"tool\": \"Reflection recorded: The user's request involves a comprehensive comparison of TCP and UDP. Key aspects include connection orientation, reliability, data ordering, flow control, congestion control, performance, advantages, disadvantages, and typical use cases. To effectively cover all these points, I should break down the research into several parts and possibly gather authoritative sources such as RFCs and networking texts. I will start by planning the research approach.\"}"
+                ]
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:17:46.759607Z",
+            "attributes": {
+                "response": "{\"ai\": {\"name\": \"ConductResearch\", \"args\": {\"research_topic\": \"Detailed comparison of TCP and UDP focusing on their core differences, including connection orientation, reliability, data ordering, flow control, congestion control, performance characteristics, advantages, disadvantages, and typical use cases. Include references to official documentation such as RFCs or authoritative networking sources.\"}, \"id\": \"call_J7kQsdf5Ct1OOENS0G00iy8h\", \"type\": \"tool_call\"}}"
+            }
+        },
+        {
+            "name": "metadata",
+            "timestamp": "2026-07-09T19:17:46.759690Z",
+            "attributes": {
+                "completion_tokens": 84,
+                "prompt_tokens": 1045,
+                "total_tokens": 1129,
+                "finish_reason": "tool_calls",
+                "finish_type": "tool_call"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langgraph.graph.state.CompiledStateGraph.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "9d6db60de48bf299",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "66290799b6d52945",
+    "start_time": "2026-07-09T19:17:44.055979Z",
+    "end_time": "2026-07-09T19:17:46.762623Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langgraph/_internal/_runnable.py:734",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "agent.langgraph",
+        "entity.1.name": "LangGraph",
+        "last.inference": "77128fefa1878817:ConductResearch",
+        "span.type": "agentic.invocation",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "64f4b78efe5d3933448b9d7cfdaddd87",
+        "entity.count": 1,
+        "span.subtype": "content_processing",
+        "monocle.last.agent.invocation.id": "",
+        "monocle.last.agent.name": "",
+        "inference.decision.span.id": "5be37b9d086679b0"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:44.056133Z",
+            "attributes": {
+                "input": "[\"What are the main differences between TCP and UDP?\", \"I want a detailed comparison of TCP and UDP that covers their core differences, specifically focusing on aspects such as connection orientation, reliability, data ordering, flow control, congestion control, and typical use cases. Please include considerations of their performance characteristics, advantages, disadvantages, and scenarios where each protocol is preferred. If applicable, include references to official documentation or authoritative sources for further reading.\"]"
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:17:46.762524Z",
+            "attributes": {
+                "response": "Reflection recorded: The user's request involves a comprehensive comparison of TCP and UDP. Key aspects include connection orientation, reliability, data ordering, flow control, congestion control, performance, advantages, disadvantages, and typical use cases. To effectively cover all these points, I should break down the research into several parts and possibly gather authoritative sources such as RFCs and networking texts. I will start by planning the research approach."
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "openai.resources.chat.completions.AsyncCompletions.create",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "d06ec17f0f67013d",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "011ec23e5deb0ef8",
+    "start_time": "2026-07-09T19:17:46.768441Z",
+    "end_time": "2026-07-09T19:18:03.666644Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/openai/_legacy_response.py:384",
+        "workflow.name": "open-deep-research",
+        "span.type": "inference.modelapi",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "9392a700e2ec09b772ec50979479c251",
+        "span.subtype": "turn_end"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langchain_core.language_models.chat_models.BaseChatModel.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "011ec23e5deb0ef8",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "66290799b6d52945",
+    "start_time": "2026-07-09T19:17:46.766766Z",
+    "end_time": "2026-07-09T19:18:03.668518Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langchain_core/runnables/base.py:6017",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "inference.openai",
+        "entity.1.provider_name": "api.openai.com",
+        "entity.1.inference_endpoint": "https://api.openai.com/v1/",
+        "entity.2.name": "gpt-4.1-nano",
+        "entity.2.type": "model.llm.gpt-4.1-nano",
+        "span.type": "inference.framework",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "9392a700e2ec09b772ec50979479c251",
+        "entity.count": 2,
+        "span.subtype": "turn_end"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:46.766967Z",
+            "attributes": {
+                "input": "Based on all the research conducted, create a comprehensive, well-structured answer to the overall research brief:\n<Research Brief>\nI want a detailed comparison of TCP and UDP that covers their core differences, specifically focusing on aspects such as connection orientation, reliability, data ordering, flow control, congestion control, and typical use cases. Please include considerations of their performance characteristics, advantages, disadvantages, and scenarios where each protocol is preferred. If applicable, include references to official documentation or authoritative sources for further reading.\n</Research Brief>\n\nFor more context, here is all of the messages so far. Focus on the research brief above, but consider these messages as well for more context.\n<Messages>\nHuman: What are the main differences between TCP and UDP?\n</Messages>\nCRITICAL: Make sure the answer is written in the same language as the human messages!\nFor example, if the user's messages are in English, then MAKE SURE you write your response in English. If the user's messages are in Chinese, then MAKE SURE you write your entire response in Chinese.\nThis is critical. The user will only understand the answer if it is written in the same language as their input message.\n\nToday's date is Thu Jul 9, 2026.\n\nHere are the findings from the research that you conducted:\n<Findings>\nReflection recorded: The user's request involves a comprehensive comparison of TCP and UDP. Key aspects include connection orientation, reliability, data ordering, flow control, congestion control, performance, advantages, disadvantages, and typical use cases. To effectively cover all these points, I should break down the research into several parts and possibly gather authoritative sources such as RFCs and networking texts. I will start by planning the research approach.\n</Findings>\n\nPlease create a detailed answer to the overall research brief that:\n1. Is well-organized with proper headings (# for title, ## for sections, ### for subsections)\n2. Includes specific facts and insights from the research\n3. References relevant sources using [Title](URL) format\n4. Provides a balanced, thorough analysis. Be as comprehensive as possible, and include all information that is relevant to the overall research question. People are using you for deep research and will expect detailed, comprehensive answers.\n5. Includes a \"Sources\" section at the end with all referenced links\n\nYou can structure your report in a number of different ways. Here are some examples:\n\nTo answer a question that asks you to compare two things, you might structure your report like this:\n1/ intro\n2/ overview of topic A\n3/ overview of topic B\n4/ comparison between A and B\n5/ conclusion\n\nTo answer a question that asks you to return a list of things, you might only need a single section which is the entire list.\n1/ list of things or table of things\nOr, you could choose to make each item in the list a separate section in the report. When asked for lists, you don't need an introduction or conclusion.\n1/ item 1\n2/ item 2\n3/ item 3\n\nTo answer a question that asks you to summarize a topic, give a report, or give an overview, you might structure your report like this:\n1/ overview of topic\n2/ concept 1\n3/ concept 2\n4/ concept 3\n5/ conclusion\n\nIf you think you can answer the question with a single section, you can do that too!\n1/ answer\n\nREMEMBER: Section is a VERY fluid and loose concept. You can structure your report however you think is best, including in ways that are not listed above!\nMake sure that your sections are cohesive, and make sense for the reader.\n\nFor each section of the report, do the following:\n- Use simple, clear language\n- Use ## for section title (Markdown format) for each section of the report\n- Do NOT ever refer to yourself as the writer of the report. This should be a professional report without any self-referential language. \n- Do not say what you are doing in the report. Just write the report without any commentary from yourself.\n- Each section should be as long as necessary to deeply answer the question with the information you have gathered. It is expected that sections will be fairly long and verbose. You are writing a deep research report, and users will expect a thorough answer.\n- Use bullet points to list out information when appropriate, but by default, write in paragraph form.\n\nREMEMBER:\nThe brief and research may be in English, but you need to translate this information to the right language when writing the final answer.\nMake sure the final answer report is in the SAME language as the human messages in the message history.\n\nFormat the report in clear markdown with proper structure and include source references where appropriate.\n\n<Citation Rules>\n- Assign each unique URL a single citation number in your text\n- End with ### Sources that lists each source with corresponding numbers\n- IMPORTANT: Number sources sequentially without gaps (1,2,3,4...) in the final list regardless of which sources you choose\n- Each source should be a separate line item in a list, so that in markdown it is rendered as a list.\n- Example format:\n  [1] Source Title: URL\n  [2] Source Title: URL\n- Citations are extremely important. Make sure to include these, and pay a lot of attention to getting these right. Users will often use these citations to look into more information.\n</Citation Rules>\n"
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:18:03.668429Z",
+            "attributes": {
+                "response": "{\"ai\": \"# Comparative Analysis of TCP and UDP\\n\\nThis report provides a comprehensive, structured comparison of Transmission Control Protocol (TCP) and User Datagram Protocol (UDP), focusing on their core differences, performance characteristics, advantages, disadvantages, and typical use cases. The analysis draws on authoritative sources, including RFCs and established networking literature, to ensure accuracy and depth.\\n\\n## 1. Overview of TCP and UDP\\n\\nTCP and UDP are the two primary transport layer protocols used in Internet communications. They serve different purposes by offering varying levels of reliability, connection management, and data handling.\\n\\n- **TCP (Transmission Control Protocol)** is a connection-oriented protocol that guarantees reliable data transmission between endpoints. It establishes a connection, manages data flow, and ensures data integrity.\\n  \\n- **UDP (User Datagram Protocol)** is a connectionless protocol designed for simple, fast transmission of data packets called datagrams, without guaranteeing delivery or order.\\n\\nUnderstanding their fundamental differences is essential for selecting the appropriate protocol based on application requirements.\\n\\n## 2. Core Differences\\n\\n### 2.1 Connection Orientation\\n\\n- **TCP** is inherently connection-oriented. Before data transfer begins, TCP establishes a reliable connection through a handshake process (the three-way handshake), ensuring both sender and receiver are ready for data transmission[1].\\n- **UDP** is connectionless. It transmits datagrams independently without establishing a dedicated connection beforehand, resulting in lower overhead and faster transfer[1].\\n\\n### 2.2 Reliability\\n\\n- **TCP** provides reliability through mechanisms such as acknowledgments, retransmissions, and error checking. If data packets are lost or corrupted, TCP ensures they are resent until properly received[2].\\n- **UDP** offers no guarantees of delivery, acknowledgment, or retransmission. It simply sends datagrams without confirming their arrival, making it suitable for applications tolerant to data loss[1].\\n\\n### 2.3 Data Ordering\\n\\n- **TCP** guarantees that data arrives in the same order it was sent. It manages sequencing of data segments and reassembles them correctly at the receiver's end[2].\\n- **UDP** does not guarantee order. Packets may arrive out of sequence, and it is up to the application layer to handle any necessary ordering[1].\\n\\n### 2.4 Flow Control\\n\\n- **TCP** employs flow control mechanisms like windowing to prevent the sender from overwhelming the receiver with too much data at once. This ensures efficient data transfer and avoids congestion[2].\\n- **UDP** does not implement flow control; data is transmitted as quickly as the sender can send and the network can handle, which may lead to packet loss under high traffic conditions[1].\\n\\n### 2.5 Congestion Control\\n\\n- **TCP** incorporates congestion control algorithms (such as slow start, congestion avoidance, fast retransmit, and fast recovery) to adapt to network conditions and prevent congestion collapse[2].\\n- **UDP** lacks congestion control features. Since it does not monitor network conditions, it can contribute to congestion if used excessively, especially on congested networks[1].\\n\\n## 3. Performance Characteristics\\n\\n| Aspect                         | TCP                                                   | UDP                                              |\\n|--------------------------------|--------------------------------------------------------|--------------------------------------------------|\\n| Overhead                       | Higher due to connection setup, error checking, and control | Lower because of minimal headers and no connection management |\\n| Speed                          | Slower, due to reliability mechanisms and connection overhead | Faster, as it transmits without acknowledgment or retransmission |\\n| Suitable for real-time data    | Less suitable, given its latency caused by reliability features | Well-suited, as it offers low latency and minimal delay |\\n\\n**Advantages of TCP** include guaranteed delivery and data integrity, essential for applications where data accuracy is critical. However, this comes at the expense of increased latency and overhead.\\n\\n**Advantages of UDP** include faster transmission and lower overhead, making it preferable in scenarios where speed outweighs reliability.\\n\\n**Disadvantages of TCP** include potential delays due to retransmissions and connection establishment.\\n\\n**Disadvantages of UDP** involve the risk of data loss, out-of-order delivery, and lack of retransmission.\\n\\n## 4. Typical Use Cases\\n\\n### 4.1 TCP Use Cases\\n- Web browsing (HTTP/HTTPS)\\n- Email transmission (SMTP, IMAP, POP)\\n- File transfer (FTP, SFTP)\\n- Remote login (SSH, Telnet)\\n\\nThese applications require reliable data transfer, ordered delivery, and error correction, making TCP the protocol of choice.\\n\\n### 4.2 UDP Use Cases\\n- Streaming media (audio, video)\\n- Online gaming\\n- Voice over IP (VoIP)\\n- DNS queries\\n- DHCP\\n\\nThese applications benefit from UDP's low latency and can tolerate some packet loss, making it suitable for real-time applications.\\n\\n## 5. Summary of Considerations\\n\\n| Aspect                      | TCP                              | UDP                              |\\n|-----------------------------|----------------------------------|----------------------------------|\\n| Connection                  | Yes                              | No                               |\\n| Reliability                 | Yes                              | No                               |\\n| Data Order                  | Guaranteed                       | Not guaranteed                   |\\n| Flow Control                | Yes                              | No                               |\\n| Congestion Control          | Yes                              | No                               |\\n| Overhead                    | Higher                           | Lower                            |\\n| Speed                       | Moderate to slow                 | Fast                             |\\n| Use Cases                   | Critical data transfer           | Real-time, tolerant to loss     |\\n| Performance Characteristics   | Reliable, but slower, higher overhead | Fast, low overhead, less reliable |\\n\\n## 6. Conclusion\\n\\nTCP and UDP serve distinct roles depending on application needs. TCP's reliability, connection management, and data integrity features make it suitable for applications where accuracy is paramount. In contrast, UDP's speed and simplicity are advantageous in real-time applications where minimal latency outweighs the cost of packet loss.\\n\\nChoosing between TCP and UDP requires assessing the application's tolerance for delay, data integrity needs, and network conditions. Developers should evaluate these factors carefully to optimize performance and reliability.\\n\\n## 7. References\\n\\n[1] RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \\n[2] RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768  \\n\\n### Sources\\n1. RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \\n2. RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768\"}"
+            }
+        },
+        {
+            "name": "metadata",
+            "timestamp": "2026-07-09T19:18:03.668468Z",
+            "attributes": {
+                "completion_tokens": 1289,
+                "prompt_tokens": 1118,
+                "total_tokens": 2407,
+                "finish_reason": "stop",
+                "finish_type": "success"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langgraph.graph.state.CompiledStateGraph.astream",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "66290799b6d52945",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "cdb417cce51169bc",
+    "start_time": "2026-07-09T19:17:42.416081Z",
+    "end_time": "2026-07-09T19:18:03.671420Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "<repo>/.venv/lib/python3.11/site-packages/langgraph/pregel/main.py:4090",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "agent.langgraph",
+        "entity.1.name": "LangGraph",
+        "last.inference": "011ec23e5deb0ef8:*",
+        "span.type": "agentic.invocation",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "scope.agentic.invocation": "9392a700e2ec09b772ec50979479c251",
+        "entity.count": 1,
+        "span.subtype": "content_processing",
+        "monocle.last.agent.invocation.id": "",
+        "monocle.last.agent.name": ""
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:42.416118Z",
+            "attributes": {
+                "input": "[\"What are the main differences between TCP and UDP?\"]"
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:18:03.671064Z",
+            "attributes": {
+                "response": "# Comparative Analysis of TCP and UDP\n\nThis report provides a comprehensive, structured comparison of Transmission Control Protocol (TCP) and User Datagram Protocol (UDP), focusing on their core differences, performance characteristics, advantages, disadvantages, and typical use cases. The analysis draws on authoritative sources, including RFCs and established networking literature, to ensure accuracy and depth.\n\n## 1. Overview of TCP and UDP\n\nTCP and UDP are the two primary transport layer protocols used in Internet communications. They serve different purposes by offering varying levels of reliability, connection management, and data handling.\n\n- **TCP (Transmission Control Protocol)** is a connection-oriented protocol that guarantees reliable data transmission between endpoints. It establishes a connection, manages data flow, and ensures data integrity.\n  \n- **UDP (User Datagram Protocol)** is a connectionless protocol designed for simple, fast transmission of data packets called datagrams, without guaranteeing delivery or order.\n\nUnderstanding their fundamental differences is essential for selecting the appropriate protocol based on application requirements.\n\n## 2. Core Differences\n\n### 2.1 Connection Orientation\n\n- **TCP** is inherently connection-oriented. Before data transfer begins, TCP establishes a reliable connection through a handshake process (the three-way handshake), ensuring both sender and receiver are ready for data transmission[1].\n- **UDP** is connectionless. It transmits datagrams independently without establishing a dedicated connection beforehand, resulting in lower overhead and faster transfer[1].\n\n### 2.2 Reliability\n\n- **TCP** provides reliability through mechanisms such as acknowledgments, retransmissions, and error checking. If data packets are lost or corrupted, TCP ensures they are resent until properly received[2].\n- **UDP** offers no guarantees of delivery, acknowledgment, or retransmission. It simply sends datagrams without confirming their arrival, making it suitable for applications tolerant to data loss[1].\n\n### 2.3 Data Ordering\n\n- **TCP** guarantees that data arrives in the same order it was sent. It manages sequencing of data segments and reassembles them correctly at the receiver's end[2].\n- **UDP** does not guarantee order. Packets may arrive out of sequence, and it is up to the application layer to handle any necessary ordering[1].\n\n### 2.4 Flow Control\n\n- **TCP** employs flow control mechanisms like windowing to prevent the sender from overwhelming the receiver with too much data at once. This ensures efficient data transfer and avoids congestion[2].\n- **UDP** does not implement flow control; data is transmitted as quickly as the sender can send and the network can handle, which may lead to packet loss under high traffic conditions[1].\n\n### 2.5 Congestion Control\n\n- **TCP** incorporates congestion control algorithms (such as slow start, congestion avoidance, fast retransmit, and fast recovery) to adapt to network conditions and prevent congestion collapse[2].\n- **UDP** lacks congestion control features. Since it does not monitor network conditions, it can contribute to congestion if used excessively, especially on congested networks[1].\n\n## 3. Performance Characteristics\n\n| Aspect                         | TCP                                                   | UDP                                              |\n|--------------------------------|--------------------------------------------------------|--------------------------------------------------|\n| Overhead                       | Higher due to connection setup, error checking, and control | Lower because of minimal headers and no connection management |\n| Speed                          | Slower, due to reliability mechanisms and connection overhead | Faster, as it transmits without acknowledgment or retransmission |\n| Suitable for real-time data    | Less suitable, given its latency caused by reliability features | Well-suited, as it offers low latency and minimal delay |\n\n**Advantages of TCP** include guaranteed delivery and data integrity, essential for applications where data accuracy is critical. However, this comes at the expense of increased latency and overhead.\n\n**Advantages of UDP** include faster transmission and lower overhead, making it preferable in scenarios where speed outweighs reliability.\n\n**Disadvantages of TCP** include potential delays due to retransmissions and connection establishment.\n\n**Disadvantages of UDP** involve the risk of data loss, out-of-order delivery, and lack of retransmission.\n\n## 4. Typical Use Cases\n\n### 4.1 TCP Use Cases\n- Web browsing (HTTP/HTTPS)\n- Email transmission (SMTP, IMAP, POP)\n- File transfer (FTP, SFTP)\n- Remote login (SSH, Telnet)\n\nThese applications require reliable data transfer, ordered delivery, and error correction, making TCP the protocol of choice.\n\n### 4.2 UDP Use Cases\n- Streaming media (audio, video)\n- Online gaming\n- Voice over IP (VoIP)\n- DNS queries\n- DHCP\n\nThese applications benefit from UDP's low latency and can tolerate some packet loss, making it suitable for real-time applications.\n\n## 5. Summary of Considerations\n\n| Aspect                      | TCP                              | UDP                              |\n|-----------------------------|----------------------------------|----------------------------------|\n| Connection                  | Yes                              | No                               |\n| Reliability                 | Yes                              | No                               |\n| Data Order                  | Guaranteed                       | Not guaranteed                   |\n| Flow Control                | Yes                              | No                               |\n| Congestion Control          | Yes                              | No                               |\n| Overhead                    | Higher                           | Lower                            |\n| Speed                       | Moderate to slow                 | Fast                             |\n| Use Cases                   | Critical data transfer           | Real-time, tolerant to loss     |\n| Performance Characteristics   | Reliable, but slower, higher overhead | Fast, low overhead, less reliable |\n\n## 6. Conclusion\n\nTCP and UDP serve distinct roles depending on application needs. TCP's reliability, connection management, and data integrity features make it suitable for applications where accuracy is paramount. In contrast, UDP's speed and simplicity are advantageous in real-time applications where minimal latency outweighs the cost of packet loss.\n\nChoosing between TCP and UDP requires assessing the application's tolerance for delay, data integrity needs, and network conditions. Developers should evaluate these factors carefully to optimize performance and reliability.\n\n## 7. References\n\n[1] RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \n[2] RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768  \n\n### Sources\n1. RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \n2. RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "langgraph.graph.state.CompiledStateGraph.ainvoke",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "cdb417cce51169bc",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0439c67b6b66954f",
+    "start_time": "2026-07-09T19:17:42.414332Z",
+    "end_time": "2026-07-09T19:18:03.671838Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "/private/tmp/claude-501/-Users-mohammedansari-Desktop-monocle-upstream-prs/f4972bad-ca0e-46e9-8662-d87442590546/scratchpad/fork_capture.py:44",
+        "workflow.name": "open-deep-research",
+        "entity.1.type": "agent.langgraph",
+        "monocle.last.agent.invocation.id": "66290799b6d52945",
+        "monocle.last.agent.name": "LangGraph",
+        "last.inference": "011ec23e5deb0ef8:*",
+        "span.type": "agentic.turn",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "entity.count": 1,
+        "span.subtype": "turn"
+    },
+    "events": [
+        {
+            "name": "data.input",
+            "timestamp": "2026-07-09T19:17:42.414368Z",
+            "attributes": {
+                "input": "[\"What are the main differences between TCP and UDP?\"]"
+            }
+        },
+        {
+            "name": "data.output",
+            "timestamp": "2026-07-09T19:18:03.671798Z",
+            "attributes": {
+                "response": "# Comparative Analysis of TCP and UDP\n\nThis report provides a comprehensive, structured comparison of Transmission Control Protocol (TCP) and User Datagram Protocol (UDP), focusing on their core differences, performance characteristics, advantages, disadvantages, and typical use cases. The analysis draws on authoritative sources, including RFCs and established networking literature, to ensure accuracy and depth.\n\n## 1. Overview of TCP and UDP\n\nTCP and UDP are the two primary transport layer protocols used in Internet communications. They serve different purposes by offering varying levels of reliability, connection management, and data handling.\n\n- **TCP (Transmission Control Protocol)** is a connection-oriented protocol that guarantees reliable data transmission between endpoints. It establishes a connection, manages data flow, and ensures data integrity.\n  \n- **UDP (User Datagram Protocol)** is a connectionless protocol designed for simple, fast transmission of data packets called datagrams, without guaranteeing delivery or order.\n\nUnderstanding their fundamental differences is essential for selecting the appropriate protocol based on application requirements.\n\n## 2. Core Differences\n\n### 2.1 Connection Orientation\n\n- **TCP** is inherently connection-oriented. Before data transfer begins, TCP establishes a reliable connection through a handshake process (the three-way handshake), ensuring both sender and receiver are ready for data transmission[1].\n- **UDP** is connectionless. It transmits datagrams independently without establishing a dedicated connection beforehand, resulting in lower overhead and faster transfer[1].\n\n### 2.2 Reliability\n\n- **TCP** provides reliability through mechanisms such as acknowledgments, retransmissions, and error checking. If data packets are lost or corrupted, TCP ensures they are resent until properly received[2].\n- **UDP** offers no guarantees of delivery, acknowledgment, or retransmission. It simply sends datagrams without confirming their arrival, making it suitable for applications tolerant to data loss[1].\n\n### 2.3 Data Ordering\n\n- **TCP** guarantees that data arrives in the same order it was sent. It manages sequencing of data segments and reassembles them correctly at the receiver's end[2].\n- **UDP** does not guarantee order. Packets may arrive out of sequence, and it is up to the application layer to handle any necessary ordering[1].\n\n### 2.4 Flow Control\n\n- **TCP** employs flow control mechanisms like windowing to prevent the sender from overwhelming the receiver with too much data at once. This ensures efficient data transfer and avoids congestion[2].\n- **UDP** does not implement flow control; data is transmitted as quickly as the sender can send and the network can handle, which may lead to packet loss under high traffic conditions[1].\n\n### 2.5 Congestion Control\n\n- **TCP** incorporates congestion control algorithms (such as slow start, congestion avoidance, fast retransmit, and fast recovery) to adapt to network conditions and prevent congestion collapse[2].\n- **UDP** lacks congestion control features. Since it does not monitor network conditions, it can contribute to congestion if used excessively, especially on congested networks[1].\n\n## 3. Performance Characteristics\n\n| Aspect                         | TCP                                                   | UDP                                              |\n|--------------------------------|--------------------------------------------------------|--------------------------------------------------|\n| Overhead                       | Higher due to connection setup, error checking, and control | Lower because of minimal headers and no connection management |\n| Speed                          | Slower, due to reliability mechanisms and connection overhead | Faster, as it transmits without acknowledgment or retransmission |\n| Suitable for real-time data    | Less suitable, given its latency caused by reliability features | Well-suited, as it offers low latency and minimal delay |\n\n**Advantages of TCP** include guaranteed delivery and data integrity, essential for applications where data accuracy is critical. However, this comes at the expense of increased latency and overhead.\n\n**Advantages of UDP** include faster transmission and lower overhead, making it preferable in scenarios where speed outweighs reliability.\n\n**Disadvantages of TCP** include potential delays due to retransmissions and connection establishment.\n\n**Disadvantages of UDP** involve the risk of data loss, out-of-order delivery, and lack of retransmission.\n\n## 4. Typical Use Cases\n\n### 4.1 TCP Use Cases\n- Web browsing (HTTP/HTTPS)\n- Email transmission (SMTP, IMAP, POP)\n- File transfer (FTP, SFTP)\n- Remote login (SSH, Telnet)\n\nThese applications require reliable data transfer, ordered delivery, and error correction, making TCP the protocol of choice.\n\n### 4.2 UDP Use Cases\n- Streaming media (audio, video)\n- Online gaming\n- Voice over IP (VoIP)\n- DNS queries\n- DHCP\n\nThese applications benefit from UDP's low latency and can tolerate some packet loss, making it suitable for real-time applications.\n\n## 5. Summary of Considerations\n\n| Aspect                      | TCP                              | UDP                              |\n|-----------------------------|----------------------------------|----------------------------------|\n| Connection                  | Yes                              | No                               |\n| Reliability                 | Yes                              | No                               |\n| Data Order                  | Guaranteed                       | Not guaranteed                   |\n| Flow Control                | Yes                              | No                               |\n| Congestion Control          | Yes                              | No                               |\n| Overhead                    | Higher                           | Lower                            |\n| Speed                       | Moderate to slow                 | Fast                             |\n| Use Cases                   | Critical data transfer           | Real-time, tolerant to loss     |\n| Performance Characteristics   | Reliable, but slower, higher overhead | Fast, low overhead, less reliable |\n\n## 6. Conclusion\n\nTCP and UDP serve distinct roles depending on application needs. TCP's reliability, connection management, and data integrity features make it suitable for applications where accuracy is paramount. In contrast, UDP's speed and simplicity are advantageous in real-time applications where minimal latency outweighs the cost of packet loss.\n\nChoosing between TCP and UDP requires assessing the application's tolerance for delay, data integrity needs, and network conditions. Developers should evaluate these factors carefully to optimize performance and reliability.\n\n## 7. References\n\n[1] RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \n[2] RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768  \n\n### Sources\n1. RFC 793 - Transmission Control Protocol: https://tools.ietf.org/html/rfc793  \n2. RFC 768 - User Datagram Protocol: https://tools.ietf.org/html/rfc768"
+            }
+        }
+    ],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+,{
+    "name": "workflow",
+    "context": {
+        "trace_id": "5d853757970d9be9f527ce95d1b1e4dc",
+        "span_id": "0439c67b6b66954f",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": null,
+    "start_time": "2026-07-09T19:17:42.414284Z",
+    "end_time": "2026-07-09T19:18:03.671866Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "monocle_apptrace.version": "0.8.8",
+        "monocle_apptrace.language": "python",
+        "span_source": "/private/tmp/claude-501/-Users-mohammedansari-Desktop-monocle-upstream-prs/f4972bad-ca0e-46e9-8662-d87442590546/scratchpad/fork_capture.py:44",
+        "scope.agentic.session": "odr-e4929a2d",
+        "scope.agentic.turn": "f6342be5026e91cd87a4e24b22b13fb3",
+        "workflow.name": "open-deep-research",
+        "span.type": "workflow",
+        "entity.1.name": "open-deep-research",
+        "entity.1.type": "workflow.langgraph",
+        "entity.2.type": "app_hosting.generic",
+        "entity.2.name": "generic",
+        "last.inference": "011ec23e5deb0ef8:*"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "service.name": "open-deep-research"
+        },
+        "schema_url": ""
+    }
+}
+]
