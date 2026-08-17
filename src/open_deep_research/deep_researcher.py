@@ -27,6 +27,10 @@ from open_deep_research.prompts import (
     lead_researcher_prompt,
     research_system_prompt,
     transform_messages_into_research_topic_prompt,
+    force_think_tool_supervisor_before_conduct_research_reminder,
+    force_think_tool_supervisor_after_conduct_research_reminder,
+    force_think_tool_researcher_after_call_search_tool_reminder,
+    has_mixed_think_tool_calls_reminder,
 )
 from open_deep_research.state import (
     AgentInputState,
@@ -50,6 +54,8 @@ from open_deep_research.utils import (
     openai_websearch_called,
     remove_up_to_last_ai_message,
     think_tool,
+    has_mixed_think_tool_calls,
+    get_previous_tool_name,
 )
 
 # Initialize a configurable model that we will use throughout the agent
@@ -260,6 +266,17 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
                 "research_brief": state.get("research_brief", "")
             }
         )
+
+    # Check if think_tool is mixed with other tools
+    if has_mixed_think_tool_calls(most_recent_message.tool_calls):
+        return Command(
+            goto="supervisor",
+            update={
+                "supervisor_messages": [
+                    HumanMessage(content=has_mixed_think_tool_calls_reminder)
+                ]
+            }
+        )
     
     # Step 2: Process all tool calls together (both think_tool and ConductResearch)
     all_tool_messages = []
@@ -284,6 +301,33 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
         tool_call for tool_call in most_recent_message.tool_calls 
         if tool_call["name"] == "ConductResearch"
     ]
+    
+    # Check if think_tool is called correctly before calling ConductResearch
+    if configurable.force_think_tool:
+        previous_tool_name = get_previous_tool_name(supervisor_messages)
+
+        # Ensure that think_tool is called correctly before calling ConductResearch
+        if conduct_research_calls:
+            if previous_tool_name != "think_tool":
+                return Command(
+                    goto="supervisor",
+                    update={
+                        "supervisor_messages": [
+                            HumanMessage(content=force_think_tool_supervisor_before_conduct_research_reminder)
+                        ]
+                    }
+                )
+
+        # Ensure that think_tool is called correctly after calling ConductResearch
+        if previous_tool_name == "ConductResearch" and most_recent_message.tool_calls[0]["name"] != "think_tool":
+            return Command(
+                goto="supervisor",
+                update={
+                    "supervisor_messages": [
+                        HumanMessage(content=force_think_tool_supervisor_after_conduct_research_reminder)
+                    ]
+                }
+            )
     
     if conduct_research_calls:
         try:
@@ -463,6 +507,17 @@ async def researcher_tools(state: ResearcherState, config: RunnableConfig) -> Co
     if not has_tool_calls and not has_native_search:
         return Command(goto="compress_research")
     
+    # Check if think_tool is mixed with other tools
+    if has_mixed_think_tool_calls(most_recent_message.tool_calls):
+        return Command(
+            goto="researcher",
+            update={
+                "researcher_messages": [
+                    HumanMessage(content=has_mixed_think_tool_calls_reminder)
+                ],
+            }
+        )
+    
     # Step 2: Handle other tool calls (search, MCP tools, etc.)
     tools = await get_all_tools(config)
     tools_by_name = {
@@ -472,6 +527,22 @@ async def researcher_tools(state: ResearcherState, config: RunnableConfig) -> Co
     
     # Execute all tool calls in parallel
     tool_calls = most_recent_message.tool_calls
+
+    # Check if think_tool is called correctly
+    if configurable.force_think_tool:
+        
+        previous_tool_name = get_previous_tool_name(researcher_messages)
+
+        # Ensure that think_tool is called correctly after calling other tools
+        if previous_tool_name and previous_tool_name != "think_tool" and tool_calls[0]["name"] != "think_tool":
+            return Command(
+                goto="researcher",
+                update={
+                    "researcher_messages": [
+                        HumanMessage(content=force_think_tool_researcher_after_call_search_tool_reminder)
+                    ]
+                }
+            )
     tool_execution_tasks = [
         execute_tool_safely(tools_by_name[tool_call["name"]], tool_call["args"], config) 
         for tool_call in tool_calls
