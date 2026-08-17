@@ -1,14 +1,80 @@
-# 🔬 Open Deep Research
+# PaperDeepResearcher
+
+Computer Science literature deep research agent, forked from [LangChain Open Deep Research](https://github.com/langchain-ai/open_deep_research).
+
+PaperDeepResearcher adapts a general-purpose deep research agent into a paper-focused research assistant for CS literature review. It focuses on academic-source retrieval, metadata reliability, evidence traceability, and Chinese report generation for students and researchers who need to survey papers quickly without losing citation grounding.
+
+## Why This Fork
+
+This project was built after an earlier ScholarAgent prototype exposed several recurring problems:
+
+- paper metadata was brittle, especially venue fields
+- summaries and abstracts stayed English-only for Chinese research workflows
+- duplicate papers from multiple sources were hard to control
+- reports were often abstract-level and lacked traceable evidence
+- frontend polish was less important than fixing the research pipeline first
+
+PaperDeepResearcher keeps the Open Deep Research foundation, but adds a dedicated CS paper workflow before investing in a new UI.
+
+## What I Added
+
+- arXiv and Semantic Scholar paper retrieval with injectable clients for testing
+- CS-focused query planning that turns Chinese or English questions into English search queries
+- metadata normalization for titles, authors, abstracts, dates, venues, identifiers, and source URLs
+- conservative deduplication across academic sources
+- explainable reranking with visible reasons for top candidates
+- PDF evidence extraction for top papers when full text is available
+- Chinese literature review reports grounded in numbered evidence snippets
+- offline unit tests for the paper research workflow
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Research question<br/>Chinese or English"] --> B["Query planner<br/>5-8 English queries"]
+    B --> C["Paper sources<br/>arXiv + Semantic Scholar"]
+    C --> D["Normalizer<br/>metadata + identifiers"]
+    D --> E["Deduplicator<br/>DOI/arXiv/S2/title fallback"]
+    E --> F["Ranker<br/>top 10 with reasons"]
+    F --> G["PDF reader<br/>top 3 when available"]
+    G --> H["Evidence store<br/>numbered snippets"]
+    H --> I["Chinese report writer<br/>literature review + appendix"]
+```
+
+## Difference From Open Deep Research
+
+| Area | Upstream Open Deep Research | PaperDeepResearcher fork |
+| --- | --- | --- |
+| Research target | General deep research tasks | Computer science paper literature review |
+| Search sources | Web/search providers and MCP tools | arXiv and Semantic Scholar paper sources |
+| Metadata handling | General web result summaries | Paper schema with venue, authors, identifiers, abstracts, and source provenance |
+| Ranking | General research planning and synthesis | Explainable paper relevance ranking |
+| Reading depth | Web pages and summarized findings | PDF evidence extraction for top papers when available |
+| Output | General research report | Chinese literature review with evidence appendix |
+
+## Verification
+
+The paper research mode is covered by offline unit tests:
+
+```bash
+python -m pytest tests/unit_tests/paper_research -q
+```
+
+Latest local verification:
+
+```text
+23 passed
+```
+
+## Suggested Resume Bullet
+
+> Forked and extended LangChain Open Deep Research into a CS literature research agent, adding arXiv and Semantic Scholar retrieval, metadata normalization, evidence-grounded PDF reading, reranking, and Chinese literature review generation with citation traceability.
+
+## Upstream Project
 
 <img width="1388" height="298" alt="full_diagram" src="https://github.com/user-attachments/assets/12a2371b-8be2-4219-9b48-90503eb43c69" />
 
 Deep research has broken out as one of the most popular agent applications. This is a simple, configurable, fully open source deep research agent that works across many model providers, search tools, and MCP servers. It's performance is on par with many popular deep research agents ([see Deep Research Bench leaderboard](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard)).
-
-## PaperDeepResearcher Fork
-
-This working branch adapts Open Deep Research into a computer science literature research agent. The first version focuses on paper-source retrieval, metadata normalization, explainable reranking, PDF evidence extraction, and Chinese evidence-grounded literature review output.
-
-See `docs/paper_deep_researcher.md` for the fork goals and MVP scope.
 
 <img width="817" height="666" alt="Screenshot 2025-07-13 at 11 21 12 PM" src="https://github.com/user-attachments/assets/052f2ed3-c664-4a4f-8ec2-074349dcaa3f" />
 
@@ -153,17 +219,3 @@ The `src/legacy/` folder contains two earlier implementations that provide alter
 - **Parallel Processing**: Multiple researchers work simultaneously
 - **Speed Optimized**: Faster report generation through concurrency
 - **MCP Support**: Extensive Model Context Protocol integration
-
-## PaperDeepResearcher Mode
-
-This fork adds a computer science literature research mode on top of Open Deep Research.
-
-The first version focuses on:
-
-- arXiv and Semantic Scholar paper metadata
-- query planning for CS literature search
-- deduplication and explainable reranking
-- top-paper PDF evidence extraction
-- Chinese literature review reports with evidence references
-
-The mode intentionally avoids Google Scholar scraping and a new frontend in the first version.
