@@ -143,12 +143,12 @@ You can use any of the tools provided to you to find resources that can help ans
 </Task>
 
 <Available Tools>
-You have access to two main tools:
-1. **tavily_search**: For conducting web searches to gather information
+You have access to these tools:
+1. **Search tools** (examples: `web_search`, `tavily_search`, `you_search` depending on configuration): Use them to conduct web searches and gather information
 2. **think_tool**: For reflection and strategic planning during research
 {mcp_prompt}
 
-**CRITICAL: Use think_tool after each search to reflect on results and plan next steps. Do not call think_tool with the tavily_search or any other tools. It should be to reflect on the results of the search.**
+**CRITICAL: Use think_tool after each search to reflect on results and plan next steps. Do not call think_tool in the same turn as any search or MCP tools—it should only be used to reflect on the results of the previous search.**
 </Available Tools>
 
 <Instructions>
