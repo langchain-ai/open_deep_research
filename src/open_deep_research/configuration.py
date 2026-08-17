@@ -161,11 +161,11 @@ class Configuration(BaseModel):
         }
     )
     research_model_max_tokens: int = Field(
-        default=10000,
+        default=2048,
         metadata={
             "x_oap_ui_config": {
                 "type": "number",
-                "default": 10000,
+                "default": 2048,
                 "description": "Maximum output tokens for research model"
             }
         }
@@ -201,11 +201,11 @@ class Configuration(BaseModel):
         }
     )
     final_report_model_max_tokens: int = Field(
-        default=10000,
+        default=2048,
         metadata={
             "x_oap_ui_config": {
                 "type": "number",
-                "default": 10000,
+                "default": 2048,
                 "description": "Maximum output tokens for final report model"
             }
         }
