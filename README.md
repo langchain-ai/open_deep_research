@@ -80,6 +80,24 @@ Open Deep Research supports a wide range of search tools. By default it uses the
 
 See the fields in the [configuration.py](https://github.com/langchain-ai/open_deep_research/blob/main/src/open_deep_research/configuration.py) for various other settings to customize the behavior of Open Deep Research. 
 
+#### Monocle Tracing
+
+Open Deep Research also supports [Monocle](https://github.com/monocle2ai/monocle), an OpenTelemetry-based tracer for agentic applications. It records each run end-to-end: LLM calls, agent steps, and tool invocations, with inputs, outputs, timings, and token counts.
+
+Install the optional extra and add the following to your `.env` file:
+
+```bash
+pip install "open_deep_research[monocle]"
+```
+
+```bash
+MONOCLE_TRACING=true
+MONOCLE_EXPORTERS=file          # file, console, okahu, s3, blob, gcs (default: file)
+OKAHU_API_KEY=okh_xxxxxxxx      # required only for the `okahu` exporter
+```
+
+Each run writes one trace file to `.monocle/`; open it in the [Monocle VS Code extension](https://marketplace.visualstudio.com/items?itemName=OkahuAI.monocle-apptrace). Connect to [Okahu](https://www.okahu.ai) to analyze traces across runs (via the `okahu` exporter).
+
 ### 📊 Evaluation
 
 Open Deep Research is configured for evaluation with [Deep Research Bench](https://huggingface.co/spaces/Ayanami0730/DeepResearch-Leaderboard). This benchmark has 100 PhD-level research tasks (50 English, 50 Chinese), crafted by domain experts across 22 fields (e.g., Science & Tech, Business & Finance) to mirror real-world deep-research needs. It has 2 evaluation metrics, but the leaderboard is based on the RACE score. This uses LLM-as-a-judge (Gemini) to evaluate research reports against a golden set of reports compiled by experts across a set of metrics.

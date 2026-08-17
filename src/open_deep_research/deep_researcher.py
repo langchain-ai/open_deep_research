@@ -1,6 +1,7 @@
 """Main LangGraph implementation for the Deep Research agent."""
 
 import asyncio
+import os
 from typing import Literal
 
 from langchain.chat_models import init_chat_model
@@ -51,6 +52,33 @@ from open_deep_research.utils import (
     remove_up_to_last_ai_message,
     think_tool,
 )
+
+def _setup_monocle_tracing() -> None:
+    """Optional Monocle observability, gated by MONOCLE_TRACING (see .env.example). No-op when off."""
+    if os.getenv("MONOCLE_TRACING", "").strip().lower() not in ("1", "true", "yes", "on"):
+        return
+    allowed = ("file", "console", "okahu", "s3", "blob", "gcs")
+    # App owns MONOCLE_EXPORTERS: validate here so a typo fails fast, then forward as-is.
+    exporters = os.getenv("MONOCLE_EXPORTERS", "").strip() or "file"
+    selected = [e.strip() for e in exporters.split(",") if e.strip()]
+    unknown = [e for e in selected if e not in allowed]
+    if unknown:
+        raise ValueError(
+            f"MONOCLE_EXPORTERS has unknown exporter(s): {', '.join(unknown)}. Allowed: {', '.join(allowed)}."
+        )
+    if "okahu" in selected and not os.getenv("OKAHU_API_KEY"):
+        raise ValueError("Monocle 'okahu' exporter is selected but OKAHU_API_KEY is not set.")
+    try:
+        from monocle_apptrace import setup_monocle_telemetry
+    except ImportError as exc:
+        raise RuntimeError(
+            "MONOCLE_TRACING is enabled but monocle_apptrace is not installed. "
+            'Install the \'monocle\' extra: pip install "open_deep_research[monocle]".'
+        ) from exc
+    setup_monocle_telemetry(workflow_name="open-deep-research", monocle_exporters_list=exporters)
+
+
+_setup_monocle_tracing()
 
 # Initialize a configurable model that we will use throughout the agent
 configurable_model = init_chat_model(
