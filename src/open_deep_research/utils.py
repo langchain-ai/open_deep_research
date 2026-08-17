@@ -87,6 +87,7 @@ async def tavily_search(
         model=configurable.summarization_model,
         max_tokens=configurable.summarization_model_max_tokens,
         api_key=model_api_key,
+        base_url=get_base_url_for_model(configurable.summarization_model, config),
         tags=["langsmith:nostream"]
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
@@ -901,6 +902,8 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return api_keys.get("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return api_keys.get("ANTHROPIC_API_KEY")
+        elif model_name.startswith("deepseek:"):
+            return api_keys.get("DEEPSEEK_API_KEY")
         elif model_name.startswith("google"):
             return api_keys.get("GOOGLE_API_KEY")
         return None
@@ -909,9 +912,25 @@ def get_api_key_for_model(model_name: str, config: RunnableConfig):
             return os.getenv("OPENAI_API_KEY")
         elif model_name.startswith("anthropic:"):
             return os.getenv("ANTHROPIC_API_KEY")
+        elif model_name.startswith("deepseek:"):
+            return os.getenv("DEEPSEEK_API_KEY")
         elif model_name.startswith("google"):
             return os.getenv("GOOGLE_API_KEY")
         return None
+
+def get_base_url_for_model(model_name: str, config: RunnableConfig):
+    """Get provider-specific base URL overrides from environment or config."""
+    should_get_from_config = os.getenv("GET_API_KEYS_FROM_CONFIG", "false")
+    model_name = model_name.lower()
+    if not model_name.startswith("deepseek:"):
+        return None
+
+    if should_get_from_config.lower() == "true":
+        api_keys = config.get("configurable", {}).get("apiKeys", {})
+        if not api_keys:
+            return None
+        return api_keys.get("DEEPSEEK_BASE_URL")
+    return os.getenv("DEEPSEEK_BASE_URL")
 
 def get_tavily_api_key(config: RunnableConfig):
     """Get Tavily API key from environment or config."""

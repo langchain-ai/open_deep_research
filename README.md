@@ -142,6 +142,24 @@ Open Deep Research supports a wide range of LLM providers via the [init_chat_mod
 
 > Note: the selected model will need to support [structured outputs](https://python.langchain.com/docs/integrations/chat/) and [tool calling](https://python.langchain.com/docs/how_to/tool_calling/).
 
+##### DeepSeek
+
+This fork supports DeepSeek through `langchain-deepseek`. Add these values to `.env`:
+
+```env
+DEEPSEEK_API_KEY=your_deepseek_key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+```
+
+Then set the model fields in LangGraph Studio to a DeepSeek model, for example:
+
+- **Summarization**: `deepseek:deepseek-v4-flash`
+- **Research**: `deepseek:deepseek-v4-flash`
+- **Compression**: `deepseek:deepseek-v4-flash`
+- **Final Report Model**: `deepseek:deepseek-v4-flash`
+
+DeepSeek does not provide OpenAI or Anthropic native web search. Use Tavily, MCP tools, or the PaperDeepResearcher arXiv/Semantic Scholar workflow for retrieval.
+
 > Note: For OpenRouter: Follow [this guide](https://github.com/langchain-ai/open_deep_research/issues/75#issuecomment-2811472408) and for local models via Ollama  see [setup instructions](https://github.com/langchain-ai/open_deep_research/issues/65#issuecomment-2743586318).
 
 #### Search API :mag:
