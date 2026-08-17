@@ -54,7 +54,8 @@ from open_deep_research.utils import (
 
 # Initialize a configurable model that we will use throughout the agent
 configurable_model = init_chat_model(
-    configurable_fields=("model", "max_tokens", "api_key"),
+    configurable_fields=("model", "max_tokens", "api_key", 
+        "openai_api_base", "model_provider", )
 )
 
 async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Command[Literal["write_research_brief", "__end__"]]:
@@ -82,7 +83,9 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
         "model": configurable.research_model,
         "max_tokens": configurable.research_model_max_tokens,
         "api_key": get_api_key_for_model(configurable.research_model, config),
-        "tags": ["langsmith:nostream"]
+        "tags": ["langsmith:nostream"], 
+        "openai_api_base": configurable.openai_api_base, 
+        "model_provider": configurable.research_model_provider, 
     }
     
     # Configure model with structured output and retry logic
@@ -135,7 +138,10 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
         "model": configurable.research_model,
         "max_tokens": configurable.research_model_max_tokens,
         "api_key": get_api_key_for_model(configurable.research_model, config),
-        "tags": ["langsmith:nostream"]
+        "tags": ["langsmith:nostream"], 
+        "openai_api_base" : configurable.openai_api_base, 
+        "model_provider": configurable.research_model_provider, 
+
     }
     
     # Configure model for structured research question generation
@@ -195,7 +201,9 @@ async def supervisor(state: SupervisorState, config: RunnableConfig) -> Command[
         "model": configurable.research_model,
         "max_tokens": configurable.research_model_max_tokens,
         "api_key": get_api_key_for_model(configurable.research_model, config),
-        "tags": ["langsmith:nostream"]
+        "tags": ["langsmith:nostream"], 
+        "openai_api_base" : configurable.openai_api_base,  
+        "model_provider": configurable.research_model_provider, 
     }
     
     # Available tools: research delegation, completion signaling, and strategic thinking
@@ -393,7 +401,9 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
         "model": configurable.research_model,
         "max_tokens": configurable.research_model_max_tokens,
         "api_key": get_api_key_for_model(configurable.research_model, config),
-        "tags": ["langsmith:nostream"]
+        "tags": ["langsmith:nostream"], 
+        "openai_api_base" : configurable.openai_api_base,  
+        "model_provider": configurable.research_model_provider, 
     }
     
     # Prepare system prompt with MCP context if available
@@ -628,7 +638,9 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
         "model": configurable.final_report_model,
         "max_tokens": configurable.final_report_model_max_tokens,
         "api_key": get_api_key_for_model(configurable.final_report_model, config),
-        "tags": ["langsmith:nostream"]
+        "tags": ["langsmith:nostream"], 
+        "openai_api_base" : configurable.openai_api_base,  
+        "model_provider": configurable.final_report_model_provider, 
     }
     
     # Step 3: Attempt report generation with token limit retry logic

@@ -86,8 +86,8 @@ async def tavily_search(
     summarization_model = init_chat_model(
         model=configurable.summarization_model,
         max_tokens=configurable.summarization_model_max_tokens,
-        api_key=model_api_key,
-        tags=["langsmith:nostream"]
+        openai_api_base=configurable.openai_api_base, 
+        model_provider=configurable.summarization_model_provider, 
     ).with_structured_output(Summary).with_retry(
         stop_after_attempt=configurable.max_structured_output_retries
     )
